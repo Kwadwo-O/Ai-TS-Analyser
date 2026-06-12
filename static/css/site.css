@@ -1,5 +1,5 @@
 ﻿/* ==========================================================================
-   COLOR PALETTE VARIABLES (Coolors: 8a4f7d-887880-88a096-bbab8b-ef8275)
+   COLOR PALETTE VARIABLES (Coolors: https://coolors.co/8a4f7d-887880-88a096-bbab8b-ef8275)
    ========================================================================== */
 :root {
     /* Brand Accent Focal Point (Vibrant Coral) */
@@ -21,11 +21,16 @@
     --success: #88a096;
     --success-hover: #6e867c;
 
-    background-color: var(--background);
+    /* Additional Utility Colors */
+    --button-color: #8a4f7d; /* Base color for buttons */
+    --button-hover-color: #734068; /* Hover color for buttons */
+
+
+
 }
 
 
-.header {
+.top-bar {
   position: sticky;
   top:0;
   display: flex;
@@ -38,24 +43,14 @@
   button {
     font-weight: bold;
     background-color: var(--button-color);
-    color: var(--text-color);
+    color: var(--button-hover-color);
     padding: 10px 25px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 20px;
-    border: 2px solid var(--button-color);
+    border: 2px solid var(--button-hover-color);
     box-shadow: 0px 0px;
     transition: box-shadow .1s ease-in-out;
-  }
-
-  img {
-    width: 125px;
-    height: 61px;
-    transition: transform .2s ease-in-out;
-  }
-
-  img:hover {
-      transform: scale(1.05);
   }
   button:hover {
     /* transform: scale(1.1); */
