@@ -2,10 +2,21 @@
 {% block title %}AI Typing Speed Analyser{% endblock %}
 
 {% block content %}
+<div id="api-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+        <h2><span class="ai-sparkle">🔑</span> Setup OpenRouter API Key</h2>
+        <p>To generate dynamic AI sentences, please enter your OpenRouter API key. This key is saved locally in your own browser storage and is never sent to a backend server.</p>
+        <input type="password" id="api-key-input" placeholder="sk-or-v1-..." />
+        <button id="save-key-btn" class="btn primary-btn">Save Key & Start</button>
+        <p class="modal-warning">Warning: Keep your keys private. Never share them publicly.</p>
+    </div>
+</div>
+
 <div class="analyzer-container">
     <header class="app-header">
         <h1>AI Typing Speed Analyser</h1>
         <p class="subtitle">Test your speed and receive smart, AI-driven performance feedback.</p>
+        <button id="clear-key-btn" class="text-link-btn">Change API Key</button>
     </header>
 
     <div class="metrics-row">
@@ -28,9 +39,8 @@
     </div>
 
     <div class="game-section">
-        <div class="text-display" id="text-challenge">
-            </div>
-        <textarea id="typing-input" placeholder="Click here and start typing to begin the test..." disabled></textarea>
+        <div class="text-display" id="text-challenge">Loading application configurations...</div>
+        <textarea id="typing-input" placeholder="Click 'Start Typing Test' below to begin..." disabled></textarea>
         <button id="start-btn" class="btn primary-btn">Start Typing Test</button>
     </div>
 
