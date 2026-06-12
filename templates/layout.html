@@ -1,14 +1,57 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Bean & Brew | Premium Coffee Roasters{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="body-content">
+
+    <header class="header">
+        <span class="text-logo-container">
+            <img src="{{ url_for('static', filename='images/Bean-Brew-TopBar.png') }}" alt="Bean & Brew Logo" id="home-logo" onclick="window.location.href='/'">
+        </span>
+
+        <span class="header-button-container">
+            <button id="MenuBtn" type="button" onclick="window.location.href='/menu'">Menu</button>
+            <button id="InfoBtn" type="button" onclick="window.location.href='/info'">Info</button>
+            <button id="BookingBtn" type="button" onclick="window.location.href='/booking'">Booking</button>
+
+            <span class="login-register-container">
+                <button id="LoginBtn" type="button" onclick="window.location.href='/login'">Login</button>
+                <button id="RegisterBtn" type="button" onclick="window.location.href='/register'">Register</button>
+            </span>
+        </span>
+    </header>
+
+
+    <section class="hero-title-section">
+        <div class="hero-container">
+            <span class="hero-badge">Est. 2026</span>
+
+            <h1 class="hero-title">Crafting Moments, <span class="text-highlight">One Brew</span> at a Time.</h1>
+
+            <p class="hero-subtitle">Welcome to Bean & Brew. Experience artisan coffee roasted to absolute perfection, curated daily menus, and seamless table bookings tailored to your day.</p>
+        </div>
+    </section>
+
+
+    <main class="main-wrapper">
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+    {% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    {% endblock %}
+
 </body>
 </html>

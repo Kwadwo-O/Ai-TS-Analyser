@@ -1,234 +1,148 @@
-﻿:root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --background: #f8fafc;
+﻿/* ==========================================================================
+   COLOR PALETTE VARIABLES (Coolors: 8a4f7d-887880-88a096-bbab8b-ef8275)
+   ========================================================================== */
+:root {
+    /* Brand Accent Focal Point (Vibrant Coral) */
+    --primary: #ef8275;
+    --primary-hover: #e06d60;
+
+    /* Backgrounds & Canvas Surfaces */
+    --background: #f4f6f5; /* Light tint inspired by Sage Green #88A096 */
     --surface: #ffffff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --success: #10b981;
+
+    /* Typography Hierarchy (Deep Plum & Muted Mauve) */
+    --text-main: #2d1628;  /* Enhanced dark contrast derivative of Plum #8A4F7D */
+    --text-muted: #887880; /* Neutral mid-tone mauve-grey */
+
+    /* Structural Framework Borders (Warm Khaki Accent) */
+    --border: #e6e0d3;     /* Light desaturated tone of Khaki #BBAB8B */
+
+    /* Validation & Success States (Sage Green) */
+    --success: #88a096;
+    --success-hover: #6e867c;
 }
 
+/* ==========================================================================
+   GLOBAL RESET & STRUCTURE
+   ========================================================================== */
 body {
     background-color: var(--background);
     color: var(--text-main);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-.analyzer-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 20px;
+/* ==========================================================================
+   HEADER / TOPBAR NAVIGATION NAVIGATION
+   ========================================================================== */
+.header {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(45, 22, 40, 0.04); /* Subtly tinted shadow matching text-main */
+    box-sizing: border-box;
+    padding: 0 40px;
+    height: 70px;
+
+    /* Flexbox Alignment across horizontal spatial coordinates */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.app-header {
-    text-align: center;
-    margin-bottom: 40px;
+/* Brand/Logo Target Wrap Positioning */
+.text-logo-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
-.app-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 8px;
-    color: #0f172a;
+#home-logo {
+    height: 42px; /* Uniform constraint boundary size */
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.subtitle { color: var(--text-muted); font-size: 1.1rem; }
+#home-logo:hover {
+    transform: scale(1.03); /* Tiny reactive hover push state */
+}
 
-.text-link-btn {
+/* Navigation & Access Button Containers */
+.header-button-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+}
+
+.login-register-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 1px solid var(--border);
+    padding-left: 16px;
+    margin-left: 4px;
+}
+
+/* ==========================================================================
+   BUTTON STRUCTURAL STATES (Layout Theme Integration)
+   ========================================================================== */
+
+/* Base configuration setup for all generic functional buttons inside header */
+.header-button-container button {
     background: none;
     border: none;
     color: var(--text-muted);
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 0.9rem;
-    margin-top: 10px;
-}
-.text-link-btn:hover { color: var(--primary); }
-
-/* Key Metrics Columns */
-.metrics-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.metric-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.metric-value {
-    display: block;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.metric-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: 0.95rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* Typing Interface Styles */
-.game-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    margin-bottom: 40px;
-}
-
-.text-display {
-    font-size: 1.35rem;
-    line-height: 2rem;
-    letter-spacing: 0.5px;
-    margin-bottom: 25px;
-    color: #475569;
-    user-select: none;
-    background: #f1f5f9;
-    padding: 20px;
-    border-radius: 8px;
-    min-height: 60px;
-}
-
-.char-correct { color: var(--success); }
-.char-incorrect { color: #ef4444; background-color: #fee2e2; border-radius: 2px; }
-.char-current { border-bottom: 2px solid var(--primary); animation: blink 1s infinite; }
-
-@keyframes blink { 50% { border-color: transparent; } }
-
-textarea {
-    width: 100%;
-    height: 120px;
-    padding: 15px;
-    box-sizing: border-box;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 1.1rem;
-    resize: none;
-    margin-bottom: 20px;
-}
-textarea:focus { outline: none; border-color: var(--primary); }
-
-.btn {
-    display: block;
-    width: 200px;
-    margin: 0 auto;
-    padding: 12px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
+    padding: 8px 16px;
     cursor: pointer;
-    border: none;
-    transition: background 0.2s;
-}
-.primary-btn { background: var(--primary); color: white; }
-.primary-btn:hover { background: var(--primary-hover); }
-
-/* Dashboard Content Wrappers */
-.hidden { display: none !important; }
-.section-divider { border: 0; height: 1px; background: var(--border); margin: 40px 0; }
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 20px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-.insights-card, .chart-card {
-    background: var(--surface);
+/* Standard Link Button Hover Interactions */
+#MenuBtn:hover, #InfoBtn:hover, #BookingBtn:hover, #LoginBtn:hover {
+    color: var(--text-main);
+    background-color: var(--background);
+}
+
+/* High Contrast Primary Action Anchor Callout (Register Button) */
+#RegisterBtn {
+    background-color: var(--primary);
+    color: var(--surface) !important; /* Force override structural base text link properties color */
+    border: 1px solid var(--primary);
+    box-shadow: 0 2px 4px rgba(239, 130, 117, 0.2);
+}
+
+#RegisterBtn:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    box-shadow: 0 4px 8px rgba(239, 130, 117, 0.3);
+}
+
+/* Unique structural emphasis treatment on Booking Button to stand out slightly */
+#BookingBtn {
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 25px;
-}
-
-.ai-sparkle { color: #eab308; }
-.ai-feedback-box {
-    background: #f0fdf4;
-    border-left: 4px solid var(--success);
-    padding: 15px;
-    border-radius: 4px;
-    font-style: italic;
-    color: #166534;
-    line-height: 1.6rem;
-}
-
-/* Performance Progress Visual Analytics Graph Module */
-.mock-chart {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 200px;
-    padding-top: 20px;
-}
-.bar-container {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    height: 160px;
-    border-bottom: 2px solid var(--border);
-    padding: 0 10px;
-}
-.bar {
-    width: 60px;
-    background: #cbd5e1;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    position: relative;
-    transition: height 1s ease-out;
-}
-.bar span {
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.8rem;
-    font-weight: 700;
     color: var(--text-main);
 }
-.session-1 { height: 40%; }
-.session-2 { height: 55%; }
-.session-3 { height: 72%; }
-.current-session { background: var(--primary); }
-.current-session span { color: var(--primary); }
-.chart-labels { display: flex; justify-content: space-between; padding: 8px 10px 0; font-size: 0.85rem; color: var(--text-muted); }
-.chart-labels .highlight { color: var(--primary); font-weight: 700; }
+#BookingBtn:hover {
+    border-color: var(--text-main);
+    background: none;
+}
 
-/* Modal Access Overlay UI Component */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999;
+/* ==========================================================================
+   MAIN VIEWPORT PAGE WRAPPER BOUNDARIES
+   ========================================================================== */
+.main-wrapper, .body-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 45px 20px;
+    box-sizing: border-box;
 }
-.modal-card {
-    background: var(--surface);
-    padding: 40px;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-    text-align: center;
-}
-.modal-card h2 { margin-top: 0; color: #0f172a; }
-.modal-card p { color: var(--text-muted); line-height: 1.5rem; margin-bottom: 25px; }
-.modal-card input {
-    width: 100%; padding: 12px; border: 2px solid var(--border);
-    border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-size: 1rem;
-}
-.modal-card input:focus { outline: none; border-color: var(--primary); }
-.modal-warning { font-size: 0.8rem !important; color: #ef4444 !important; margin-top: 15px; font-weight: 600; }
