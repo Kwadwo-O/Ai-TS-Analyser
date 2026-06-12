@@ -1,0 +1,71 @@
+﻿{% extends "layout.html" %}
+{% block title %}AI Typing Speed Analyser{% endblock %}
+
+{% block content %}
+<div class="analyzer-container">
+    <header class="app-header">
+        <h1>AI Typing Speed Analyser</h1>
+        <p class="subtitle">Test your speed and receive smart, AI-driven performance feedback.</p>
+    </header>
+
+    <div class="metrics-row">
+        <div class="metric-card">
+            <span class="metric-value" id="wpm-display">0</span>
+            <span class="metric-label">WPM</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-value" id="accuracy-display">100%</span>
+            <span class="metric-label">Accuracy</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-value" id="errors-display">0</span>
+            <span class="metric-label">Errors</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-value" id="timer-display">30s</span>
+            <span class="metric-label">Time Left</span>
+        </div>
+    </div>
+
+    <div class="game-section">
+        <div class="text-display" id="text-challenge">
+            </div>
+        <textarea id="typing-input" placeholder="Click here and start typing to begin the test..." disabled></textarea>
+        <button id="start-btn" class="btn primary-btn">Start Typing Test</button>
+    </div>
+
+    <div class="dashboard-section hidden" id="dashboard">
+        <hr class="section-divider" />
+        <h2><span class="ai-sparkle">✨</span> AI Performance Insights</h2>
+        
+        <div class="dashboard-grid">
+            <div class="insights-card">
+                <h3>Smart Feedback</h3>
+                <div class="ai-feedback-box">
+                    <p id="ai-analysis">Analyzing your typing patterns... Please complete a test session.</p>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>Improvement Over Time</h3>
+                <div class="mock-chart">
+                    <div class="bar-container">
+                        <div class="bar session-1" style="height: 40%;"><span>42 WPM</span></div>
+                        <div class="bar session-2" style="height: 55%;"><span>58 WPM</span></div>
+                        <div class="bar session-3" style="height: 72%;"><span>75 WPM</span></div>
+                        <div class="bar current-session" id="current-bar" style="height: 0%;"><span id="current-bar-text">0 WPM</span></div>
+                    </div>
+                    <div class="chart-labels">
+                        <span>Session 1</span>
+                        <span>Session 2</span>
+                        <span>Session 3</span>
+                        <span class="highlight">Current Test</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
