@@ -20,129 +20,48 @@
     /* Validation & Success States (Sage Green) */
     --success: #88a096;
     --success-hover: #6e867c;
-}
 
-/* ==========================================================================
-   GLOBAL RESET & STRUCTURE
-   ========================================================================== */
-body {
     background-color: var(--background);
-    color: var(--text-main);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    margin: 0;
-    padding: 0;
 }
 
-/* ==========================================================================
-   HEADER / TOPBAR NAVIGATION NAVIGATION
-   ========================================================================== */
+
 .header {
-    background-color: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(45, 22, 40, 0.04); /* Subtly tinted shadow matching text-main */
-    box-sizing: border-box;
-    padding: 0 40px;
-    height: 70px;
+  position: sticky;
+  top:0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  background-color: var(--background);
+  box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.1);
 
-    /* Flexbox Alignment across horizontal spatial coordinates */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Brand/Logo Target Wrap Positioning */
-.text-logo-container {
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-#home-logo {
-    height: 42px; /* Uniform constraint boundary size */
-    width: auto;
+  button {
+    font-weight: bold;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    padding: 10px 25px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s ease;
-}
+    font-size: 20px;
+    border: 2px solid var(--button-color);
+    box-shadow: 0px 0px;
+    transition: box-shadow .1s ease-in-out;
+  }
 
-#home-logo:hover {
-    transform: scale(1.03); /* Tiny reactive hover push state */
-}
+  img {
+    width: 125px;
+    height: 61px;
+    transition: transform .2s ease-in-out;
+  }
 
-/* Navigation & Access Button Containers */
-.header-button-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    height: 100%;
-}
+  img:hover {
+      transform: scale(1.05);
+  }
+  button:hover {
+    /* transform: scale(1.1); */
+    box-shadow: 4px 4px;
+  }
 
-.login-register-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-left: 1px solid var(--border);
-    padding-left: 16px;
-    margin-left: 4px;
-}
-
-/* ==========================================================================
-   BUTTON STRUCTURAL STATES (Layout Theme Integration)
-   ========================================================================== */
-
-/* Base configuration setup for all generic functional buttons inside header */
-.header-button-container button {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    font-weight: 600;
-    padding: 8px 16px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-/* Standard Link Button Hover Interactions */
-#MenuBtn:hover, #InfoBtn:hover, #BookingBtn:hover, #LoginBtn:hover {
-    color: var(--text-main);
-    background-color: var(--background);
-}
-
-/* High Contrast Primary Action Anchor Callout (Register Button) */
-#RegisterBtn {
-    background-color: var(--primary);
-    color: var(--surface) !important; /* Force override structural base text link properties color */
-    border: 1px solid var(--primary);
-    box-shadow: 0 2px 4px rgba(239, 130, 117, 0.2);
-}
-
-#RegisterBtn:hover {
-    background-color: var(--primary-hover);
-    border-color: var(--primary-hover);
-    box-shadow: 0 4px 8px rgba(239, 130, 117, 0.3);
-}
-
-/* Unique structural emphasis treatment on Booking Button to stand out slightly */
-#BookingBtn {
-    border: 1px solid var(--border);
-    color: var(--text-main);
-}
-#BookingBtn:hover {
-    border-color: var(--text-main);
-    background: none;
-}
-
-/* ==========================================================================
-   MAIN VIEWPORT PAGE WRAPPER BOUNDARIES
-   ========================================================================== */
-.main-wrapper, .body-content {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 45px 20px;
-    box-sizing: border-box;
-}
+  button:active {
+    box-shadow: 0px 0px;
+}}
