@@ -1,14 +1,12 @@
 import requests
+import os
+import json
+
 
 #this is the backend
 #it uses openrouteservice api
 #it generates the sentence fot the typing speed test
 #and it also sends the results to the ai to decode
-
-
-import os
-import requests
-import json
 
 
 def verify_openrouter() -> bool:
