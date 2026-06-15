@@ -17,8 +17,8 @@ API_KEY = ("sk-or-v1-"
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json",
-    "HTTP-Referer": "https://localhost:3000",  # Optional but recommended by OpenRouter
-    "X-Title": "Typing Speed Test Backend"  # Optional but recommended by OpenRouter
+    "HTTP-Referer": "https://localhost:3000",
+    "X-Title": "Typing Speed Test Backend"
 }
 
 Analysis_prompt = "analise this data"
