@@ -59,6 +59,10 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/play')
+def play():
+    return render_template('Play.html')
+
 with app.app_context():
     db.create_all()
 
