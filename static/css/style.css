@@ -1,8 +1,5 @@
-﻿/* ==========================================================================
-   COLOR PALETTE VARIABLES (Coolors: https://coolors.co/8a4f7d-887880-88a096-bbab8b-ef8275)
-   ========================================================================== */
 /* ==========================================================================
-   COLOR PALETTE VARIABLES
+   COLOR PALETTE VARIABLES (Coolors: https://coolors.co/8a4f7d-887880-88a096-bbab8b-ef8275)
    ========================================================================== */
 :root {
     --primary: #ef8275;
@@ -31,6 +28,11 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
+}
+
+main {
+    background: var(--background);
+    color: var(--text-main);
 }
 
 /* ==========================================================================
@@ -108,13 +110,51 @@ body {
 }
 
 /* ==========================================================================
-   TITLE / WELCOME LAYOUT
+   TITLE, WELCOME & LOGIN HEADERS (SHARED STYLES)
    ========================================================================== */
-.title-container {
+.title-container,
+.login_header {
     max-width: 900px;
     margin: 0 auto;
     padding: 4rem 2rem;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Shared Main Heading Styles */
+.title-container h1,
+.login_header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    margin-top: 0;
+}
+
+/* Target span micro-animations if used in login page too */
+.title-container h1 span,
+.login_header h1 span {
+    color: var(--primary);
+    display: inline-block;
+    transition: transform 0.3s var(--transition-smooth);
+}
+
+.title-container h1:hover span,
+.login_header h1:hover span {
+    transform: scale(1.05);
+}
+
+/* Shared Description Text Styles */
+.title-description,
+.login_header p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 650px;
+    margin: 0 auto 2.5rem auto;
 }
 
 .title-badge {
@@ -137,43 +177,10 @@ body {
     transform: translateY(-2px);
 }
 
-.title-container h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-}
-
-.title-container h1 span {
-    color: var(--primary);
-    display: inline-block;
-    transition: transform 0.3s var(--transition-smooth);
-}
-
-.title-container h1:hover span {
-    transform: scale(1.05);
-}
-
-.title-description {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    max-width: 650px;
-    margin: 0 auto 2.5rem auto;
-}
-
 /* ==========================================================================
-   LOGIN / WELCOME LAYOUT
+   LOGIN FORM LAYOUT
    ========================================================================== */
-
 .login_content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.login_header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -188,6 +195,7 @@ body {
     text-align: left;
     background: var(--surface);
     border: 1px solid var(--border);
+    margin-bottom: 4rem; /* Adds balanced spacing under the form card */
 }
 
 .login-group input {
@@ -232,19 +240,6 @@ body {
 
 .btn-login:active {
     transform: translateY(0);
-}
-
-main {
-    background: var(--background);
-    color: var(--text-main);
-}
-
-.login_header h1 {
-    color: var(--text-main);
-}
-
-.login_header p {
-    color: var(--text-muted);
 }
 
 /* ==========================================================================
