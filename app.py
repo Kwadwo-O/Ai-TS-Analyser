@@ -1,8 +1,9 @@
-﻿from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
+from backend import backend_generate, backend_send, verify_openrouter
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
@@ -62,6 +63,10 @@ def logout():
 @app.route('/play')
 def play():
     return render_template('Play.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('Dashboard.html')
 
 with app.app_context():
     db.create_all()
