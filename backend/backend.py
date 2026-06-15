@@ -10,11 +10,10 @@ URL = "https://openrouter.ai/api/v1/key"
 #and it also sends the results to the ai to decode
 
 
-def verify_openrouter(api_key):
+def verify_openrouter():
 
 
+def backend_generate():
 
-def backend_generate(api_key):
 
-
-def backend_send(api_key, original_sentence, user_sentence, time):
+def backend_send(original_sentence, user_sentence, time):
