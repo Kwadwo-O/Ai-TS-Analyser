@@ -8,7 +8,7 @@ and it also sends the results to the AI to decode
 import requests
 import json
 
-MODEL = "openrouter/free"
+MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 API_KEY = ("sk-or-v1-"
            "817b25c971cdfe90b3847536e74b3bbcba48c5ddc85ea023b5d93f3b54c7cb0f")
 HEADERS = {
@@ -59,14 +59,18 @@ def backend_send(original_sentence, user_sentence, time, typing_speed):
     analise this data and give accurate data.
     give me the data in json format:
     (
-      "text_analysis": (), # analysis of the typing speed make it detailed and stated the user 
+      "text_analysis": (), # analysis of the typing speed make it detailed and stated the user (just text) like in text give description 
       "user_rating": (), the rating of the user like average, beginner or pro ect
-      "score": (), # the users score out of 100
+      "score": (), # the users score out of 100%
       "accuracy": (), # how accurate the user is 
-      "mistakes": [], add the word they wrote wrong and the correct spelling
+      "mistakes": [
+        "correct word": "incorrect word"
+      ], add the word they wrote wrong and the correct spelling correct word in the first stretchmarks and incorrect for the second brackets if no mistake is made do not return anything
     )
     """
-    print(send_data(prompt))
+    data = send_data(prompt).strip("```json")
+    data = json.loads(data)
+    print(f"response:{data["text_analysis"]}")
 
 
 
