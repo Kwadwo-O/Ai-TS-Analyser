@@ -1,12 +1,26 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{% block title %}Typing Speed Analyser{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Typing Speed Analyser{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block styles %}{% endblock %}
 </head>
 <body>
-    <nav>
 
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">⌨️ AI TS Analyser</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/play" class="nav-link">Play</a></li>
+                <li><a href="/login" class="nav-link">Login</a></li>
+                <li><a href="/register" class="nav-link">Register</a></li>
+            </ul>
+        </div>
     </nav>
+
     <main class="main-wrapper">
         {% block content %}
         {% endblock %}

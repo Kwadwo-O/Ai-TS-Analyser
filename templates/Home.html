@@ -1,6 +1,35 @@
 ﻿{% extends "Base.html" %}
-
 {% block content %}
-    <h1>AI Typing Speed Analyser - Home page</h1>
-    <p>Welcome to the AI Typing Speed Analyser! This application allows you to test your typing speed and accuracy.</p>
+<div class="title-container">
+    <div class="title-badge">Intermediate ML Project</div>
+
+    <h1>AI Typing Speed Analyser</h1>
+
+    <p class="title-description">
+        Welcome to the AI Typing Speed Analyser! This application builds on the core typing speed game by using basic machine learning logic to track your progress and provide smart feedback.
+    </p>
+
+    <div class="cta-group">
+        <a href="#" class="btn btn-primary">Start Typing Test</a>
+        <a href="#" class="btn btn-secondary">View Dashboard</a>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🎮</div>
+            <h3>Typing-Game Mechanic</h3>
+            <p>Engage in the core typing challenge designed to accurately capture your words-per-minute, mistakes, and overall elapsed time.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Statistics Tracker</h3>
+            <p>Log your historical test metrics to securely capture your words-per-minute, errors, and time over every session.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>Feedback Logic</h3>
+            <p>Processes your history with basic ML logic to automatically analyse performance improvements over time and present a visual dashboard.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

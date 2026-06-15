@@ -9,7 +9,7 @@ import requests
 import json
 
 URL = "https://openrouter.ai/api/v1/key"
-MODEL = "openrouter/free"
+MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 
 API_KEY = ("sk-or-v1-"
            "817b25c971cdfe90b3847536e74b3bbcba48c5ddc85ea023b5d93f3b54c7cb0f")
@@ -24,35 +24,36 @@ HEADERS = {
 Analysis_prompt = "analise this data"
 
 
-def send_data(api_key, data):
-    """Sends a prompt to the AI and returns its text response."""
+def send_data(data):
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     data = {
         "model": MODEL,  # You can change this to any OpenRouter model slug
-        "messages": [
-            {"role": "user", "content": data}
-        ]
+        "messages": [{"role": "user", "content": data}]
     }
 
     response = requests.post(url, headers=HEADERS, json=data)
 
     if response.status_code == 200:
-        # Dig into the JSON response to grab just the generated text
         return response.json()["choices"][0]["message"]["content"]
     else:
         return f"Error: {response.status_code} - {response.text}"
 
 def verify_openrouter():
-    """Checks if the API key is valid."""
+    #Checks if the API key is valid.
     url = "https://openrouter.ai/api/v1/key"
     response = requests.get(url, headers=HEADERS)
     return response.status_code == 200
 
 
 def backend_generate():
-    prompt = "Generate a random sentence for a typing speed test."
-    data = send_data()
+    prompt = """Generate a random sentence for a typing speed test. 
+    the sentence should be between 10 and 20 words long. 
+    The sentence should be grammatically correct and should not contain any special characters or numbers.
+    The sentence should be in English.
+    The sentence should be unique and not a common phrase or idiom.
+    The sentence should have accurate punctuation like commas."""
+    data = send_data(prompt)
     return data
 
 def backend_send(original_sentence, user_sentence, time, typing_speed, accuracy):
@@ -64,6 +65,9 @@ def backend_send(original_sentence, user_sentence, time, typing_speed, accuracy)
 
 
 if __name__ == "__main__":
+    data = backend_generate()
+    print(data)
+    exit()
     print("Verifying API Key...")
     if verify_openrouter():
         print("Key is valid! Sending prompt...")
