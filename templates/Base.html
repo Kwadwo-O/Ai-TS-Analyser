@@ -15,8 +15,13 @@
             <ul class="nav-menu">
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/play" class="nav-link">Play</a></li>
-                <li><a href="/login" class="nav-link">Login</a></li>
-                <li><a href="/register" class="nav-link">Register</a></li>
+
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></li>
+                {% else %}
+                    <li><a href="/login" class="nav-link">Login</a></li>
+                    <li><a href="/register" class="nav-link">Register</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
