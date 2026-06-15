@@ -62,16 +62,22 @@ def backend_send(original_sentence, user_sentence, time, typing_speed):
       "text_analysis": (), # analysis of the typing speed make it detailed and stated the user (just text) like in text give description 
       "user_rating": (), the rating of the user like average, beginner or pro ect
       "score": (), # the users score out of 100%
-      "accuracy": (), # how accurate the user is 
+      "accuracy": (), # how accurate the user is out of 100
       "mistakes": [
         "correct word": "incorrect word"
       ], add the word they wrote wrong and the correct spelling correct word in the first stretchmarks and incorrect for the second brackets if no mistake is made do not return anything
     )
     """
     data = send_data(prompt).strip("```json")
-    data = json.loads(data)
-    print(f"response:{data["text_analysis"]}")
 
+    if '"error"' in data:
+        return "Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+    else:
+        data = json.loads(data)
+        print(f"""response:{data["text_analysis"]}
+        user rating:{data["user_rating"]}
+        score: {data["score"]}/100%
+        accuracy: {data["accuracy"]}/100""")
 
 
 

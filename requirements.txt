@@ -1,8 +1,8 @@
 ﻿flask
-
+pip-system-certs
 mkdir my-flask-site
 cd my-flask-site
 python -m venv venv
-# Windows
+
 venv\Scripts\activate
 pip install flask flask-sqlalchemy flask-login

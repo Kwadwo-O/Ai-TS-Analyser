@@ -13,5 +13,17 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="users [2]" uuid="388eda7b-3ffb-4a7d-a559-1a76e4a40553">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\S2502817\OneDrive - Notre Dame Catholic Sixth Form College\Ai-TS-Analyser\instance\users.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.51.1/org/xerial/sqlite-jdbc/3.51.1.0/sqlite-jdbc-3.51.1.0.jar</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
 </project>
