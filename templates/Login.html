@@ -1,13 +1,30 @@
-﻿{% extends "Base.html" %}
+{% extends "Base.html" %}
 
 {% block content %}
-    <h1>AI Typing Speed Analyser - Login</h1>
-    <p>Welcome to the AI Typing Speed Analyser! This application allows you to test your typing speed and accuracy.</p>
-    <h1>Login</h1>
-    <form method="POST">
-    <input type="text" name="username" placeholder="Username" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit">Log In</button>
-    </form>
-    <p>No account? <a href="/register">Register</a></p>
+    <div class="login_header">
+        <h1>Welcome to the AI Typing Speed Analyser!</h1>
+    </div>
+
+    <main class="login_content">
+        <div class="login-container">
+            <h2>Welcome Back</h2>
+            <p class="login-subtitle">Please enter your details to sign in</p>
+
+            <form action="#" method="POST">
+                <div class="login-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+
+                <div class="login-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+
+            <p class="form-footer">Don't have an account? <a href="{{ url_for('Register') }}">Register here</a></p>
+        </div>
+    </main>
 {% endblock %}
