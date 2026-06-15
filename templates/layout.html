@@ -8,16 +8,11 @@
 </head>
 <body>
 
-    <header class="header">
-        <div class="top-bar-container">
-            <h1>AI Typing Speed Analyser</h1>
-            <div class="top-bar-actions">
-                <button class="nav-solid-pill" onclick="window.location.href='/'">Play</button>
-                <button class="nav-interactive-btn accent-outline" onclick="window.location.href='/settings'">Settings</button>
-            </div>
-        </div>
-    </header>
-
+    <div class="top-bar">
+        <h1>AI Typing Speed Analyser</h1>
+        <button>Play</button>
+        <button>Settings</button>
+    </div>
     <main class="main-wrapper">
         {% block content %}
         {% endblock %}
