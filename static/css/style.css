@@ -163,6 +163,91 @@ body {
 }
 
 /* ==========================================================================
+   LOGIN / WELCOME LAYOUT
+   ========================================================================== */
+
+.login_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login_header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.login-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.login-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(239, 130, 117, 0.15);
+}
+
+.login-subtitle {
+    color: var(--text-muted);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: var(--button-color);
+    color: var(--surface);
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: var(--button-hover-color);
+    transform: translateY(-1px);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+main {
+    background: var(--background);
+    color: var(--text-main);
+}
+
+.login_header h1 {
+    color: var(--text-main);
+}
+
+.login_header p {
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
    BUTTONS & ACTIONS
    ========================================================================== */
 .cta-group {
