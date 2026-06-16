@@ -69,33 +69,48 @@ def play():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    # Force query the exact user model row instance using the current user ID
+    # Fetch the live tracked user instance directly from database context
     db_user = User.query.get(current_user.id)
+
+    # Track which sub-panel to display. Defaults to 'profile'
+    current_tab = request.args.get('tab', 'profile')
 
     if request.method == 'POST':
         action = request.form.get('action')
 
-        if action == 'clear':
+        # --- SETTINGS TAB ACTIONS ---
+        if action == 'delete_account':
+            try:
+                db.session.delete(db_user)
+                db.session.commit()
+                logout_user()  # Log the user out since their account no longer exists
+                flash('Your account has been permanently deleted.', 'success')
+                return redirect(url_for('register'))  # Send them back to registration page
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error processing account termination: {str(e)}', 'error')
+                return redirect(url_for('dashboard', tab='settings'))
+
+        # --- PROFILE/API KEY ACTIONS ---
+        elif action == 'clear':
             db_user.api_key = None
             db.session.commit()
             flash('API key removed from your account.')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard', tab='profile'))
 
         elif action == 'save':
-            # Safely fetch parameter strings directly from the raw form dictionary dictionary
             api_key = request.form.get('api_key', '').strip()
 
-            # 1. Structural Validation Check
             if not api_key.startswith("sk-or-v1-"):
                 flash("Invalid format! Key must start with 'sk-or-v1-'")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard', tab='profile'))
 
-            # 2. Live API Validation Check
             try:
+                # Assuming verify_openrouter is imported from your backend module
                 if verify_openrouter(api_key):
-                    db_user.api_key = api_key  # Modify row data directly
-                    db.session.add(db_user)  # Re-verify tracking attachment
-                    db.session.commit()  # Force hardware write block execution
+                    db_user.api_key = api_key
+                    db.session.add(db_user)
+                    db.session.commit()
                     flash('API key verified and updated successfully.')
                 else:
                     flash('Verification failed! The API key is invalid or rejected.')
@@ -103,9 +118,9 @@ def dashboard():
                 db.session.rollback()
                 flash(f'Connection error during verification: {str(e)}')
 
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard', tab='profile'))
 
-    # GET request processing block
+    # GET request processing: Validate saved key state
     is_valid = False
     if db_user and db_user.api_key:
         try:
@@ -113,7 +128,13 @@ def dashboard():
         except Exception:
             is_valid = False
 
-    return render_template('dashboard.html', api_key=db_user.api_key, is_valid=is_valid)
+    return render_template(
+        'dashboard.html',
+        api_key=db_user.api_key,
+        is_valid=is_valid,
+        current_tab=current_tab,
+        user=db_user
+    )
 
 with app.app_context():
     db.create_all()

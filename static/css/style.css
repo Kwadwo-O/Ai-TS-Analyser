@@ -63,7 +63,6 @@ body {
     z-index: 10;
 }
 
-/* Connects the entry slide-down to the navbar component */
 .animate-nav {
     animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -97,7 +96,6 @@ body {
     color: var(--primary);
 }
 
-/* Sleek sliding baseline effect for navigation choices */
 .nav-link::after {
     content: '';
     position: absolute;
@@ -153,7 +151,6 @@ body {
     width: 100%;
     text-align: center;
     box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
-    /* Snappy premium acceleration for template layouts */
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -192,7 +189,6 @@ body {
     border: none;
     cursor: pointer;
     text-align: center;
-    /* Soft elastic feedback loop on click actions */
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.15s ease, color 0.15s ease, box-shadow 0.2s ease;
 }
 
@@ -237,7 +233,6 @@ body {
     min-height: calc(100vh - 70px);
 }
 
-/* Dynamic subtle focus wrapper for typing test sentence targets */
 #target-phrase {
     animation: textPulse 4s infinite ease-in-out;
     transition: background-color 0.3s ease;
@@ -271,7 +266,6 @@ body {
     transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
 }
 
-/* Expands subtly and turns color accents on selector match */
 .form-input:focus {
     outline: none;
     border-color: var(--primary);
@@ -302,7 +296,6 @@ body {
     text-shadow: 0 0 1px rgba(224, 109, 96, 0.3);
 }
 
-/* Correction log box entrance scale adjustment */
 #res-mistakes div {
     animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -310,7 +303,6 @@ body {
 /* ==========================================================================
    6. DASHBOARD & CONFIGURATION EXTENSIONS (CLEAN CLASSIFICATION)
    ========================================================================== */
-
 .dashboard-wrapper {
     max-width: 800px;
     margin: 0 auto;
@@ -357,6 +349,16 @@ body {
     border: 1px solid var(--success-hover);
 }
 
+.status-badge.inactive {
+    background-color: rgba(225, 112, 85, 0.15);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
 .monospace-font {
     font-family: monospace;
 }
@@ -395,14 +397,20 @@ body {
     padding: 0.9rem;
 }
 
+/* Tutorial Dropdown / Accordion Enhancements */
 .guide-card {
     background-color: var(--surface);
     border-left: 4px solid var(--button-color);
+    transition: background-color 0.2s ease;
+}
+
+.guide-card[open] summary {
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.75rem;
 }
 
 .guide-title {
     color: var(--button-color);
-    margin-bottom: 1rem;
     font-size: 1.25rem;
     font-weight: 700;
 }
@@ -431,6 +439,7 @@ body {
     border: 1px solid var(--border);
 }
 
+/* Alert Notification Framework */
 .alert-card {
     max-width: 100%;
     padding: 1rem;
@@ -472,4 +481,19 @@ code {
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
+}
+
+/* Multi-tab Selection Framework Elements */
+.tab-navigation-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.tab-navigation-row .btn {
+    padding: 0.6rem 1.5rem;
+    text-decoration: none;
+    font-size: 0.95rem;
 }
