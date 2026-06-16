@@ -35,7 +35,7 @@ def register():
             flash('Username already taken.')
             return redirect(url_for('register'))
         hashed_pw = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_pw)
+        new_user = User(username=username, password=hashed_pw, api="")
         db.session.add(new_user)
         db.session.commit()
         flash('Account created! Please log in.')
@@ -61,12 +61,59 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/play')
+@login_required
 def play():
     return render_template('Play.html')
 
-@app.route('/dashboard')
+
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
-    return render_template('Dashboard.html')
+    # Force query the exact user model row instance using the current user ID
+    db_user = User.query.get(current_user.id)
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'clear':
+            db_user.api_key = None
+            db.session.commit()
+            flash('API key removed from your account.')
+            return redirect(url_for('dashboard'))
+
+        elif action == 'save':
+            # Safely fetch parameter strings directly from the raw form dictionary dictionary
+            api_key = request.form.get('api_key', '').strip()
+
+            # 1. Structural Validation Check
+            if not api_key.startswith("sk-or-v1-"):
+                flash("Invalid format! Key must start with 'sk-or-v1-'")
+                return redirect(url_for('dashboard'))
+
+            # 2. Live API Validation Check
+            try:
+                if verify_openrouter(api_key):
+                    db_user.api_key = api_key  # Modify row data directly
+                    db.session.add(db_user)  # Re-verify tracking attachment
+                    db.session.commit()  # Force hardware write block execution
+                    flash('API key verified and updated successfully.')
+                else:
+                    flash('Verification failed! The API key is invalid or rejected.')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Connection error during verification: {str(e)}')
+
+        return redirect(url_for('dashboard'))
+
+    # GET request processing block
+    is_valid = False
+    if db_user and db_user.api_key:
+        try:
+            is_valid = verify_openrouter(db_user.api_key)
+        except Exception:
+            is_valid = False
+
+    return render_template('dashboard.html', api_key=db_user.api_key, is_valid=is_valid)
 
 with app.app_context():
     db.create_all()

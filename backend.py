@@ -9,8 +9,7 @@ import requests
 import json
 
 MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-API_KEY = ("sk-or-v1-"
-           "817b25c971cdfe90b3847536e74b3bbcba48c5ddc85ea023b5d93f3b54c7cb0f")
+API_KEY = ""
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json",
@@ -29,11 +28,30 @@ def send_data(data):
     else:
         return f"Error: {response.status_code} - {response.text}"
 
-def verify_openrouter():
-    #Checks if the API key is valid.
+def verify_openrouter(api_key: str = API_KEY):
+    """Pings the OpenRouter API key status endpoint to check if it is valid.
+        Returns True if valid, False if invalid or if a connection error occurs.
+    """
     url = "https://openrouter.ai/api/v1/key"
-    response = requests.get(url, headers=HEADERS)
-    return response.status_code == 200
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    try:
+        # Send a GET request with a 5-second timeout to prevent freezing
+        response = requests.get(url, headers=headers, timeout=5)
+        # A status code of 200 means the key is completely valid
+        if response.status_code == 200:
+            print("Key is valid")
+            return True
+        else:
+            print(f"API Key is invalid. Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
+    except requests.RequestException as e:
+        print(f"📡 Connection error occurred: {e}")
+        return False
+
 
 
 def backend_generate():

@@ -1,66 +1,87 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="login-container" style="max-width: 900px; margin: 0 auto; flex-direction: column;">
+<div class="login-container dashboard-wrapper">
 
-    <div class="main-card" style="max-width: 100%; margin-bottom: 2rem; text-align: left; padding: 2.5rem 2rem;">
-        <h1 class="title" style="font-size: 2.5rem; margin-bottom: 0.5rem;">Performance <span class="title-highlight">Dashboard</span></h1>
-        <p class="description" style="margin-bottom: 0;">Track your typing milestones, speed fluctuations, and precision growth over time.</p>
+    <div class="main-card dashboard-banner">
+        <h1 class="title">Account <span class="title-highlight">Dashboard</span></h1>
+        <p class="description">Manage your OpenRouter connection settings below to run custom typing evaluations.</p>
     </div>
 
-    <div style="display: flex; gap: 1.5rem; width: 100%; margin-bottom: 2rem;">
-        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
-            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Average Speed</div>
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--button-color); margin-top: 0.25rem;">{{ avg_wpm }} <span style="font-size: 1rem; font-weight: 500;">WPM</span></div>
-        </div>
-
-        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
-            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Avg Accuracy</div>
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success-hover); margin-top: 0.25rem;">{{ avg_acc }}<span style="font-size: 1.5rem;">%</span></div>
-        </div>
-
-        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
-            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">All-Time Best</div>
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin-top: 0.25rem;">{{ best_wpm }} <span style="font-size: 1rem; font-weight: 500;">WPM</span></div>
-        </div>
-    </div>
-
-    <div class="main-card" style="max-width: 100%; text-align: left; padding: 2.5rem 2rem;">
-        <h3 style="color: var(--text-main); margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: 700;">Recent Typing Sessions</h3>
-
-        {% if history %}
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
-                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Date Took</th>
-                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Typing Speed</th>
-                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Accuracy</th>
-                        <th style="padding: 0.75rem 1rem; font-weight: 600;">AI Rank Tier</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for session in history %}
-                    <tr style="border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 1rem; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='var(--background)'" onmouseout="this.style.backgroundColor='transparent'">
-                        <td style="padding: 1rem; font-weight: 500;">{{ session.date }}</td>
-                        <td style="padding: 1rem; font-weight: 700; color: var(--button-color);">{{ session.wpm }} WPM</td>
-                        <td style="padding: 1rem; font-weight: 600; color: var(--success-hover);">{{ session.accuracy }}%</td>
-                        <td style="padding: 1rem;">
-                            <span style="background-color: var(--background); color: var(--text-main); padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border);">
-                                {{ session.rank }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-            <p style="margin-bottom: 1.5rem; font-size: 1.05rem;">No historical records tracked yet. Complete your first test to view your progress analytics!</p>
-            <a href="/play" class="btn btn-play" style="display: inline-block;">Take Your First Test</a>
-        </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="main-card alert-card" style="padding: 1rem; margin-bottom: 1rem; border-color: var(--border);">
+                    <p class="alert-message" style="margin: 0; font-weight: 600; color: var(--text-main);">🔔 {{ msg }}</p>
+                </div>
+            {% endfor %}
         {% endif %}
-    </div>
+    {% endwith %}
+
+    {% if api_key %}
+        <div class="main-card dashboard-card">
+            <div class="card-header-row">
+                <h3 class="card-section-title">Engine Status</h3>
+                {% if is_valid %}
+                    <span class="status-badge active">● Key Valid & Connected</span>
+                {% else %}
+                    <span class="status-badge inactive" style="background-color: rgba(225, 112, 85, 0.15); color: var(--primary); border: 1px solid var(--primary); padding: 0.4rem 1rem; border-radius: 30px; font-size: 0.85rem; font-weight: 700;">● Key Invalid / Expired</span>
+                {% endif %}
+            </div>
+
+            {% if is_valid %}
+                <p class="description" style="margin-top: 1rem;">TypeSwift is successfully paired with your personal OpenRouter account. Your credentials are securely tied directly to your user profile database row.</p>
+            {% else %}
+                <p class="description" style="color: var(--primary); font-weight: 600; margin-top: 1rem;">Your saved key failed authentication checks. Please disconnect this key and generate a fresh token from your OpenRouter account.</p>
+            {% endif %}
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label class="form-label">Stored Credential Token Target</label>
+                <input type="text" class="form-input monospace-font" value="sk-or-v1-••••••••••••••••••••••••••••••••" disabled>
+            </div>
+
+            <form action="/dashboard" method="POST" style="margin-top: 1.5rem;">
+                <input type="hidden" name="action" value="clear">
+                <button type="submit" class="btn btn-dashboard disconnect-btn">Disconnect API Key</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="dashboard-grid" style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <div class="main-card dashboard-card">
+                <h3 class="card-section-title">API Key Activation Required</h3>
+                <p class="description" style="margin-top: 0.5rem;">No API configuration profile found on your profile. Paste your token here to access typing rooms.</p>
+
+                <form action="/dashboard" method="POST" class="dashboard-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" name="action" value="save">
+                    <div class="form-group no-margin">
+                        <label for="api_key" class="form-label">Enter OpenRouter API Key</label>
+                        <input type="password" id="api_key" name="api_key" class="form-input large-padding" placeholder="sk-or-v1-..." required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-play full-width-btn" style="margin-top: 1rem;">Verify & Save Key</button>
+                </form>
+            </div>
+
+            <details class="main-card dashboard-card guide-card" style="cursor: pointer;">
+                <summary class="guide-title" style="list-style: none; display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; color: var(--button-color); outline: none;">
+                    <span>📖 How to get an OpenRouter Key?</span>
+                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">Click to expand ↓</span>
+                </summary>
+
+                <div class="dropdown-content" style="margin-top: 1.5rem; cursor: default;">
+                    <ol class="guide-steps" style="padding-left: 1.25rem; color: var(--text-muted); line-height: 1.8; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li>Log into <a href="https://openrouter.ai/" target="_blank" class="form-link highlight-link" style="font-weight: 700;">openrouter.ai</a></li>
+                        <li>Navigate to your dashboard profile selection and select <strong>Keys</strong> (or visit <a href="https://openrouter.ai/keys" target="_blank" class="form-link">openrouter.ai/keys</a>).</li>
+                        <li>Generate a fresh token string starting with the prefix <code>sk-or-v1-</code>.</li>
+                        <li>Return here, paste the string value into the prompt container form block, and click save.</li>
+                    </ol>
+                    <div class="guide-note" style="background-color: var(--background); margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--text-muted); border: 1px solid var(--border);">
+                        💡 <strong>Note:</strong> Your token remains entirely local to your workspace setup configuration parameters and is never shared outside your local database layer.
+                    </div>
+                </div>
+            </details>
+
+        </div>
+    {% endif %}
 
 </div>
 {% endblock %}
