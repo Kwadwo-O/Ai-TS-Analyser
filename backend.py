@@ -35,7 +35,8 @@ def verify_openrouter(api_key: str = API_KEY):
     url = "https://openrouter.ai/api/v1/key"
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Title": "Typing Speed Test Backend"
     }
     try:
         # Send a GET request with a 5-second timeout to prevent freezing
