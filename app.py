@@ -27,6 +27,7 @@ def load_user(user_id):
 def home():
     return render_template('home.html', name=current_user.username)
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -36,8 +37,12 @@ def register():
         if existing:
             flash('Username already taken.')
             return redirect(url_for('register'))
+
         hashed_pw = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_pw, api="")
+
+        # FIX: Changed 'api=""' to 'api_key=None' to match your User database model property definition
+        new_user = User(username=username, password=hashed_pw, api_key=None)
+
         db.session.add(new_user)
         db.session.commit()
         flash('Account created! Please log in.')
