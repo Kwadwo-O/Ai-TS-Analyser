@@ -1,5 +1,66 @@
 {% extends "Base.html" %}
 {% block content %}
-    <h1>AI Typing Speed Analyser - Dashboard</h1>
-    <p>Welcome to the AI Typing Speed Analyser! This application allows you to test your typing speed and accuracy.</p>
+<div class="login-container" style="max-width: 900px; margin: 0 auto; flex-direction: column;">
+
+    <div class="main-card" style="max-width: 100%; margin-bottom: 2rem; text-align: left; padding: 2.5rem 2rem;">
+        <h1 class="title" style="font-size: 2.5rem; margin-bottom: 0.5rem;">Performance <span class="title-highlight">Dashboard</span></h1>
+        <p class="description" style="margin-bottom: 0;">Track your typing milestones, speed fluctuations, and precision growth over time.</p>
+    </div>
+
+    <div style="display: flex; gap: 1.5rem; width: 100%; margin-bottom: 2rem;">
+        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Average Speed</div>
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--button-color); margin-top: 0.25rem;">{{ avg_wpm }} <span style="font-size: 1rem; font-weight: 500;">WPM</span></div>
+        </div>
+
+        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Avg Accuracy</div>
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success-hover); margin-top: 0.25rem;">{{ avg_acc }}<span style="font-size: 1.5rem;">%</span></div>
+        </div>
+
+        <div class="main-card" style="flex: 1; padding: 1.5rem; max-width: 100%;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">All-Time Best</div>
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin-top: 0.25rem;">{{ best_wpm }} <span style="font-size: 1rem; font-weight: 500;">WPM</span></div>
+        </div>
+    </div>
+
+    <div class="main-card" style="max-width: 100%; text-align: left; padding: 2.5rem 2rem;">
+        <h3 style="color: var(--text-main); margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: 700;">Recent Typing Sessions</h3>
+
+        {% if history %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
+                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Date Took</th>
+                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Typing Speed</th>
+                        <th style="padding: 0.75rem 1rem; font-weight: 600;">Accuracy</th>
+                        <th style="padding: 0.75rem 1rem; font-weight: 600;">AI Rank Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in history %}
+                    <tr style="border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 1rem; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='var(--background)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <td style="padding: 1rem; font-weight: 500;">{{ session.date }}</td>
+                        <td style="padding: 1rem; font-weight: 700; color: var(--button-color);">{{ session.wpm }} WPM</td>
+                        <td style="padding: 1rem; font-weight: 600; color: var(--success-hover);">{{ session.accuracy }}%</td>
+                        <td style="padding: 1rem;">
+                            <span style="background-color: var(--background); color: var(--text-main); padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border);">
+                                {{ session.rank }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <p style="margin-bottom: 1.5rem; font-size: 1.05rem;">No historical records tracked yet. Complete your first test to view your progress analytics!</p>
+            <a href="/play" class="btn btn-play" style="display: inline-block;">Take Your First Test</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
 {% endblock %}

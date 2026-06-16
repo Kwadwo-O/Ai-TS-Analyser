@@ -86,7 +86,6 @@ if __name__ == "__main__":
                  "The quiet library held namy old books and students reed them carefuly.", 20, "20wpm")
     # data = backend_generate()
     # print(data)
-    exit()
     print("Verifying API Key...")
     if verify_openrouter():
         print("Key is valid! Sending prompt...")

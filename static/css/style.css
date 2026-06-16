@@ -29,6 +29,7 @@ body {
     background-color: var(--background);
     color: var(--text-main);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .main-wrapper {
@@ -38,8 +39,19 @@ body {
 }
 
 /* ==========================================================================
-   3. NAVIGATION BAR
+   3. NAVIGATION BAR & KEYFRAMES
    ========================================================================== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -51,11 +63,21 @@ body {
     z-index: 10;
 }
 
+/* Connects the entry slide-down to the navbar component */
+.animate-nav {
+    animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .nav-logo {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-main);
     text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.nav-logo:hover {
+    transform: scale(1.03);
 }
 
 .nav-links {
@@ -67,20 +89,40 @@ body {
     color: var(--text-muted);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.15s ease;
+    position: relative;
+    transition: color 0.2s ease;
 }
 
 .nav-link:hover {
     color: var(--primary);
 }
 
+/* Sleek sliding baseline effect for navigation choices */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--primary);
+    transform-origin: bottom right;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
 /* ==========================================================================
-   4. HOME PAGE & ANIMATIONS
+   4. HOME PAGE, CORE ANIMATIONS & CONTAINERS
    ========================================================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(25px);
     }
     to {
         opacity: 1;
@@ -88,10 +130,16 @@ body {
     }
 }
 
+@keyframes textPulse {
+    0% { border-color: var(--border); }
+    50% { border-color: var(--primary); }
+    100% { border-color: var(--border); }
+}
+
 .home-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Fixes large gaps, aligns closer to top */
+    align-items: flex-start;
     padding-top: 2.5rem;
     min-height: calc(100vh - 70px);
 }
@@ -104,8 +152,9 @@ body {
     max-width: 550px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(45, 22, 40, 0.03);
-    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    /* Snappy premium acceleration for template layouts */
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .title {
@@ -117,7 +166,7 @@ body {
 }
 
 .title-highlight {
-    color: var(--primary); /* Changed to accent primary for a cleaner look */
+    color: var(--primary);
 }
 
 .description {
@@ -143,15 +192,16 @@ body {
     border: none;
     cursor: pointer;
     text-align: center;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.15s ease, color 0.15s ease;
+    /* Soft elastic feedback loop on click actions */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.15s ease, color 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .btn:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(-1px) scale(0.98);
 }
 
 .btn-play {
@@ -161,6 +211,7 @@ body {
 
 .btn-play:hover {
     background-color: var(--button-hover-color);
+    box-shadow: 0 6px 20px rgba(138, 79, 125, 0.2);
 }
 
 .btn-dashboard {
@@ -172,17 +223,24 @@ body {
 .btn-dashboard:hover {
     background-color: var(--primary);
     color: var(--surface);
+    box-shadow: 0 6px 20px rgba(239, 130, 117, 0.15);
 }
 
 /* ==========================================================================
-   5. LOGIN & AUTHENTICATION STYLES
+   5. GAMEPLAY, LOGIN & REGISTER STYLES
    ========================================================================== */
 .login-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Fixes large vertical gaps on the login page */
+    align-items: flex-start;
     padding-top: 2.5rem;
     min-height: calc(100vh - 70px);
+}
+
+/* Dynamic subtle focus wrapper for typing test sentence targets */
+#target-phrase {
+    animation: textPulse 4s infinite ease-in-out;
+    transition: background-color 0.3s ease;
 }
 
 .login-form {
@@ -210,12 +268,15 @@ body {
     border-radius: 8px;
     background-color: var(--background);
     color: var(--text-main);
-    transition: border-color 0.15s ease, outline 0.15s ease;
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
 }
 
+/* Expands subtly and turns color accents on selector match */
 .form-input:focus {
     outline: none;
     border-color: var(--primary);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 4px rgba(239, 130, 117, 0.12);
 }
 
 .form-input::placeholder {
@@ -233,586 +294,15 @@ body {
     color: var(--primary);
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, text-shadow 0.15s ease;
 }
 
 .form-link:hover {
     color: var(--primary-hover);
-    text-decoration: underline;
+    text-shadow: 0 0 1px rgba(224, 109, 96, 0.3);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*!* ==========================================================================*/
-/*   2. BASE STYLES*/
-/*   ========================================================================== *!*/
-/*body {*/
-/*    background-color: var(--background);*/
-/*    color: var(--text-main);*/
-/*    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;*/
-/*    line-height: 1.6;*/
-/*    margin: 0;*/
-/*    padding: 0;*/
-/*}*/
-
-/*main {*/
-/*    background: var(--background);*/
-/*    color: var(--text-main);*/
-/*}*/
-
-/*.main-wrapper {*/
-/*    min-height: calc(100vh - 70px);*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    justify-content: center;*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   3. NAVIGATION MENU*/
-/*   ========================================================================== *!*/
-/*.navbar {*/
-/*    background-color: var(--surface);*/
-/*    border-bottom: 1px solid var(--border);*/
-/*    position: sticky;*/
-/*    top: 0;*/
-/*    z-index: 100;*/
-/*    box-shadow: 0 2px 10px rgba(45, 22, 40, 0.02);*/
-/*}*/
-
-/*.nav-container {*/
-/*    max-width: 1000px;*/
-/*    margin: 0 auto;*/
-/*    padding: 1rem 2rem;*/
-/*    display: flex;*/
-/*    justify-content: space-between;*/
-/*    align-items: center;*/
-/*}*/
-
-/*.nav-logo {*/
-/*    font-size: 1.25rem;*/
-/*    font-weight: 800;*/
-/*    color: var(--text-main);*/
-/*    text-decoration: none;*/
-/*    transition: transform 0.2s var(--transition-smooth);*/
-/*}*/
-
-/*.nav-logo:hover {*/
-/*    transform: scale(1.03);*/
-/*}*/
-
-/*.nav-menu {*/
-/*    list-style: none;*/
-/*    display: flex;*/
-/*    gap: 2rem;*/
-/*    margin: 0;*/
-/*    padding: 0;*/
-/*}*/
-
-/*.nav-link {*/
-/*    text-decoration: none;*/
-/*    color: var(--text-muted);*/
-/*    font-weight: 600;*/
-/*    font-size: 0.95rem;*/
-/*    padding: 0.5rem 0;*/
-/*    position: relative;*/
-/*    transition: color 0.3s var(--transition-smooth);*/
-/*}*/
-
-/*!* Link underline layout micro-animation transition *!*/
-/*.nav-link::after {*/
-/*    content: '';*/
-/*    position: absolute;*/
-/*    bottom: 0;*/
-/*    left: 0;*/
-/*    width: 100%;*/
-/*    height: 2px;*/
-/*    background-color: var(--primary);*/
-/*    transform: scaleX(0);*/
-/*    transform-origin: right;*/
-/*    transition: transform 0.3s var(--transition-smooth);*/
-/*}*/
-
-/*.nav-link:hover {*/
-/*    color: var(--text-main);*/
-/*}*/
-
-/*.nav-link:hover::after {*/
-/*    transform: scaleX(1);*/
-/*    transform-origin: left;*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   4. TYPOGRAPHY & HEADERS*/
-/*   ========================================================================== *!*/
-/*.title-container,*/
-/*.login_header {*/
-/*    max-width: 900px;*/
-/*    margin: 0 auto;*/
-/*    padding: 4rem 2rem;*/
-/*    text-align: center;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-/*!* Shared Main Heading Styles *!*/
-/*.title-container h1,*/
-/*.login_header h1 {*/
-/*    font-size: 3rem;*/
-/*    font-weight: 800;*/
-/*    color: var(--text-main);*/
-/*    margin-bottom: 1.5rem;*/
-/*    line-height: 1.2;*/
-/*    margin-top: 0;*/
-/*}*/
-
-/*!* Target span micro-animations if used in login page too *!*/
-/*.title-container h1 span,*/
-/*.login_header h1 span {*/
-/*    color: var(--primary);*/
-/*    display: inline-block;*/
-/*    transition: transform 0.3s var(--transition-smooth);*/
-/*}*/
-
-/*.title-container h1:hover span,*/
-/*.login_header h1:hover span {*/
-/*    transform: scale(1.05);*/
-/*}*/
-
-/*!* Shared Description Text Styles *!*/
-/*.title-description,*/
-/*.login_header p {*/
-/*    font-size: 1.2rem;*/
-/*    color: var(--text-muted);*/
-/*    max-width: 650px;*/
-/*    margin: 0 auto 2.5rem auto;*/
-/*}*/
-
-/*.title-badge {*/
-/*    display: inline-block;*/
-/*    background-color: var(--border);*/
-/*    color: var(--text-main);*/
-/*    font-size: 0.85rem;*/
-/*    font-weight: 600;*/
-/*    padding: 0.4rem 1rem;*/
-/*    border-radius: 50px;*/
-/*    margin-bottom: 1.5rem;*/
-/*    text-transform: uppercase;*/
-/*    letter-spacing: 0.05em;*/
-/*    transition: background-color 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);*/
-/*}*/
-
-/*.title-badge:hover {*/
-/*    background-color: var(--primary);*/
-/*    color: var(--surface);*/
-/*    transform: translateY(-2px);*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   5. FORMS & INPUTS*/
-/*   ========================================================================== *!*/
-/*.login_content {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-/*.login-container {*/
-/*    padding: 40px;*/
-/*    border-radius: 12px;*/
-/*    width: 100%;*/
-/*    max-width: 420px;*/
-/*    text-align: left;*/
-/*    background: var(--surface);*/
-/*    border: 1px solid var(--border);*/
-/*    margin-bottom: 4rem; !* Adds balanced spacing under the form card *!*/
-/*}*/
-
-/*.login-group input {*/
-/*    width: 100%;*/
-/*    padding: 12px 16px;*/
-/*    background-color: var(--background);*/
-/*    border: 1px solid var(--border);*/
-/*    border-radius: 6px;*/
-/*    color: var(--text-main);*/
-/*    font-size: 1rem;*/
-/*    outline: none;*/
-/*    transition: all 0.2s ease;*/
-/*}*/
-
-/*.login-group input:focus {*/
-/*    border-color: var(--primary);*/
-/*    box-shadow: 0 0 0 3px rgba(239, 130, 117, 0.15);*/
-/*}*/
-
-/*.login-subtitle {*/
-/*    color: var(--text-muted);*/
-/*}*/
-
-/*.btn-login {*/
-/*    width: 100%;*/
-/*    padding: 14px;*/
-/*    background: var(--button-color);*/
-/*    color: var(--surface);*/
-/*    font-size: 1rem;*/
-/*    font-weight: 700;*/
-/*    border: none;*/
-/*    border-radius: 6px;*/
-/*    cursor: pointer;*/
-/*    transition: transform 0.15s ease, background-color 0.2s ease;*/
-/*    margin-top: 10px;*/
-/*}*/
-
-/*.btn-login:hover {*/
-/*    background: var(--button-hover-color);*/
-/*    transform: translateY(-1px);*/
-/*}*/
-
-/*.btn-login:active {*/
-/*    transform: translateY(0);*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   6. BUTTONS & ACTIONS*/
-/*   ========================================================================== *!*/
-/*.cta-group {*/
-/*    display: flex;*/
-/*    gap: 1rem;*/
-/*    justify-content: center;*/
-/*    flex-wrap: wrap;*/
-/*}*/
-
-/*.btn {*/
-/*    display: inline-block;*/
-/*    padding: 0.85rem 2rem;*/
-/*    font-size: 1rem;*/
-/*    font-weight: 600;*/
-/*    border-radius: 8px;*/
-/*    text-decoration: none;*/
-/*    border: none;*/
-/*    cursor: pointer;*/
-/*    transition: transform 0.2s var(--transition-smooth), box-shadow 0.2s var(--transition-smooth);*/
-/*}*/
-
-/*.btn:active {*/
-/*    transform: scale(0.97);*/
-/*}*/
-
-/*.btn-primary {*/
-/*    background-color: var(--button-color);*/
-/*    color: var(--surface);*/
-/*    box-shadow: 0 4px 12px rgba(138, 79, 125, 0.2);*/
-/*}*/
-
-/*.btn-primary:hover {*/
-/*    background-color: var(--button-hover-color);*/
-/*    transform: translateY(-2px);*/
-/*    box-shadow: 0 6px 20px rgba(138, 79, 125, 0.35);*/
-/*}*/
-
-/*.btn-secondary {*/
-/*    background-color: var(--surface);*/
-/*    color: var(--text-main);*/
-/*    border: 2px solid var(--border);*/
-/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);*/
-/*}*/
-
-/*.btn-secondary:hover {*/
-/*    background-color: var(--surface);*/
-/*    border-color: var(--text-muted);*/
-/*    transform: translateY(-2px);*/
-/*    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   7. FEATURES & CARDS*/
-/*   ========================================================================== *!*/
-/*.features-section {*/
-/*    padding: 5rem 2rem;*/
-/*}*/
-
-/*.features-container {*/
-/*    max-width: 1000px;*/
-/*    margin: 0 auto;*/
-/*}*/
-
-/*.section-title {*/
-/*    font-size: 2rem;*/
-/*    font-weight: 800;*/
-/*    text-align: center;*/
-/*    margin-bottom: 0.7rem;*/
-/*    color: var(--text-main);*/
-/*}*/
-
-/*.section-subtitle {*/
-/*    text-align: center;*/
-/*    color: var(--text-muted);*/
-/*    margin-bottom: 3rem;*/
-/*    font-size: 1.05rem;*/
-/*    line-height: 1.6;*/
-/*}*/
-
-/*.features-grid {*/
-/*    display: grid;*/
-/*    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));*/
-/*    gap: 2rem;*/
-/*    max-width: 1000px;*/
-/*    margin: 0 auto;*/
-/*    padding: 0 1rem;*/
-/*}*/
-
-/*.feature-card {*/
-/*    background-color: var(--surface);*/
-/*    padding: 2rem;*/
-/*    border-radius: 12px;*/
-/*    border: 1px solid var(--border);*/
-/*    text-align: left;*/
-/*    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);*/
-/*    transition: transform 0.4s var(--transition-smooth),*/
-/*                box-shadow 0.4s var(--transition-smooth),*/
-/*                border-color 0.4s var(--transition-smooth);*/
-/*}*/
-
-/*.feature-card:hover {*/
-/*    transform: translateY(-8px);*/
-/*    border-color: var(--primary);*/
-/*    box-shadow: 0 12px 30px rgba(239, 130, 117, 0.15);*/
-/*}*/
-
-/*.feature-card h3 {*/
-/*    font-size: 1.3rem;*/
-/*    margin: 1rem 0 0.8rem 0;*/
-/*    color: var(--text-main);*/
-/*}*/
-
-/*.feature-card p {*/
-/*    color: var(--text-muted);*/
-/*    line-height: 1.7;*/
-/*    font-size: 0.95rem;*/
-/*}*/
-
-/*.feature-icon {*/
-/*    font-size: 2.5rem;*/
-/*    display: inline-block;*/
-/*    width: auto;*/
-/*    height: auto;*/
-/*    background-color: transparent;*/
-/*    border-radius: 0;*/
-/*    margin-bottom: 1rem;*/
-/*    color: inherit;*/
-/*    animation: bounce 2s infinite;*/
-/*}*/
-
-/*.feature-card:nth-child(1) .feature-icon { animation-delay: 0s; }*/
-/*.feature-card:nth-child(2) .feature-icon { animation-delay: 0.2s; }*/
-/*.feature-card:nth-child(3) .feature-icon { animation-delay: 0.4s; }*/
-
-/*!* ==========================================================================*/
-/*   8. HERO SECTION (HOME PAGE)*/
-/*   ========================================================================= *!*/
-/*.hero-section {*/
-/*    background: linear-gradient(135deg, rgba(239, 130, 117, 0.08) 0%, rgba(136, 160, 150, 0.05) 100%);*/
-/*    border-bottom: 1px solid var(--border);*/
-/*    padding: 5rem 2rem 3rem;*/
-/*}*/
-
-/*.hero-content {*/
-/*    max-width: 900px;*/
-/*    margin: 0 auto;*/
-/*    text-align: center;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    align-items: center;*/
-/*    animation: fadeInDown 0.6s ease-out;*/
-/*}*/
-
-/*.hero-content h1 {*/
-/*    font-size: 3.5rem;*/
-/*    font-weight: 900;*/
-/*    background: linear-gradient(135deg, var(--text-main), var(--button-color));*/
-/*    -webkit-background-clip: text;*/
-/*    -webkit-text-fill-color: transparent;*/
-/*    background-clip: text;*/
-/*    margin: 1rem 0;*/
-/*    line-height: 1.2;*/
-/*}*/
-
-/*.hero-description {*/
-/*    font-size: 1.3rem;*/
-/*    color: var(--text-muted);*/
-/*    max-width: 700px;*/
-/*    margin: 1.5rem auto 2rem;*/
-/*    line-height: 1.8;*/
-/*    animation: fadeInUp 0.6s ease-out 0.2s backwards;*/
-/*}*/
-
-/*.hero-buttons {*/
-/*    display: flex;*/
-/*    gap: 1.5rem;*/
-/*    justify-content: center;*/
-/*    flex-wrap: wrap;*/
-/*    margin-top: 2.5rem;*/
-/*    animation: fadeInUp 0.6s ease-out 0.4s backwards;*/
-/*}*/
-
-/*.btn-large {*/
-/*    padding: 1rem 2.5rem !important;*/
-/*    font-size: 1.1rem;*/
-/*    border-radius: 10px;*/
-/*    transition: all 0.3s var(--transition-smooth);*/
-/*}*/
-
-/*.btn-primary.btn-large {*/
-/*    box-shadow: 0 6px 20px rgba(138, 79, 125, 0.25);*/
-/*}*/
-
-/*.btn-primary.btn-large:hover {*/
-/*    transform: translateY(-4px);*/
-/*    box-shadow: 0 10px 30px rgba(138, 79, 125, 0.35);*/
-/*}*/
-
-/*.btn-secondary.btn-large {*/
-/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);*/
-/*}*/
-
-/*.btn-secondary.btn-large:hover {*/
-/*    transform: translateY(-4px);*/
-/*    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   9. STATS SECTION*/
-/*   ========================================================================= *!*/
-/*.stats-section {*/
-/*    background: var(--background);*/
-/*    padding: 3.5rem 2rem;*/
-/*    border-bottom: 1px solid var(--border);*/
-/*}*/
-
-/*.stats-container {*/
-/*    display: grid;*/
-/*    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));*/
-/*    gap: 2rem;*/
-/*    max-width: 900px;*/
-/*    margin: 0 auto;*/
-/*}*/
-
-/*.stat-item {*/
-/*    padding: 2rem;*/
-/*    background: var(--surface);*/
-/*    border-radius: 12px;*/
-/*    border: 1px solid var(--border);*/
-/*    text-align: center;*/
-/*    transition: all 0.3s var(--transition-smooth);*/
-/*    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);*/
-/*}*/
-
-/*.stat-item:hover {*/
-/*    transform: translateY(-4px);*/
-/*    box-shadow: 0 6px 16px rgba(239, 130, 117, 0.1);*/
-/*    border-color: var(--primary);*/
-/*}*/
-
-/*.stat-number {*/
-/*    font-size: 2.5rem;*/
-/*    font-weight: 800;*/
-/*    color: var(--primary);*/
-/*    margin-bottom: 0.5rem;*/
-/*}*/
-
-/*.stat-label {*/
-/*    color: var(--text-muted);*/
-/*    font-size: 0.95rem;*/
-/*    font-weight: 600;*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   10. CTA SECTION (CALL-TO-ACTION)*/
-/*   ========================================================================= *!*/
-/*.cta-section {*/
-/*    background: linear-gradient(135deg, var(--button-color) 0%, var(--primary) 100%);*/
-/*    padding: 4rem 2rem;*/
-/*    color: var(--surface);*/
-/*}*/
-
-/*.cta-content {*/
-/*    max-width: 700px;*/
-/*    margin: 0 auto;*/
-/*    text-align: center;*/
-/*}*/
-
-/*.cta-content h2 {*/
-/*    font-size: 2rem;*/
-/*    font-weight: 800;*/
-/*    margin-bottom: 1rem;*/
-/*    line-height: 1.3;*/
-/*}*/
-
-/*.cta-content p {*/
-/*    font-size: 1.1rem;*/
-/*    margin-bottom: 2rem;*/
-/*    opacity: 0.95;*/
-/*    line-height: 1.6;*/
-/*}*/
-
-/*.btn-cta {*/
-/*    background: var(--surface);*/
-/*    color: var(--button-color);*/
-/*    font-weight: 700;*/
-/*    padding: 1rem 2.5rem;*/
-/*    border-radius: 10px;*/
-/*    display: inline-block;*/
-/*    transition: all 0.3s ease;*/
-/*    text-decoration: none;*/
-/*    border: none;*/
-/*}*/
-
-/*.btn-cta:hover {*/
-/*    transform: scale(1.05);*/
-/*    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);*/
-/*}*/
-
-/*!* ==========================================================================*/
-/*   11. ANIMATIONS*/
-/*   ========================================================================= *!*/
-/*@keyframes bounce {*/
-/*    0%, 100% { transform: translateY(0); }*/
-/*    50% { transform: translateY(-10px); }*/
-/*}*/
-
-/*@keyframes fadeInDown {*/
-/*    from {*/
-/*        opacity: 0;*/
-/*        transform: translateY(-30px);*/
-/*    }*/
-/*    to {*/
-/*        opacity: 1;*/
-/*        transform: translateY(0);*/
-/*    }*/
-/*}*/
-
-/*@keyframes fadeInUp {*/
-/*    from {*/
-/*        opacity: 0;*/
-/*        transform: translateY(30px);*/
-/*    }*/
-/*    to {*/
-/*        opacity: 1;*/
-/*        transform: translateY(0);*/
-/*    }*/
-/*}*/
-
+/* Correction log box entrance scale adjustment */
+#res-mistakes div {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
