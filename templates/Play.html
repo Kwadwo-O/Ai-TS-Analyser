@@ -232,17 +232,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // --- KEYDOWN DETECTOR: ENTER KEY TO AUTO-SUBMIT ---
     hiddenCatcher.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
-            // Prevent the default newline breaking action of the enter key
             event.preventDefault();
-
-            // Only fire if the user has typed enough characters to display the submit button
             if (hiddenCatcher.value.length >= rawChallengeText.length && !submitBtn.disabled) {
                 submitBtn.click();
             }
         }
     });
 
-    // --- PHASE 3: SUBMISSION LOGS ENGINE & DASHBOARD SCRIPT ---
+    // --- PHASE 3: SUBMISSION LOGS ENGINE ---
     submitBtn.addEventListener("click", async function() {
         clearInterval(timerInterval);
         document.body.removeEventListener("click", focusCatcher);
@@ -267,13 +264,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const submitContentType = response.headers.get("content-type");
             if (!submitContentType || !submitContentType.includes("application/json")) {
-                throw new Error(`The evaluation processor returned an unexpected HTML layout (${response.status}) instead of structured data JSON package values.`);
+                throw new Error(`The evaluation processor returned an unexpected HTML layout (${response.status}) instead of structured data JSON.`);
             }
 
             let parsedData = await response.json();
             parsedData = parsedData || {};
 
-            // Internal fallback engine parsing string blocks from raw terminal logs
+            // Internal fallback parser if backend returns unformatted string data logs
             if (typeof parsedData === 'string' || !parsedData.accuracy) {
                 const normString = (typeof parsedData === 'string' ? parsedData : JSON.stringify(parsedData))
                                     .replace(/\\n/g, '\n').replace(/[{}"']/g, '');
@@ -301,55 +298,54 @@ document.addEventListener("DOMContentLoaded", function() {
                 };
             }
 
-            // Client Console Diagnostic Log Reporting
-            console.log("=== PERFORMANCE RUN DATA REGISTERED ===");
-            console.log(`Speed Output: ${finalPaceString}`);
-            console.log(`Calculated Accuracy: ${parsedData.accuracy}`);
-            console.log(`Score Milestone: ${parsedData.score}`);
-            console.log(`Assigned Tier: ${parsedData.user_rating}`);
-            console.log("========================================");
-
-            // Populate current scorecard summary nodes
+            // Assign raw properties to output nodes
             document.getElementById("res-speed").textContent = finalPaceString;
             document.getElementById("res-accuracy").textContent = parsedData.accuracy || "100%";
             document.getElementById("res-score").textContent = parsedData.score || "100/100";
             document.getElementById("res-rating").textContent = parsedData.user_rating || "Pro";
             document.getElementById("res-analysis").textContent = parsedData.text_analysis || "Analysis complete.";
 
-            // Dynamic tracking list rendering for mistyped word blocks
+            // --- RENDER MISTAKES IN THE PLAY RESULTS CONTAINER ---
             const mistakeLog = document.getElementById("res-mistakes");
             const mistakesWrapper = document.getElementById("mistakes-wrapper");
-            mistakeLog.innerHTML = "";
 
-            const mistakeList = parsedData.mistakes || [];
-            mistakesWrapper.style.display = "block";
+            if (mistakeLog && mistakesWrapper) {
+                mistakeLog.innerHTML = "";
+                mistakesWrapper.style.display = "block"; // Make the container card section visible
 
-            if (Array.isArray(mistakeList) && mistakeList.length > 0) {
-                mistakeList.forEach(item => {
-                    if (item && typeof item === 'object') {
-                        const keys = Object.keys(item);
-                        if (keys.length > 0) {
-                            const correctWord = keys[0];
-                            const userWord = item[correctWord];
+                const mistakeList = parsedData.mistakes || [];
 
-                            const errorRow = document.createElement("div");
-                            errorRow.style.fontSize = "0.95rem";
-                            errorRow.style.padding = "0.25rem 0";
-                            errorRow.innerHTML = `❌ Expected: <strong>${correctWord}</strong> | Typed: <span class="text-error" style="font-weight:700;">${userWord}</span>`;
-                            mistakeLog.appendChild(errorRow);
+                if (Array.isArray(mistakeList) && mistakeList.length > 0) {
+                    // Loop through and display each parsed mistake word discrepancy
+                    mistakeList.forEach(item => {
+                        if (item && typeof item === 'object') {
+                            const keys = Object.keys(item);
+                            if (keys.length > 0) {
+                                const correctWord = keys[0];
+                                const userWord = item[correctWord];
+
+                                const errorRow = document.createElement("div");
+                                errorRow.style.fontSize = "0.95rem";
+                                errorRow.style.padding = "0.35rem 0";
+                                errorRow.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+                                errorRow.innerHTML = `❌ Expected: <strong style="color:#fff;">${correctWord}</strong> | Typed: <span style="color:var(--primary); font-weight:700;">${userWord}</span>`;
+                                mistakeLog.appendChild(errorRow);
+                            }
                         }
-                    }
-                });
-            } else {
-                const successRow = document.createElement("div");
-                successRow.style.fontSize = "1rem";
-                successRow.style.color = "var(--success-hover)";
-                successRow.style.fontWeight = "600";
-                successRow.innerHTML = `✨ Perfect typing execution! No word discrepancies detected.`;
-                mistakeLog.appendChild(successRow);
+                    });
+                } else {
+                    // Flawless run placeholder message injection
+                    const successRow = document.createElement("div");
+                    successRow.style.fontSize = "1rem";
+                    successRow.style.color = "var(--success-hover)";
+                    successRow.style.fontWeight = "600";
+                    successRow.style.padding = "0.5rem 0";
+                    successRow.innerHTML = `✨ Perfect typing execution! No word discrepancies detected.`;
+                    mistakeLog.appendChild(successRow);
+                }
             }
 
-            // Inject an option to route directly back to the dashboard summary view
+            // Inject navigation shortcut link
             if (!document.getElementById("nav-dashboard-shortcut")) {
                 const dashboardBtn = document.createElement("button");
                 dashboardBtn.id = "nav-dashboard-shortcut";
