@@ -2,45 +2,52 @@
 {% block content %}
 <div class="login-container dashboard-wrapper">
 
-    <div class="main-card dashboard-banner">
+    <div class="main-card dashboard-banner passive-float">
         <h1 class="title">Typing <span class="title-highlight">Game</span></h1>
         <p class="description">Test your baseline performance accuracy. Click "Generate Challenge" to fetch an AI synthesized passage text prompt block.</p>
     </div>
 
     <div id="setup-panel" class="main-card dashboard-card">
-        <button id="start-btn" class="btn btn-play full-width-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            Generate Challenge Passage
+        <div id="error-fallback" class="main-card alert-card failure" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--primary); background: rgba(255, 0, 0, 0.05); padding: 1rem 1.25rem; border-radius: 8px; text-align: left;">
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                <svg style="color: var(--primary); flex-shrink: 0; margin-top: 2px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.25rem;" id="error-title">Generation Error</strong>
+                    <span id="error-text" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;"></span>
+                </div>
+            </div>
+        </div>
+
+        <button id="start-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <svg id="start-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span id="start-spinner" class="loading-spinner" style="display: none;"></span>
+            <span id="start-btn-text">Generate Challenge Passage</span>
         </button>
-        <p id="error-fallback" class="text-error" style="display: none; margin-top: 1rem; font-weight: 600; white-space: pre-wrap; text-align: left;"></p>
     </div>
 
     <div id="game-panel" class="main-card dashboard-card" style="display: none;">
-
         <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem;">
             <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
             </div>
             <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
             </div>
         </div>
 
         <div class="form-group" style="margin-top: 1.5rem; position: relative;">
             <label class="form-label">Challenge Target Text (Type anywhere on screen to begin)</label>
-
-            <div id="text-display" class="monospace-font" style="background-color: var(--surface); border: 2px solid var(--border); padding: 1.5rem; border-radius: 12px; font-size: 1.4rem; line-height: 2; font-weight: 500; letter-spacing: 1px; user-select: none; word-break: break-word; text-align: left;">
-                </div>
-
+            <div id="text-display" class="monospace-font"></div>
             <input type="text" id="hidden-keyboard-catcher" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px;">
         </div>
 
         <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
-            <button id="submit-btn" class="btn btn-play" style="display: none; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                Submit for Evaluation
+            <button id="submit-btn" class="btn btn-play interactive-hover" style="display: none; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem;">
+                <span id="submit-spinner" class="loading-spinner" style="display: none; border-left-color: #fff;"></span>
+                <svg id="submit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span id="submit-btn-text">Submit for Evaluation</span>
             </button>
         </div>
     </div>
@@ -77,49 +84,34 @@
 
         <div id="mistakes-wrapper" class="form-group" style="margin-top: 1.5rem; display: none; text-align: left;">
             <label class="form-label" style="color: var(--primary);">Identified Word Discrepancies</label>
-            <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
-                </div>
+            <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;"></div>
         </div>
 
-        <button id="reset-btn" class="btn btn-dashboard full-width-btn" style="margin-top: 2rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <button id="reset-btn" class="btn btn-dashboard full-width-btn interactive-hover" style="margin-top: 2rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
             Run Another Speed Challenge
         </button>
     </div>
-
 </div>
 
-<style>
-    .char-span {
-        position: relative;
-        color: var(--text-muted);
-        transition: background-color 0.1s, color 0.1s;
-        border-radius: 3px;
-        padding: 0 1px;
-    }
-    .char-span.correct {
-        color: var(--success-hover);
-        background-color: rgba(136, 160, 150, 0.15);
-    }
-    .char-span.incorrect {
-        color: var(--primary);
-        background-color: rgba(239, 130, 117, 0.2);
-    }
-    .char-span.active-cursor {
-        border-bottom: 3px solid var(--button-color);
-        animation: cursorBlink 0.8s infinite steps(2, start);
-    }
-    @keyframes cursorBlink {
-        to { border-bottom-color: transparent; }
-    }
-</style>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const startBtn = document.getElementById("start-btn");
+    const startIcon = document.getElementById("start-icon");
+    const startSpinner = document.getElementById("start-spinner");
+    const startBtnText = document.getElementById("start-btn-text");
+
     const submitBtn = document.getElementById("submit-btn");
+    const submitIcon = document.getElementById("submit-icon");
+    const submitSpinner = document.getElementById("submit-spinner");
+    const submitBtnText = document.getElementById("submit-btn-text");
+
     const resetBtn = document.getElementById("reset-btn");
     const errorFallback = document.getElementById("error-fallback");
+    const errorTitle = document.getElementById("error-title");
+    const errorText = document.getElementById("error-text");
 
     const setupPanel = document.getElementById("setup-panel");
     const gamePanel = document.getElementById("game-panel");
@@ -135,27 +127,47 @@ document.addEventListener("DOMContentLoaded", function() {
     let timerInterval = null;
     let timingStarted = false;
 
-    // --- PHASE 1: CHALLENGE TEXT SETUP GENERATOR ---
+    function calculateStandardWPM(characterCount, secondsElapsed) {
+        if (secondsElapsed <= 0) return 0;
+        return Math.round((characterCount / 5) / (secondsElapsed / 60));
+    }
+
     if (startBtn) {
         startBtn.addEventListener("click", async function() {
             startBtn.disabled = true;
-            startBtn.textContent = "Fetching Challenge Text...";
+            startIcon.style.display = "none";
+            startSpinner.style.display = "inline-block";
+            startBtnText.textContent = "Fetching Challenge Text...";
             errorFallback.style.display = "none";
 
             try {
                 const response = await fetch("/api/generate");
 
+                if (response.status === 429) {
+                    throw new Error("RATE_LIMIT_HIT");
+                }
+
                 const contentType = response.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error(`Server returned an invalid HTML page (${response.status}). Ensure you are logged in and your backend function isn't crashing.`);
+                    throw new Error(`Server returned non-JSON payload (${response.status}).`);
                 }
 
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.error || "Failed text configuration setup.");
 
-                rawChallengeText = result.sentence;
+                // CRITICAL FIX: Explicitly intercept rate limit text strings hiding inside successful 200 OK responses
+                let textToVerify = result.sentence || "";
+                if (typeof textToVerify === "object") {
+                    textToVerify = JSON.stringify(textToVerify);
+                }
 
+                if (textToVerify.includes("429") || textToVerify.toLowerCase().includes("rate limit")) {
+                    throw new Error("RATE_LIMIT_HIT");
+                }
+
+                rawChallengeText = result.sentence;
                 textDisplay.innerHTML = "";
+
                 rawChallengeText.split("").forEach((char, idx) => {
                     const span = document.createElement("span");
                     span.textContent = char;
@@ -179,10 +191,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 focusCatcher();
 
             } catch (err) {
-                errorFallback.textContent = err.message;
+                // Route everything back into the menu layout card
+                if (err.message === "RATE_LIMIT_HIT") {
+                    errorTitle.textContent = "Rate Limit Exceeded";
+                    errorText.textContent = "You've run out of daily free AI model requests. Please add credits or wait for your daily limit counter reset.";
+                } else {
+                    errorTitle.textContent = "Generation Error";
+                    errorText.textContent = err.message;
+                }
+
                 errorFallback.style.display = "block";
+
+                // Keep the menu visible and restore button usability
+                setupPanel.style.display = "block";
+                gamePanel.style.display = "none";
+
                 startBtn.disabled = false;
-                startBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Generate Challenge Passage`;
+                startIcon.style.display = "inline-block";
+                startSpinner.style.display = "none";
+                startBtnText.textContent = "Generate Challenge Passage";
             }
         });
     }
@@ -191,7 +218,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (gamePanel.style.display === "block") hiddenCatcher.focus();
     }
 
-    // --- PHASE 2: REALTIME CHARACTER HIGHLIGHT ENGINE ---
     hiddenCatcher.addEventListener("input", function() {
         const val = hiddenCatcher.value;
 
@@ -200,15 +226,11 @@ document.addEventListener("DOMContentLoaded", function() {
             timerInterval = setInterval(() => {
                 timeElapsed++;
                 timerLabel.textContent = `${timeElapsed}s`;
-
-                const wordsTyped = val.trim().split(/\s+/).filter(Boolean).length;
-                const minFraction = timeElapsed / 60;
-                liveWpmLabel.textContent = `${minFraction > 0 ? Math.round(wordsTyped / minFraction) : 0} WPM`;
+                liveWpmLabel.textContent = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
             }, 1000);
         }
 
         const spans = textDisplay.querySelectorAll(".char-span");
-
         spans.forEach((span, idx) => {
             span.classList.remove("correct", "incorrect", "active-cursor");
             if (idx < val.length) {
@@ -222,6 +244,8 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
+        liveWpmLabel.textContent = `${calculateStandardWPM(val.length, timeElapsed)} WPM`;
+
         if (val.length >= rawChallengeText.length) {
             submitBtn.style.display = "inline-flex";
         } else {
@@ -229,7 +253,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- KEYDOWN DETECTOR: ENTER KEY TO AUTO-SUBMIT ---
     hiddenCatcher.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -239,17 +262,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- PHASE 3: SUBMISSION LOGS ENGINE ---
     submitBtn.addEventListener("click", async function() {
         clearInterval(timerInterval);
         document.body.removeEventListener("click", focusCatcher);
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "AI Analysis Processing...";
+        submitIcon.style.display = "none";
+        submitSpinner.style.display = "inline-block";
+        submitBtnText.textContent = "AI Analysis Processing...";
         hiddenCatcher.disabled = true;
 
         try {
-            const finalPaceString = liveWpmLabel.textContent;
+            const exactFinalWPM = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
 
             const response = await fetch("/api/submit", {
                 method: "POST",
@@ -258,19 +282,18 @@ document.addEventListener("DOMContentLoaded", function() {
                     original_sentence: rawChallengeText,
                     user_sentence: hiddenCatcher.value,
                     time: `${timeElapsed} seconds`,
-                    typing_speed: finalPaceString
+                    typing_speed: exactFinalWPM
                 })
             });
 
             const submitContentType = response.headers.get("content-type");
             if (!submitContentType || !submitContentType.includes("application/json")) {
-                throw new Error(`The evaluation processor returned an unexpected HTML layout (${response.status}) instead of structured data JSON.`);
+                throw new Error(`The evaluation processor returned unexpected data formatting.`);
             }
 
             let parsedData = await response.json();
             parsedData = parsedData || {};
 
-            // Internal fallback parser if backend returns unformatted string data logs
             if (typeof parsedData === 'string' || !parsedData.accuracy) {
                 const normString = (typeof parsedData === 'string' ? parsedData : JSON.stringify(parsedData))
                                     .replace(/\\n/g, '\n').replace(/[{}"']/g, '');
@@ -280,43 +303,33 @@ document.addEventListener("DOMContentLoaded", function() {
                     return match ? match[1].trim() : null;
                 };
 
-                let analysisText = extractMetric("text_analysis") || extractMetric("response");
-                if (!analysisText) {
-                    const lines = normString.split('\n');
-                    analysisText = lines[0] ? lines[0].replace("response:", "").trim() : "";
-                }
-
                 let accuracyVal = extractMetric("accuracy") || "100%";
                 if (accuracyVal === "100/100") accuracyVal = "100%";
 
                 parsedData = {
-                    text_analysis: analysisText || "Analysis complete.",
-                    user_rating: extractMetric("user rating") || extractMetric("user_rating") || "Pro",
+                    text_analysis: extractMetric("text_analysis") || "Analysis complete.",
+                    user_rating: extractMetric("user rating") || "Pro",
                     score: extractMetric("score") || "100/100",
                     accuracy: accuracyVal,
                     mistakes: parsedData.mistakes || []
                 };
             }
 
-            // Assign raw properties to output nodes
-            document.getElementById("res-speed").textContent = finalPaceString;
+            document.getElementById("res-speed").textContent = exactFinalWPM;
             document.getElementById("res-accuracy").textContent = parsedData.accuracy || "100%";
             document.getElementById("res-score").textContent = parsedData.score || "100/100";
             document.getElementById("res-rating").textContent = parsedData.user_rating || "Pro";
             document.getElementById("res-analysis").textContent = parsedData.text_analysis || "Analysis complete.";
 
-            // --- RENDER MISTAKES IN THE PLAY RESULTS CONTAINER ---
             const mistakeLog = document.getElementById("res-mistakes");
             const mistakesWrapper = document.getElementById("mistakes-wrapper");
 
             if (mistakeLog && mistakesWrapper) {
                 mistakeLog.innerHTML = "";
-                mistakesWrapper.style.display = "block"; // Make the container card section visible
+                mistakesWrapper.style.display = "block";
 
                 const mistakeList = parsedData.mistakes || [];
-
                 if (Array.isArray(mistakeList) && mistakeList.length > 0) {
-                    // Loop through and display each parsed mistake word discrepancy
                     mistakeList.forEach(item => {
                         if (item && typeof item === 'object') {
                             const keys = Object.keys(item);
@@ -325,31 +338,35 @@ document.addEventListener("DOMContentLoaded", function() {
                                 const userWord = item[correctWord];
 
                                 const errorRow = document.createElement("div");
-                                errorRow.style.fontSize = "0.95rem";
-                                errorRow.style.padding = "0.35rem 0";
-                                errorRow.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-                                errorRow.innerHTML = `❌ Expected: <strong style="color:#fff;">${correctWord}</strong> | Typed: <span style="color:var(--primary); font-weight:700;">${userWord}</span>`;
+                                errorRow.className = "mistake-entry-row";
+                                // STYLE FIX: Added inline high-contrast var values so 'Expected' words are readable against a light background
+                                errorRow.innerHTML = `
+                                    <svg class="theme-error-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <span style="color: #333333; font-weight: 500;">Expected:</span> <strong class="expected-word-text" style="color: #111111; font-weight: 700; background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${correctWord}</strong> <span class="divider-bar" style="color: #888888; margin: 0 4px;">|</span> <span style="color: #333333; font-weight: 500;">Typed:</span> <span class="typed-error-text" style="color: var(--primary); font-weight: 600;">${userWord}</span>
+                                `;
                                 mistakeLog.appendChild(errorRow);
                             }
                         }
                     });
                 } else {
-                    // Flawless run placeholder message injection
                     const successRow = document.createElement("div");
-                    successRow.style.fontSize = "1rem";
-                    successRow.style.color = "var(--success-hover)";
-                    successRow.style.fontWeight = "600";
-                    successRow.style.padding = "0.5rem 0";
-                    successRow.innerHTML = `✨ Perfect typing execution! No word discrepancies detected.`;
+                    successRow.className = "mistake-entry-row perfect-run-row";
+                    successRow.innerHTML = `
+                        <svg class="theme-success-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Perfect typing execution! No word discrepancies detected.
+                    `;
                     mistakeLog.appendChild(successRow);
                 }
             }
 
-            // Inject navigation shortcut link
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 140, spread: 80, origin: { y: 0.6 } });
+            }
+
             if (!document.getElementById("nav-dashboard-shortcut")) {
                 const dashboardBtn = document.createElement("button");
                 dashboardBtn.id = "nav-dashboard-shortcut";
-                dashboardBtn.className = "btn btn-play";
+                dashboardBtn.className = "btn btn-play interactive-hover";
                 dashboardBtn.style.marginTop = "1rem";
                 dashboardBtn.style.width = "100%";
                 dashboardBtn.style.backgroundColor = "transparent";
@@ -366,26 +383,34 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch (err) {
             alert(`Evaluation Processing Exception Error: ${err.message}`);
             submitBtn.disabled = false;
-            submitBtn.textContent = "Submit for Evaluation";
+            submitIcon.style.display = "inline-block";
+            submitSpinner.style.display = "none";
+            submitBtnText.textContent = "Submit for Evaluation";
             hiddenCatcher.disabled = false;
             document.body.addEventListener("click", focusCatcher);
             focusCatcher();
         }
     });
 
-    // --- PHASE 4: RE-INITIALIZATION CLEANER ---
     resetBtn.addEventListener("click", function() {
         resultsPanel.style.display = "none";
         setupPanel.style.display = "block";
         hiddenCatcher.value = "";
         hiddenCatcher.disabled = false;
 
+        submitBtn.disabled = false;
+        submitIcon.style.display = "inline-block";
+        submitSpinner.style.display = "none";
+        submitBtnText.textContent = "Submit for Evaluation";
+
         const shortcut = document.getElementById("nav-dashboard-shortcut");
         if (shortcut) shortcut.remove();
 
         if (startBtn) {
             startBtn.disabled = false;
-            startBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Generate Challenge Passage`;
+            startIcon.style.display = "inline-block";
+            startSpinner.style.display = "none";
+            startBtnText.textContent = "Generate Challenge Passage";
         }
     });
 });

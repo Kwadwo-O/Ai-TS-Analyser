@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify  # Make sure jsonify is imported at the top
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
+import re, traceback
+
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from backend import backend_generate, backend_send, verify_openrouter
-from models import db, User, TypingResult
-import traceback, re
+from models import TypingResult, db, User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'

@@ -497,3 +497,144 @@ code {
     text-decoration: none;
     font-size: 0.95rem;
 }
+
+/* ==========================================================================
+   7. TYPING ENGINE TEXT RENDERING & CONTRAST RULES
+   ========================================================================== */
+#text-display {
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    line-height: 2;
+    font-weight: 500;
+    letter-spacing: 1px;
+    user-select: none;
+    word-break: break-word;
+    text-align: left;
+}
+
+.char-span {
+    position: relative;
+    color: var(--text-muted);
+    transition: background-color 0.1s, color 0.1s;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+.char-span.correct {
+    color: var(--success-hover);
+    background-color: rgba(136, 160, 150, 0.15);
+}
+
+.char-span.incorrect {
+    color: var(--primary);
+    background-color: rgba(239, 130, 117, 0.2);
+}
+
+.char-span.active-cursor {
+    border-bottom: 3px solid var(--button-color);
+    animation: cursorBlink 0.8s infinite steps(2, start);
+}
+
+@keyframes cursorBlink {
+    to { border-bottom-color: transparent; }
+}
+
+/* Mistake Log Data-Row Formatting */
+.mistake-entry-row {
+    font-size: 0.95rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.expected-word-text {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.divider-bar {
+    color: var(--text-muted);
+    margin: 0 0.25rem;
+}
+
+.typed-error-text {
+    color: var(--primary);
+    font-weight: 700;
+    background-color: rgba(239, 130, 117, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+/* ==========================================================================
+   8. ACTIVE LOADING ANIMATIONS & PASSIVE MICRO-INTERACTIONS
+   ========================================================================== */
+
+/* Circular Processing Spinner Framework */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-left-color: var(--surface);
+    animation: spinLoader 0.75s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes spinLoader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Passive Micro-Interactions: Soft Float Effect */
+.passive-float {
+    animation: floatingMotion 6s ease-in-out infinite alternate !important;
+}
+
+@keyframes floatingMotion {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-6px); }
+}
+
+/* Snappy Action States for Interactive Items */
+.interactive-hover {
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+                background-color 0.15s ease,
+                box-shadow 0.2s ease !important;
+}
+
+.interactive-hover:hover {
+    transform: translateY(-3px) scale(1.01) !important;
+}
+
+.interactive-hover:active {
+    transform: translateY(-1px) scale(0.99) !important;
+}
+
+/* Color Scheme Integration for Inline SVGs */
+.theme-error-icon {
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+}
+
+.theme-success-icon {
+    color: var(--success-hover);
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+}
+
+.perfect-run-row {
+    color: var(--success-hover) !important;
+    font-weight: 600;
+    font-size: 1rem !important;
+}Mo
