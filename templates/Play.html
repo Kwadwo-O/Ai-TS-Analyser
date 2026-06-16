@@ -3,7 +3,7 @@
 <div class="login-container dashboard-wrapper">
 
     <div class="main-card dashboard-banner">
-        <h1 class="title">Typing <span class="title-highlight">Arena</span></h1>
+        <h1 class="title">Typing <span class="title-highlight">Game</span></h1>
         <p class="description">Test your baseline performance accuracy. Click "Generate Challenge" to fetch an AI synthesized passage text prompt block.</p>
     </div>
 
@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 liveWpmLabel.textContent = "0 WPM";
                 submitBtn.style.display = "none";
                 hiddenCatcher.value = "";
+                hiddenCatcher.disabled = false;
 
                 setupPanel.style.display = "none";
                 gamePanel.style.display = "block";
@@ -228,7 +229,20 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- PHASE 3: SUBMISSION ENGINE WITH DYNAMIC MISTAKE DISPLAY ---
+    // --- KEYDOWN DETECTOR: ENTER KEY TO AUTO-SUBMIT ---
+    hiddenCatcher.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            // Prevent the default newline breaking action of the enter key
+            event.preventDefault();
+
+            // Only fire if the user has typed enough characters to display the submit button
+            if (hiddenCatcher.value.length >= rawChallengeText.length && !submitBtn.disabled) {
+                submitBtn.click();
+            }
+        }
+    });
+
+    // --- PHASE 3: SUBMISSION LOGS ENGINE & DASHBOARD SCRIPT ---
     submitBtn.addEventListener("click", async function() {
         clearInterval(timerInterval);
         document.body.removeEventListener("click", focusCatcher);
@@ -259,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let parsedData = await response.json();
             parsedData = parsedData || {};
 
-            // Internal string extractor fallback if your backend passes raw log strings rather than JSON keys
+            // Internal fallback engine parsing string blocks from raw terminal logs
             if (typeof parsedData === 'string' || !parsedData.accuracy) {
                 const normString = (typeof parsedData === 'string' ? parsedData : JSON.stringify(parsedData))
                                     .replace(/\\n/g, '\n').replace(/[{}"']/g, '');
@@ -287,25 +301,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 };
             }
 
-            // Assign data values directly to the corresponding UI nodes
+            // Client Console Diagnostic Log Reporting
+            console.log("=== PERFORMANCE RUN DATA REGISTERED ===");
+            console.log(`Speed Output: ${finalPaceString}`);
+            console.log(`Calculated Accuracy: ${parsedData.accuracy}`);
+            console.log(`Score Milestone: ${parsedData.score}`);
+            console.log(`Assigned Tier: ${parsedData.user_rating}`);
+            console.log("========================================");
+
+            // Populate current scorecard summary nodes
             document.getElementById("res-speed").textContent = finalPaceString;
             document.getElementById("res-accuracy").textContent = parsedData.accuracy || "100%";
             document.getElementById("res-score").textContent = parsedData.score || "100/100";
             document.getElementById("res-rating").textContent = parsedData.user_rating || "Pro";
             document.getElementById("res-analysis").textContent = parsedData.text_analysis || "Analysis complete.";
 
-            // --- HANDLING MISTAKES BLOCK DISPLAY ---
+            // Dynamic tracking list rendering for mistyped word blocks
             const mistakeLog = document.getElementById("res-mistakes");
             const mistakesWrapper = document.getElementById("mistakes-wrapper");
             mistakeLog.innerHTML = "";
 
             const mistakeList = parsedData.mistakes || [];
-
-            // Always display the wrapper container to show either typos or clear confirmation
             mistakesWrapper.style.display = "block";
 
             if (Array.isArray(mistakeList) && mistakeList.length > 0) {
-                // Render discrepancies if items are present inside the array list
                 mistakeList.forEach(item => {
                     if (item && typeof item === 'object') {
                         const keys = Object.keys(item);
@@ -322,13 +341,27 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
             } else {
-                // If the array list is empty, display a perfect run validation notice
                 const successRow = document.createElement("div");
                 successRow.style.fontSize = "1rem";
                 successRow.style.color = "var(--success-hover)";
                 successRow.style.fontWeight = "600";
                 successRow.innerHTML = `✨ Perfect typing execution! No word discrepancies detected.`;
                 mistakeLog.appendChild(successRow);
+            }
+
+            // Inject an option to route directly back to the dashboard summary view
+            if (!document.getElementById("nav-dashboard-shortcut")) {
+                const dashboardBtn = document.createElement("button");
+                dashboardBtn.id = "nav-dashboard-shortcut";
+                dashboardBtn.className = "btn btn-play";
+                dashboardBtn.style.marginTop = "1rem";
+                dashboardBtn.style.width = "100%";
+                dashboardBtn.style.backgroundColor = "transparent";
+                dashboardBtn.style.border = "2px solid var(--button-color)";
+                dashboardBtn.style.color = "var(--button-color)";
+                dashboardBtn.innerHTML = `📊 View Run Metrics on Historical Dashboard`;
+                dashboardBtn.onclick = () => { window.location.href = "/dashboard"; };
+                resetBtn.parentNode.insertBefore(dashboardBtn, resetBtn);
             }
 
             gamePanel.style.display = "none";
@@ -344,12 +377,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- PHASE 4: RE-INITIALIZATION CLEANER LOOP ---
+    // --- PHASE 4: RE-INITIALIZATION CLEANER ---
     resetBtn.addEventListener("click", function() {
         resultsPanel.style.display = "none";
         setupPanel.style.display = "block";
         hiddenCatcher.value = "";
         hiddenCatcher.disabled = false;
+
+        const shortcut = document.getElementById("nav-dashboard-shortcut");
+        if (shortcut) shortcut.remove();
 
         if (startBtn) {
             startBtn.disabled = false;

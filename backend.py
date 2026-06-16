@@ -96,10 +96,10 @@ def backend_send(original_sentence, user_sentence, time, typing_speed, api_key: 
         data = json.loads(data)
         print(data)
         print(f"""response:{data["text_analysis"]}
-        user rating:{data["user_rating"]}
-        score: {data["score"]}/100%
-        accuracy: {data["accuracy"]}/100
-        mistakes = {data.get("mistakes", [])}""")
+user rating:{data["user_rating"]}
+score: {data["score"]}/100%
+accuracy: {data["accuracy"]}/100
+mistakes = {data.get("mistakes", [])}""")
     return data
 
 

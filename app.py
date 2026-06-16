@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from backend import backend_generate, backend_send, verify_openrouter
 from models import db, User, TypingResult
-import traceback
+import traceback, re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
