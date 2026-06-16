@@ -10,19 +10,19 @@ import json
 
 MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 API_KEY = ""
-HEADERS = {
-    "Authorization": f"Bearer {API_KEY}",
-    "Content-Type": "application/json",
-    "X-Title": "Typing Speed Test Backend"
-}
 
-def send_data(data):
+def send_data(data, api_key: str = API_KEY):
     url = "https://openrouter.ai/api/v1/chat/completions"
     data = {
         "model": MODEL,  # You can change this to any OpenRouter model slug
         "messages": [{"role": "user", "content": data}]
     }
-    response = requests.post(url, headers=HEADERS, json=data)
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "X-Title": "Typing Speed Test Backend"
+    }
+    response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:
         return response.json()["choices"][0]["message"]["content"]
     else:
@@ -55,21 +55,22 @@ def verify_openrouter(api_key: str = API_KEY):
 
 
 
-def backend_generate():
+def backend_generate(api_key: str = API_KEY):
     prompt = """
     Generate a random sentence for a typing speed test. 
     the sentence should be between 10 and 20 words long. 
     The sentence should be grammatically correct and should not contain any special characters or numbers.
     The sentence should be in English.
     The sentence should be unique and not a common phrase or idiom.
-    The sentence should have accurate punctuation like commas.
+    The sentence should have accurate punctuation like commas and spaces to separate words.
     Avoid inappropriate or sensitive sentences.
     Avoid hard words to type.
+    
     """
-    data = send_data(prompt)
+    data = send_data(prompt, api_key)
     return data
 
-def backend_send(original_sentence, user_sentence, time, typing_speed):
+def backend_send(original_sentence, user_sentence, time, typing_speed, api_key: str = API_KEY):
     prompt = f"""
     using this original sentence:{original_sentence}
     use this user typed sentence: {user_sentence}
@@ -84,19 +85,22 @@ def backend_send(original_sentence, user_sentence, time, typing_speed):
       "accuracy": (), # how accurate the user is out of 100
       "mistakes": [
         "correct word": "incorrect word"
-      ], add the word they wrote wrong and the correct spelling correct word in the first stretchmarks and incorrect for the second brackets if no mistake is made do not return anything
+      ], add the word they wrote wrong and the correct spelling correct word in the first stretchmarks and incorrect for the second brackets if no mistake is made do not return anything - if the word cannot be found in the sentence do not return anything
     )
     """
-    data = send_data(prompt).strip("```json")
+    data = send_data(prompt, api_key).strip("```json")
 
     if '"error"' in data:
         return "Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
     else:
         data = json.loads(data)
+        print(data)
         print(f"""response:{data["text_analysis"]}
         user rating:{data["user_rating"]}
         score: {data["score"]}/100%
-        accuracy: {data["accuracy"]}/100""")
+        accuracy: {data["accuracy"]}/100
+        mistakes = {data.get("mistakes", [])}""")
+    return data
 
 
 

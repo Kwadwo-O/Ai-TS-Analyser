@@ -1,6 +1,6 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="login-container dashboard-wrapper">
+<div class="login-container dashboard-wrapper" style="max-width: 950px; margin: 0 auto;">
 
     <div class="main-card dashboard-banner">
         <h1 class="title">Account <span class="title-highlight">Console</span></h1>
@@ -30,12 +30,65 @@
     {% endwith %}
 
     {% if current_tab == 'profile' %}
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; width: 100%;">
+            <div class="main-card dashboard-card" style="text-align: center; padding: 1.25rem;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Challenges Completed</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ total_tests }}</div>
+            </div>
+            <div class="main-card dashboard-card" style="text-align: center; padding: 1.25rem;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Average Speed</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--button-color); margin-top: 0.25rem;">{{ avg_wpm }} <span style="font-size: 1.1rem; font-weight: 500; color: var(--text-muted);">WPM</span></div>
+            </div>
+            <div class="main-card dashboard-card" style="text-align: center; padding: 1.25rem;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Top Typing Speed</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--success-hover); margin-top: 0.25rem;">{{ highest_wpm }} <span style="font-size: 1.1rem; font-weight: 500; color: var(--text-muted);">WPM</span></div>
+            </div>
+        </div>
+
         <div class="main-card dashboard-card">
             <h3 class="card-section-title">User Account Metadata</h3>
             <div class="form-group" style="margin-top: 1.5rem;">
                 <p><strong>Username / Account Identifier:</strong> <span>{{ user.username }}</span></p>
                 <p style="margin-top: 0.5rem;"><strong>Database Record Token ID:</strong> <code>#00{{ user.id }}</code></p>
             </div>
+        </div>
+
+        <div class="main-card dashboard-card" style="margin-top: 1.5rem; padding: 1.5rem;">
+            <h3 class="card-section-title" style="margin-bottom: 1.25rem; border-bottom: 2px solid var(--border); padding-bottom: 0.75rem;">
+                Historical Typing Run Records
+            </h3>
+
+            {% if history %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-weight: 700;">
+                            <th style="padding: 0.75rem 0.5rem;">Date Run</th>
+                            <th style="padding: 0.75rem 0.5rem;">Speed</th>
+                            <th style="padding: 0.75rem 0.5rem;">Accuracy</th>
+                            <th style="padding: 0.75rem 0.5rem;">Score Metric</th>
+                            <th style="padding: 0.75rem 0.5rem;">Tier Status</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: var(--text-main);">
+                        {% for run in history %}
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 0.75rem 0.5rem; color: var(--text-muted);">{{ run.date_recorded.strftime('%b %d, %Y @ %I:%M %p') }}</td>
+                            <td style="padding: 0.75rem 0.5rem; font-weight: 700; color: var(--button-color);">{{ run.speed_wpm }} WPM</td>
+                            <td style="padding: 0.75rem 0.5rem; color: var(--success-hover); font-weight: 600;">{{ run.accuracy }}</td>
+                            <td style="padding: 0.75rem 0.5rem; font-family: monospace;">{{ run.score }}</td>
+                            <td style="padding: 0.75rem 0.5rem;"><span style="background: var(--surface); border: 1px solid var(--border); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">{{ run.tier_status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+                <p style="margin: 0; font-size: 1rem;">No typing metrics logged to this account yet.</p>
+            </div>
+            {% endif %}
         </div>
 
         <div class="main-card dashboard-card" style="margin-top: 1.5rem;">

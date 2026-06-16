@@ -1,170 +1,361 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="home-container" style="flex-direction: column; align-items: center; gap: 2rem;">
+<div class="login-container dashboard-wrapper">
 
-    <div class="main-card" id="game-card" style="max-width: 700px; width: 100%;">
-        <h1 class="title">Type<span class="title-highlight">Swift</span></h1>
-        <p class="description">Type the phrase below. The real-time counter initializes automatically on your first stroke entry.</p>
+    <div class="main-card dashboard-banner">
+        <h1 class="title">Typing <span class="title-highlight">Arena</span></h1>
+        <p class="description">Test your baseline performance accuracy. Click "Generate Challenge" to fetch an AI synthesized passage text prompt block.</p>
+    </div>
 
-        <div id="target-phrase" style="background-color: var(--background); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border); text-align: left; font-size: 1.25rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.6; color: var(--text-main); user-select: none;">
-            {{ target_text }}
+    <div id="setup-panel" class="main-card dashboard-card">
+        <button id="start-btn" class="btn btn-play full-width-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Generate Challenge Passage
+        </button>
+        <p id="error-fallback" class="text-error" style="display: none; margin-top: 1rem; font-weight: 600; white-space: pre-wrap; text-align: left;"></p>
+    </div>
+
+    <div id="game-panel" class="main-card dashboard-card" style="display: none;">
+
+        <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem;">
+            <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
+            </div>
+            <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
+            </div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem; font-weight: 700; font-size: 1.1rem;">
-            <div style="color: var(--text-muted);">Duration: <span id="timer-val" style="color: var(--primary);">0.0</span>s</div>
-            <div style="color: var(--text-muted);">Live Pace: <span id="wpm-val" style="color: var(--button-color);">0</span> WPM</div>
+        <div class="form-group" style="margin-top: 1.5rem; position: relative;">
+            <label class="form-label">Challenge Target Text (Type anywhere on screen to begin)</label>
+
+            <div id="text-display" class="monospace-font" style="background-color: var(--surface); border: 2px solid var(--border); padding: 1.5rem; border-radius: 12px; font-size: 1.4rem; line-height: 2; font-weight: 500; letter-spacing: 1px; user-select: none; word-break: break-word; text-align: left;">
+                </div>
+
+            <input type="text" id="hidden-keyboard-catcher" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px;">
         </div>
 
-        <div class="form-group">
-            <textarea id="typing-input" class="form-input" rows="3" placeholder="Begin matching text strings here..." style="resize: none; font-size: 1.15rem; line-height: 1.6; padding: 1rem;" autocomplete="off" autofocus></textarea>
-        </div>
-
-        <p id="status-message" style="margin-top: 1.25rem; color: var(--button-color); font-weight: 600; display: none; text-align: center;">
-            🔄 Contacting OpenRouter engine for performance decoding...
-        </p>
-
-        <div style="margin-top: 1.5rem; text-align: center;">
-            <a href="/play" class="btn btn-dashboard" style="display: inline-block; padding: 0.6rem 1.5rem; font-size: 0.95rem;">Skip / Next Phrase</a>
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+            <button id="submit-btn" class="btn btn-play" style="display: none; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Submit for Evaluation
+            </button>
         </div>
     </div>
 
-    <div class="main-card" id="result-card" style="max-width: 700px; width: 100%; display: none; text-align: left; padding: 2.5rem 2rem;">
-        <h2 class="title" style="text-align: center; font-size: 2.25rem; margin-bottom: 1.5rem;">AI <span class="title-highlight">Analysis</span></h2>
+    <div id="results-panel" class="main-card alert-card success" style="display: none; max-width: 100%; padding: 2.5rem 2rem;">
+        <h3 class="card-section-title" style="color: var(--button-color); font-size: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12 6.477 22 12 22z"></path><path d="M12 6v6l4 2"></path></svg>
+            AI Evaluation Breakdown
+        </h3>
 
-        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 140px; background: var(--background); padding: 1.25rem 0.75rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
-                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Gross Score</div>
-                <div id="res-score" style="font-size: 1.75rem; font-weight: bold; color: var(--button-color); margin-top: 0.25rem;">--</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom: 2rem; width: 100%;">
+            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Final Speed</div>
+                <div id="res-speed" style="font-size: 1.4rem; font-weight: 700; color: var(--button-color); margin-top: 0.25rem;">--</div>
             </div>
-            <div style="flex: 1; min-width: 140px; background: var(--background); padding: 1.25rem 0.75rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
-                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Accuracy Rating</div>
-                <div id="res-accuracy" style="font-size: 1.75rem; font-weight: bold; color: var(--success-hover); margin-top: 0.25rem;">--</div>
+            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Accuracy</div>
+                <div id="res-accuracy" style="font-size: 1.4rem; font-weight: 700; color: var(--success-hover); margin-top: 0.25rem;">--</div>
             </div>
-            <div style="flex: 1; min-width: 140px; background: var(--background); padding: 1.25rem 0.75rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
-                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">AI Rank Placement</div>
-                <div id="res-rating" style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-top: 0.4rem;">--</div>
+            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Overall Score</div>
+                <div id="res-score" style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">--</div>
+            </div>
+            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Tier Status</div>
+                <div id="res-rating" style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-top: 0.4rem; text-transform: capitalize;">--</div>
             </div>
         </div>
 
-        <div style="margin-bottom: 2rem;">
-            <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 700;">Text Assessment</h4>
-            <p id="res-analysis" style="color: var(--text-muted); line-height: 1.6; font-size: 1rem; background-color: var(--background); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--button-color);"></p>
+        <div class="form-group" style="text-align: left;">
+            <label class="form-label">Qualitative Performance Analysis</label>
+            <p id="res-analysis" style="color: var(--text-main); line-height: 1.6; background-color: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); font-size: 1rem; margin-top: 0.5rem;"></p>
         </div>
 
-        <div id="mistakes-container" style="margin-bottom: 2.5rem;">
-            <h4 style="color: var(--text-main); margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 700;">Correction Log</h4>
-            <div id="res-mistakes" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+        <div id="mistakes-wrapper" class="form-group" style="margin-top: 1.5rem; display: none; text-align: left;">
+            <label class="form-label" style="color: var(--primary);">Identified Word Discrepancies</label>
+            <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
         </div>
 
-        <div style="text-align: center;">
-            <a href="/play" class="btn btn-play" style="display: block; width: 100%;">Load Next Challenge</a>
-        </div>
+        <button id="reset-btn" class="btn btn-dashboard full-width-btn" style="margin-top: 2rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            Run Another Speed Challenge
+        </button>
     </div>
+
 </div>
 
+<style>
+    .char-span {
+        position: relative;
+        color: var(--text-muted);
+        transition: background-color 0.1s, color 0.1s;
+        border-radius: 3px;
+        padding: 0 1px;
+    }
+    .char-span.correct {
+        color: var(--success-hover);
+        background-color: rgba(136, 160, 150, 0.15);
+    }
+    .char-span.incorrect {
+        color: var(--primary);
+        background-color: rgba(239, 130, 117, 0.2);
+    }
+    .char-span.active-cursor {
+        border-bottom: 3px solid var(--button-color);
+        animation: cursorBlink 0.8s infinite steps(2, start);
+    }
+    @keyframes cursorBlink {
+        to { border-bottom-color: transparent; }
+    }
+</style>
+
 <script>
-const targetText = "{{ target_text }}".trim();
-const inputArea = document.getElementById('typing-input');
-const timerDisplay = document.getElementById('timer-val');
-const wpmDisplay = document.getElementById('wpm-val');
-const statusMsg = document.getElementById('status-message');
+document.addEventListener("DOMContentLoaded", function() {
+    const startBtn = document.getElementById("start-btn");
+    const submitBtn = document.getElementById("submit-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const errorFallback = document.getElementById("error-fallback");
 
-let startTime = null;
-let timerInterval = null;
-let testActive = true;
+    const setupPanel = document.getElementById("setup-panel");
+    const gamePanel = document.getElementById("game-panel");
+    const resultsPanel = document.getElementById("results-panel");
 
-inputArea.addEventListener('input', () => {
-    if (!testActive) return;
+    const textDisplay = document.getElementById("text-display");
+    const hiddenCatcher = document.getElementById("hidden-keyboard-catcher");
+    const timerLabel = document.getElementById("timer-label");
+    const liveWpmLabel = document.getElementById("live-wpm");
 
-    // Initialize tracking timers on initial stroke registration
-    if (startTime === null) {
-        startTime = new Date();
-        timerInterval = setInterval(updateTimer, 100);
+    let rawChallengeText = "";
+    let timeElapsed = 0;
+    let timerInterval = null;
+    let timingStarted = false;
+
+    // --- PHASE 1: CHALLENGE TEXT SETUP GENERATOR ---
+    if (startBtn) {
+        startBtn.addEventListener("click", async function() {
+            startBtn.disabled = true;
+            startBtn.textContent = "Fetching Challenge Text...";
+            errorFallback.style.display = "none";
+
+            try {
+                const response = await fetch("/api/generate");
+
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error(`Server returned an invalid HTML page (${response.status}). Ensure you are logged in and your backend function isn't crashing.`);
+                }
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Failed text configuration setup.");
+
+                rawChallengeText = result.sentence;
+
+                textDisplay.innerHTML = "";
+                rawChallengeText.split("").forEach((char, idx) => {
+                    const span = document.createElement("span");
+                    span.textContent = char;
+                    span.classList.add("char-span");
+                    if (idx === 0) span.classList.add("active-cursor");
+                    textDisplay.appendChild(span);
+                });
+
+                timeElapsed = 0;
+                timingStarted = false;
+                timerLabel.textContent = "0s";
+                liveWpmLabel.textContent = "0 WPM";
+                submitBtn.style.display = "none";
+                hiddenCatcher.value = "";
+
+                setupPanel.style.display = "none";
+                gamePanel.style.display = "block";
+
+                document.body.addEventListener("click", focusCatcher);
+                focusCatcher();
+
+            } catch (err) {
+                errorFallback.textContent = err.message;
+                errorFallback.style.display = "block";
+                startBtn.disabled = false;
+                startBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Generate Challenge Passage`;
+            }
+        });
     }
 
-    const currentInput = inputArea.value;
-
-    // Trigger complete events once character string limits are achieved
-    if (currentInput.length >= targetText.length) {
-        clearInterval(timerInterval);
-        testActive = false;
-        inputArea.disabled = true;
-        submitResults(currentInput);
+    function focusCatcher() {
+        if (gamePanel.style.display === "block") hiddenCatcher.focus();
     }
-});
 
-function updateTimer() {
-    const timePassed = (new Date() - startTime) / 1000;
-    timerDisplay.innerText = timePassed.toFixed(1);
+    // --- PHASE 2: REALTIME CHARACTER HIGHLIGHT ENGINE ---
+    hiddenCatcher.addEventListener("input", function() {
+        const val = hiddenCatcher.value;
 
-    // Calculate words-per-minute dynamically (Standard metric: total inputs / 5)
-    const wordCount = inputArea.value.length / 5;
-    if (timePassed > 0) {
-        const liveWpm = Math.round(wordCount / (timePassed / 60));
-        wpmDisplay.innerText = liveWpm > 0 ? liveWpm : 0;
-    }
-}
+        if (!timingStarted && val.length > 0) {
+            timingStarted = true;
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                timerLabel.textContent = `${timeElapsed}s`;
 
-function submitResults(finalTypedText) {
-    statusMsg.style.display = "block";
+                const wordsTyped = val.trim().split(/\s+/).filter(Boolean).length;
+                const minFraction = timeElapsed / 60;
+                liveWpmLabel.textContent = `${minFraction > 0 ? Math.round(wordsTyped / minFraction) : 0} WPM`;
+            }, 1000);
+        }
 
-    const timeTaken = parseFloat(timerDisplay.innerText);
-    const finalWpm = parseInt(wpmDisplay.innerText);
+        const spans = textDisplay.querySelectorAll(".char-span");
 
-    fetch('/submit-score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            original_sentence: targetText,
-            user_sentence: finalTypedText,
-            time_taken: timeTaken,
-            wpm: finalWpm
-        })
-    })
-    .then(res => res.json())
-    .then(response => {
-        if (response.status === "success") {
-            statusMsg.style.display = "none";
-            showResultsCard(response.analysis);
+        spans.forEach((span, idx) => {
+            span.classList.remove("correct", "incorrect", "active-cursor");
+            if (idx < val.length) {
+                if (val[idx] === rawChallengeText[idx]) {
+                    span.classList.add("correct");
+                } else {
+                    span.classList.add("incorrect");
+                }
+            } else if (idx === val.length) {
+                span.classList.add("active-cursor");
+            }
+        });
+
+        if (val.length >= rawChallengeText.length) {
+            submitBtn.style.display = "inline-flex";
         } else {
-            statusMsg.innerText = "Error decoding AI metadata streams.";
-            statusMsg.style.color = "var(--primary)";
+            submitBtn.style.display = "none";
         }
-    })
-    .catch(err => {
-        statusMsg.innerText = "Network pipeline error encountered.";
-        statusMsg.style.color = "var(--primary)";
-        console.error(err);
     });
-}
 
-function showResultsCard(analysis) {
-    // Populate dynamic evaluation bindings safely
-    document.getElementById('res-score').innerText = analysis.score || "100%";
-    document.getElementById('res-accuracy').innerText = analysis.accuracy || "100%";
-    document.getElementById('res-rating').innerText = analysis.user_rating || "Skilled";
-    document.getElementById('res-analysis').innerText = analysis.text_analysis || "No analytical text statement produced.";
+    // --- PHASE 3: SUBMISSION ENGINE WITH DYNAMIC MISTAKE DISPLAY ---
+    submitBtn.addEventListener("click", async function() {
+        clearInterval(timerInterval);
+        document.body.removeEventListener("click", focusCatcher);
 
-    const mistakesDiv = document.getElementById('res-mistakes');
-    const mistakesContainer = document.getElementById('mistakes-container');
-    mistakesDiv.innerHTML = "";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "AI Analysis Processing...";
+        hiddenCatcher.disabled = true;
 
-    // Parse dictionary elements safely to populate error lists
-    if (analysis.mistakes && Object.keys(analysis.mistakes).length > 0) {
-        mistakesContainer.style.display = "block";
-        for (const [correct, incorrect] of Object.entries(analysis.mistakes)) {
-            const row = document.createElement('div');
-            row.style.cssText = "background: #fff5f4; border: 1px solid var(--primary); padding: 0.6rem 1rem; border-radius: 6px; font-size: 0.95rem; color: var(--text-main); font-weight: 500;";
-            row.innerHTML = `❌ Expected <strong style="color:var(--success-hover); font-weight:700;">"${correct}"</strong> but you typed <del style="color:var(--primary); font-weight:700;">"${incorrect}"</del>`;
-            mistakesDiv.appendChild(row);
+        try {
+            const finalPaceString = liveWpmLabel.textContent;
+
+            const response = await fetch("/api/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    original_sentence: rawChallengeText,
+                    user_sentence: hiddenCatcher.value,
+                    time: `${timeElapsed} seconds`,
+                    typing_speed: finalPaceString
+                })
+            });
+
+            const submitContentType = response.headers.get("content-type");
+            if (!submitContentType || !submitContentType.includes("application/json")) {
+                throw new Error(`The evaluation processor returned an unexpected HTML layout (${response.status}) instead of structured data JSON package values.`);
+            }
+
+            let parsedData = await response.json();
+            parsedData = parsedData || {};
+
+            // Internal string extractor fallback if your backend passes raw log strings rather than JSON keys
+            if (typeof parsedData === 'string' || !parsedData.accuracy) {
+                const normString = (typeof parsedData === 'string' ? parsedData : JSON.stringify(parsedData))
+                                    .replace(/\\n/g, '\n').replace(/[{}"']/g, '');
+
+                const extractMetric = (key) => {
+                    const match = normString.match(new RegExp(key + "\\s*:\\s*([^\\n,\\r]+)", "i"));
+                    return match ? match[1].trim() : null;
+                };
+
+                let analysisText = extractMetric("text_analysis") || extractMetric("response");
+                if (!analysisText) {
+                    const lines = normString.split('\n');
+                    analysisText = lines[0] ? lines[0].replace("response:", "").trim() : "";
+                }
+
+                let accuracyVal = extractMetric("accuracy") || "100%";
+                if (accuracyVal === "100/100") accuracyVal = "100%";
+
+                parsedData = {
+                    text_analysis: analysisText || "Analysis complete.",
+                    user_rating: extractMetric("user rating") || extractMetric("user_rating") || "Pro",
+                    score: extractMetric("score") || "100/100",
+                    accuracy: accuracyVal,
+                    mistakes: parsedData.mistakes || []
+                };
+            }
+
+            // Assign data values directly to the corresponding UI nodes
+            document.getElementById("res-speed").textContent = finalPaceString;
+            document.getElementById("res-accuracy").textContent = parsedData.accuracy || "100%";
+            document.getElementById("res-score").textContent = parsedData.score || "100/100";
+            document.getElementById("res-rating").textContent = parsedData.user_rating || "Pro";
+            document.getElementById("res-analysis").textContent = parsedData.text_analysis || "Analysis complete.";
+
+            // --- HANDLING MISTAKES BLOCK DISPLAY ---
+            const mistakeLog = document.getElementById("res-mistakes");
+            const mistakesWrapper = document.getElementById("mistakes-wrapper");
+            mistakeLog.innerHTML = "";
+
+            const mistakeList = parsedData.mistakes || [];
+
+            // Always display the wrapper container to show either typos or clear confirmation
+            mistakesWrapper.style.display = "block";
+
+            if (Array.isArray(mistakeList) && mistakeList.length > 0) {
+                // Render discrepancies if items are present inside the array list
+                mistakeList.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        const keys = Object.keys(item);
+                        if (keys.length > 0) {
+                            const correctWord = keys[0];
+                            const userWord = item[correctWord];
+
+                            const errorRow = document.createElement("div");
+                            errorRow.style.fontSize = "0.95rem";
+                            errorRow.style.padding = "0.25rem 0";
+                            errorRow.innerHTML = `❌ Expected: <strong>${correctWord}</strong> | Typed: <span class="text-error" style="font-weight:700;">${userWord}</span>`;
+                            mistakeLog.appendChild(errorRow);
+                        }
+                    }
+                });
+            } else {
+                // If the array list is empty, display a perfect run validation notice
+                const successRow = document.createElement("div");
+                successRow.style.fontSize = "1rem";
+                successRow.style.color = "var(--success-hover)";
+                successRow.style.fontWeight = "600";
+                successRow.innerHTML = `✨ Perfect typing execution! No word discrepancies detected.`;
+                mistakeLog.appendChild(successRow);
+            }
+
+            gamePanel.style.display = "none";
+            resultsPanel.style.display = "block";
+
+        } catch (err) {
+            alert(`Evaluation Processing Exception Error: ${err.message}`);
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit for Evaluation";
+            hiddenCatcher.disabled = false;
+            document.body.addEventListener("click", focusCatcher);
+            focusCatcher();
         }
-    } else {
-        mistakesContainer.style.display = "none";
-    }
+    });
 
-    // Unveil evaluation card smooth display node transformation
-    document.getElementById('result-card').style.display = "block";
-    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth' });
-}
+    // --- PHASE 4: RE-INITIALIZATION CLEANER LOOP ---
+    resetBtn.addEventListener("click", function() {
+        resultsPanel.style.display = "none";
+        setupPanel.style.display = "block";
+        hiddenCatcher.value = "";
+        hiddenCatcher.disabled = false;
+
+        if (startBtn) {
+            startBtn.disabled = false;
+            startBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Generate Challenge Passage`;
+        }
+    });
+});
 </script>
 {% endblock %}

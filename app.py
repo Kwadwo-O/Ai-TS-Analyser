@@ -1,9 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify  # Make sure jsonify is imported at the top
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from backend import backend_generate, backend_send, verify_openrouter
+from models import db, User, TypingResult
+import traceback
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
@@ -60,11 +62,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/play')
-@login_required
-def play():
-    return render_template('Play.html')
-
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -106,7 +103,6 @@ def dashboard():
                 return redirect(url_for('dashboard', tab='profile'))
 
             try:
-                # Assuming verify_openrouter is imported from your backend module
                 if verify_openrouter(api_key):
                     db_user.api_key = api_key
                     db.session.add(db_user)
@@ -128,13 +124,134 @@ def dashboard():
         except Exception:
             is_valid = False
 
+    # --- STATISTICAL DATA CALCULATIONS ENGINE ---
+    # Query all historical results linked to this account, ordered by recent date first
+    user_history = TypingResult.query.filter_by(user_id=db_user.id).order_by(TypingResult.date_recorded.desc()).all()
+
+    total_tests = len(user_history)
+    avg_wpm = 0
+    highest_wpm = 0
+
+    if total_tests > 0:
+        speeds = [run.speed_wpm for run in user_history]
+        avg_wpm = round(sum(speeds) / total_tests)
+        highest_wpm = max(speeds)
+
     return render_template(
         'dashboard.html',
         api_key=db_user.api_key,
         is_valid=is_valid,
         current_tab=current_tab,
-        user=db_user
+        user=db_user,
+        history=user_history,
+        total_tests=total_tests,
+        avg_wpm=avg_wpm,
+        highest_wpm=highest_wpm
     )
+
+
+
+
+
+@app.route('/play')
+@login_required
+def play():
+    return render_template('Play.html')
+
+
+@app.route('/api/generate', methods=['GET'])
+def api_generate():
+    # 1. API Safe Authentication Check (avoids forcing an HTML redirect)
+    if not current_user.is_authenticated:
+        return jsonify({"error": "Session expired or unauthenticated. Please log in again."}), 401
+
+    try:
+        # 2. Fetch the user context from your Database
+        db_user = User.query.get(current_user.id)
+        if not db_user or not db_user.api_key:
+            return jsonify({"error": "Missing OpenRouter API Key. Please add one in your Dashboard settings."}), 400
+
+        # 3. Run your generator function
+        generated_sentence = backend_generate(db_user.api_key)
+
+        # 4. Fallback validation if your backend returns an unexpected non-string type
+        if not generated_sentence:
+            return jsonify({"error": "The AI generation routine returned an empty challenge text string."}), 500
+
+        return jsonify({"sentence": str(generated_sentence)})
+
+    except Exception as e:
+        # Prints out the real breakdown trace to your terminal console logs for debugging
+        print("Real Error Traceback:")
+        traceback.print_exc()
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
+
+
+@app.route('/api/submit', methods=['POST'])
+@login_required
+def api_submit():
+    data = request.get_json() or {}
+    original = data.get('original_sentence', '')
+    user_typed = data.get('user_sentence', '')
+    time_taken = data.get('time', '')
+    speed = data.get('typing_speed', '0 WPM')
+
+    try:
+        # 1. Call your OpenRouter/LLM backend processing routine
+        analysis_result = backend_send(
+            original_sentence=original,
+            user_sentence=user_typed,
+            time=time_taken,
+            typing_speed=speed,
+            api_key=current_user.api_key
+        )
+
+        # 2. Parse raw log string blocks if backend returns text instead of an object dictionary
+        if isinstance(analysis_result, str):
+            norm_str = analysis_result.replace("{", "").replace("}", "").replace("response:", "")
+
+            rating_m = re.search(r"user\s*rating\s*:\s*([^\n,]+)", norm_str, re.I)
+            score_m = re.search(r"score\s*:\s*([^\n,]+)", norm_str, re.I)
+            acc_m = re.search(r"accuracy\s*:\s*([^\n,]+)", norm_str, re.I)
+
+            analysis_result = {
+                "text_analysis": "Analysis complete.",
+                "user_rating": rating_m.group(1).replace("'", "").replace('"', '').strip() if rating_m else "Pro",
+                "score": score_m.group(1).replace("'", "").replace('"', '').strip() if score_m else "100/100",
+                "accuracy": acc_m.group(1).replace("'", "").replace('"', '').strip() if acc_m else "100%",
+                "mistakes": []
+            }
+
+        # 3. Extract the clean numerical integer from the speed string (e.g., "72 WPM" -> 72)
+        raw_wpm_digits = re.sub(r"\D", "", str(speed))
+        wpm_value = int(raw_wpm_digits) if raw_wpm_digits else 0
+
+        # 4. Standardize accuracy percentage formatting
+        acc_string = str(analysis_result.get("accuracy", "100%"))
+        if acc_string == "100/100":
+            acc_string = "100%"
+
+        # 5. DATABASE TRANSACTION: Instantiate and commit the record row
+        new_run_record = TypingResult(
+            user_id=current_user.id,
+            speed_wpm=wpm_value,
+            accuracy=acc_string,
+            score=str(analysis_result.get("score", "100/100")),
+            tier_status=str(analysis_result.get("user_rating", "Pro"))
+        )
+
+        db.session.add(new_run_record)
+        db.session.commit()
+
+        # Update payload metrics mapping dictionary before returning it to the frontend script
+        analysis_result["accuracy"] = acc_string
+        return jsonify(analysis_result)
+
+    except Exception as e:
+        db.session.rollback()  # Clear memory transactional operations if an error occurs
+        import traceback
+        traceback.print_exc()  # Prints the detailed error trace directly to your PyCharm console log window
+        return jsonify({"error": f"Database recording pipeline error: {str(e)}"}), 500
 
 with app.app_context():
     db.create_all()
