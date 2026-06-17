@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block styles %}{% endblock %}
 </head>
+<script>
+    // Executed immediately before standard DOM layouts process
+    if (localStorage.getItem("app-ui-theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+    }
+</script>
 <body>
     <nav class="navbar animate-nav">
         <a href="/" class="nav-logo">
