@@ -15,6 +15,66 @@
     --button-hover-color: #734068;
 }
 
+/* ADDED: Dark Theme Variable Overrides */
+html[data-theme="dark"] {
+    --background: #181116;
+    --surface: #241921;
+    --text-main: #f5f0f3;
+    --text-muted: #a3929b;
+    --border: #3b2b37;
+    --button-color: #be7cb0;
+    --button-hover-color: #d29ec6;
+}
+
+/* ==========================================================================
+   ADDITIONAL ADDED SWITCH COMPONENT DESIGNS
+   ========================================================================== */
+.theme-switch-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: background-color .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 34px;
+}
+
+.theme-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .theme-switch-slider {
+    background-color: var(--button-color);
+}
+
+input:checked + .theme-switch-slider:before {
+    transform: translateX(24px);
+}
+
 /* ==========================================================================
    2. GLOBAL LAYOUT & BASE STYLES
    ========================================================================== */
@@ -30,6 +90,7 @@ body {
     color: var(--text-main);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .main-wrapper {
@@ -41,7 +102,6 @@ body {
 /* ==========================================================================
    3. NAVIGATION BAR & KEYFRAMES
    ========================================================================== */
-/* Upgraded transition logic for base layout load states */
 @keyframes slideDownAnimation {
     from {
         opacity: 0;
@@ -62,6 +122,7 @@ body {
     border-bottom: 2px solid var(--border);
     position: relative;
     z-index: 10;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .animate-nav {
@@ -165,6 +226,7 @@ body {
     text-align: center;
     box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .title {
@@ -276,7 +338,7 @@ body {
     border-radius: 8px;
     background-color: var(--background);
     color: var(--text-main);
-    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease, background-color 0.3s ease;
 }
 
 .form-input:focus {
@@ -451,6 +513,7 @@ body {
     font-size: 0.85rem;
     color: var(--text-muted);
     border: 1px solid var(--border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Alert Notification Framework */
@@ -486,6 +549,7 @@ code {
     font-family: monospace;
     font-weight: bold;
     border: 1px solid var(--border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .form-input:disabled {
@@ -504,6 +568,7 @@ code {
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border);
     padding-bottom: 0.5rem;
+    transition: border-color 0.3s ease;
 }
 
 .tab-navigation-row .btn {
@@ -562,6 +627,7 @@ code {
     user-select: none;
     word-break: break-word;
     text-align: left;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .char-span {
@@ -626,8 +692,6 @@ code {
 /* ==========================================================================
    8. ACTIVE LOADING ANIMATIONS & PASSIVE MICRO-INTERACTIONS
    ========================================================================== */
-
-/* Circular Processing Spinner Framework */
 .loading-spinner {
     display: inline-block;
     width: 16px;
@@ -644,7 +708,6 @@ code {
     100% { transform: rotate(360deg); }
 }
 
-/* Passive Micro-Interactions: Soft Float Effect */
 .passive-float {
     animation: floatingMotion 6s ease-in-out infinite alternate !important;
 }
@@ -654,7 +717,6 @@ code {
     100% { transform: translateY(-6px); }
 }
 
-/* Snappy Action States for Interactive Items */
 .interactive-hover {
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
                 background-color 0.15s ease,
@@ -669,7 +731,6 @@ code {
     transform: translateY(-1px) scale(0.99) !important;
 }
 
-/* Color Scheme Integration for Inline SVGs */
 .theme-error-icon {
     color: var(--primary);
     flex-shrink: 0;

@@ -115,6 +115,22 @@
         </div>
 
     {% elif current_tab == 'settings' %}
+        <div class="main-card dashboard-card" style="margin-bottom: 1.5rem;">
+            <h3 class="card-section-title" style="margin-bottom: 0.5rem;">Interface Theme Mode</h3>
+            <p class="description" style="margin-bottom: 1.5rem;">Adjust the appearance framework of your gaming cockpit layout configuration.</p>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background-color: var(--background); padding: 1rem 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
+                <div style="display: inline-flex; align-items: center; gap: 0.75rem;">
+                    <svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <span style="font-weight: 600; color: var(--text-main);">Dark Background Mapping</span>
+                </div>
+                <label class="theme-switch-container">
+                    <input type="checkbox" id="theme-toggle-checkbox">
+                    <span class="theme-switch-slider"></span>
+                </label>
+            </div>
+        </div>
+
         {% if api_key %}
             <div class="main-card dashboard-card">
                 <div class="card-header-row">
@@ -196,4 +212,33 @@
     {% endif %}
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleInput = document.getElementById("theme-toggle-checkbox");
+    if (!toggleInput) return;
+
+    // Read stored attribute preferences directly on interface mount
+    const savedTheme = localStorage.getItem("app-ui-theme") || "light";
+
+    if (savedTheme === "dark") {
+        toggleInput.checked = true;
+        document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+        toggleInput.checked = false;
+        document.documentElement.removeAttribute("data-theme");
+    }
+
+    // Capture user click selection toggle alterations
+    toggleInput.addEventListener("change", function() {
+        if (toggleInput.checked) {
+            document.documentElement.setAttribute("data-theme", "dark");
+            localStorage.setItem("app-ui-theme", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+            localStorage.setItem("app-ui-theme", "light");
+        }
+    });
+});
+</script>
 {% endblock %}
