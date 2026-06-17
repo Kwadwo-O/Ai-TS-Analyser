@@ -783,3 +783,25 @@ code {
     font-weight: 600;
     font-size: 1rem !important;
 }
+
+/* ==========================================================================
+   THEME SELECT CONTAINER DESIGNS
+   ========================================================================== */
+.theme-select-dropdown {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-select-dropdown:focus {
+    border-color: var(--button-color);
+}

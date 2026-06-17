@@ -10,19 +10,36 @@ import json
 
 MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 API_KEY = ""
+max_sentence = 10
 
-def send_data(data, api_key: str = API_KEY):
+def change_model(model: str = MODEL):
+    global MODEL
+    MODEL = model
+
+
+def send_data(data, api_key=None):
     url = "https://openrouter.ai/api/v1/chat/completions"
-    data = {
-        "model": MODEL,  # You can change this to any OpenRouter model slug
+    # 1. Fallback check: If no specific key is passed, look for your global constant
+    if not api_key:
+        try:
+            from backend import API_KEY
+            api_key = API_KEY
+        except ImportError:
+            api_key = ""
+    print(api_key)
+    print(data)
+    print(f"Sending data to OpenRouter API with model: {MODEL}")
+    payload = {
+        "model": MODEL,
         "messages": [{"role": "user", "content": data}]
     }
+    # 2. Build the secure authentication header dictionary map
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "X-Title": "Typing Speed Test Backend"
     }
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=payload, timeout=60)
     if response.status_code == 200:
         return response.json()["choices"][0]["message"]["content"]
     else:
@@ -57,26 +74,31 @@ def verify_openrouter(api_key: str = API_KEY):
 
 def backend_generate(api_key: str = API_KEY, difficulty=None):
 
+    global max_sentence
     if difficulty == 1:
-        max = 20
+        max_sentence = 20
+        difficulty = "easy"
     elif difficulty == 2:
-        max = 30
+        max_sentence = 30
+        difficulty = "medium"
     elif difficulty == 3:
-        max = 40
-    else:
-        max = 50
-    prompt = f"""
-    Generate a random sentence for a typing speed test. 
-    the sentence should be between 10 and {max} words long. 
-    The sentence should be grammatically correct and should not contain any special characters or numbers.
-    The sentence should be in English.
-    The sentence should be unique and not a common phrase or idiom.
-    The sentence should have accurate punctuation like commas and spaces to separate words.
-    Avoid inappropriate or sensitive sentences.
-    Avoid hard words to type.
-    
-    """
+        max_sentence = 40
+        difficulty = "hard"
+    prompt = f"""Generate a random sentence for a typing speed test. 
+The sentence should be between 10 and {max_sentence} words long. 
+The sentence should be {difficulty} difficulty.
+if the difficulty is easy, the sentence should be easy to type no special characters.
+if the difficulty is medium, the sentence should be medium difficulty with some use of advanced punctuation like commas and periods.
+if the difficulty is hard, the sentence should be hard difficulty with special characters and advanced punctuation like parentheses, brackets, and quotes.
+The sentence should be in English.
+space each word with a space.
+The sentence should be a realistic sentence that can be typed out by a human.
+The sentence should be unique and not a common phrase or idiom.
+The sentence should have accurate punctuation like commas and spaces to separate words.
+Avoid inappropriate or sensitive sentences.
+Avoid hard words to type."""
     data = send_data(prompt, api_key)
+    print(data)
     return data
 
 def backend_send(original_sentence, user_sentence, time, typing_speed, api_key: str = API_KEY):
