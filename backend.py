@@ -55,10 +55,19 @@ def verify_openrouter(api_key: str = API_KEY):
 
 
 
-def backend_generate(api_key: str = API_KEY):
-    prompt = """
+def backend_generate(api_key: str = API_KEY, difficulty=None):
+
+    if difficulty == 1:
+        max = 20
+    elif difficulty == 2:
+        max = 30
+    elif difficulty == 3:
+        max = 40
+    else:
+        max = 50
+    prompt = f"""
     Generate a random sentence for a typing speed test. 
-    the sentence should be between 10 and 20 words long. 
+    the sentence should be between 10 and {max} words long. 
     The sentence should be grammatically correct and should not contain any special characters or numbers.
     The sentence should be in English.
     The sentence should be unique and not a common phrase or idiom.
@@ -76,7 +85,9 @@ def backend_send(original_sentence, user_sentence, time, typing_speed, api_key: 
     use this user typed sentence: {user_sentence}
     the time taken for the sentence: {time}
     use this typing speed: {typing_speed}
-    analise this data and give accurate data.
+    analise this data and give accurate data. Compare the Original sentence with the user typed sentence. if the user sentence is completely different
+    do not give a score just return 0 for the score and 0 for the accuracy.
+    if the typing speed does not align with the time taken and the length of the sentence, do not give a score.
     give me the data in json format:
     (
       "text_analysis": (), # analysis of the typing speed make it detailed and stated the user (just text) like in text give description 

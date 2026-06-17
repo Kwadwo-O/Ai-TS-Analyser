@@ -176,8 +176,11 @@ def api_generate():
         if not db_user or not db_user.api_key:
             return jsonify({"error": "Missing OpenRouter API Key. Please add one in your Dashboard settings."}), 400
 
-        # 3. Run your generator function
-        generated_sentence = backend_generate(db_user.api_key)
+        # READ DIFFICULTY PARAMETER FROM THE FECH CALL QUERY STRING
+        difficulty = request.args.get('difficulty', 'medium')
+
+        # 3. Run your generator function passing the difficulty level context
+        generated_sentence = backend_generate(db_user.api_key, difficulty)
 
         # 4. Fallback validation if your backend returns an unexpected non-string type
         if not generated_sentence:

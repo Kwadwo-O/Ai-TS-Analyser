@@ -360,6 +360,7 @@ body {
     font-size: 0.85rem;
     font-weight: 700;
     border: 1px solid var(--success-hover);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .status-badge.inactive {
@@ -509,6 +510,41 @@ code {
     padding: 0.6rem 1.5rem;
     text-decoration: none;
     font-size: 0.95rem;
+}
+
+/* Custom Native Range Slider Extensions */
+.form-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--border);
+    outline: none;
+    transition: background 0.15s ease;
+}
+
+.form-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.15s ease;
+}
+
+.form-range-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.15s ease;
 }
 
 /* ==========================================================================
