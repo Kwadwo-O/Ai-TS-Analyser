@@ -1,9 +1,7 @@
 import re, traceback
-
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from backend import backend_generate, backend_send, verify_openrouter
 from models import TypingResult, db, User
 
@@ -14,11 +12,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db.init_app(app)
 
 login_manager = LoginManager(app)
-login_manager.login_view = 'login'  # redirect here if not logged in
+login_manager.login_view = 'login'
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 # --- Routes ---
 
@@ -31,23 +31,49 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        # Clean white space from ends of fields
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+
+        # 1. Base emptiness checks
+        if not username or not password:
+            flash('All input fields are required to establish an account profile.')
+            return redirect(url_for('register'))
+
+        # 2. Username structure restrictions
+        if len(username) < 3:
+            flash('Your username must be at least 3 characters long.')
+            return redirect(url_for('register'))
+
+        if not re.match(r'^\w+$', username):
+            flash('Usernames can only contain standard alphanumeric characters and underscores.')
+            return redirect(url_for('register'))
+
+        # 3. Strength metrics evaluation for Password protection
+        if len(password) < 8:
+            flash('Security validation failed: Password must be at least 8 characters long.')
+            return redirect(url_for('register'))
+
+        if not any(char.isdigit() for char in password) or not any(char.isalpha() for char in password):
+            flash('Security validation failed: Password must include a mixture of both letters and numeric digits.')
+            return redirect(url_for('register'))
+
+        # 4. Check database duplicates
         existing = User.query.filter_by(username=username).first()
         if existing:
             flash('Username already taken.')
             return redirect(url_for('register'))
 
         hashed_pw = generate_password_hash(password)
-
-        # FIX: Changed 'api=""' to 'api_key=None' to match your User database model property definition
         new_user = User(username=username, password=hashed_pw, api_key=None)
 
         db.session.add(new_user)
         db.session.commit()
         flash('Account created! Please log in.')
         return redirect(url_for('login'))
+
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -61,6 +87,7 @@ def login():
         flash('Invalid username or password.')
     return render_template('login.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -71,41 +98,37 @@ def logout():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    # Fetch the live tracked user instance directly from database context
     db_user = User.query.get(current_user.id)
-
-    # Track which sub-panel to display. Defaults to 'profile'
     current_tab = request.args.get('tab', 'profile')
 
     if request.method == 'POST':
         action = request.form.get('action')
+        target_tab = request.args.get('tab', 'profile')
 
-        # --- SETTINGS TAB ACTIONS ---
         if action == 'delete_account':
             try:
                 db.session.delete(db_user)
                 db.session.commit()
-                logout_user()  # Log the user out since their account no longer exists
+                logout_user()
                 flash('Your account has been permanently deleted.', 'success')
-                return redirect(url_for('register'))  # Send them back to registration page
+                return redirect(url_for('register'))
             except Exception as e:
                 db.session.rollback()
                 flash(f'Error processing account termination: {str(e)}', 'error')
                 return redirect(url_for('dashboard', tab='settings'))
 
-        # --- PROFILE/API KEY ACTIONS ---
         elif action == 'clear':
             db_user.api_key = None
             db.session.commit()
             flash('API key removed from your account.')
-            return redirect(url_for('dashboard', tab='profile'))
+            return redirect(url_for('dashboard', tab=target_tab))
 
         elif action == 'save':
             api_key = request.form.get('api_key', '').strip()
 
             if not api_key.startswith("sk-or-v1-"):
                 flash("Invalid format! Key must start with 'sk-or-v1-'")
-                return redirect(url_for('dashboard', tab='profile'))
+                return redirect(url_for('dashboard', tab=target_tab))
 
             try:
                 if verify_openrouter(api_key):
@@ -119,9 +142,8 @@ def dashboard():
                 db.session.rollback()
                 flash(f'Connection error during verification: {str(e)}')
 
-        return redirect(url_for('dashboard', tab='profile'))
+        return redirect(url_for('dashboard', tab=target_tab))
 
-    # GET request processing: Validate saved key state
     is_valid = False
     if db_user and db_user.api_key:
         try:
@@ -129,10 +151,7 @@ def dashboard():
         except Exception:
             is_valid = False
 
-    # --- STATISTICAL DATA CALCULATIONS ENGINE ---
-    # Query all historical results linked to this account, ordered by recent date first
     user_history = TypingResult.query.filter_by(user_id=db_user.id).order_by(TypingResult.date_recorded.desc()).all()
-
     total_tests = len(user_history)
     avg_wpm = 0
     highest_wpm = 0
@@ -155,9 +174,6 @@ def dashboard():
     )
 
 
-
-
-
 @app.route('/play')
 @login_required
 def play():
@@ -166,30 +182,23 @@ def play():
 
 @app.route('/api/generate', methods=['GET'])
 def api_generate():
-    # 1. API Safe Authentication Check (avoids forcing an HTML redirect)
     if not current_user.is_authenticated:
         return jsonify({"error": "Session expired or unauthenticated. Please log in again."}), 401
 
     try:
-        # 2. Fetch the user context from your Database
         db_user = User.query.get(current_user.id)
         if not db_user or not db_user.api_key:
             return jsonify({"error": "Missing OpenRouter API Key. Please add one in your Dashboard settings."}), 400
 
-        # READ DIFFICULTY PARAMETER FROM THE FECH CALL QUERY STRING
         difficulty = request.args.get('difficulty', 'medium')
-
-        # 3. Run your generator function passing the difficulty level context
         generated_sentence = backend_generate(db_user.api_key, difficulty)
 
-        # 4. Fallback validation if your backend returns an unexpected non-string type
         if not generated_sentence:
             return jsonify({"error": "The AI generation routine returned an empty challenge text string."}), 500
 
         return jsonify({"sentence": str(generated_sentence)})
 
     except Exception as e:
-        # Prints out the real breakdown trace to your terminal console logs for debugging
         print("Real Error Traceback:")
         traceback.print_exc()
         return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
@@ -205,7 +214,6 @@ def api_submit():
     speed = data.get('typing_speed', '0 WPM')
 
     try:
-        # 1. Call your OpenRouter/LLM backend processing routine
         analysis_result = backend_send(
             original_sentence=original,
             user_sentence=user_typed,
@@ -214,7 +222,6 @@ def api_submit():
             api_key=current_user.api_key
         )
 
-        # 2. Parse raw log string blocks if backend returns text instead of an object dictionary
         if isinstance(analysis_result, str):
             norm_str = analysis_result.replace("{", "").replace("}", "").replace("response:", "")
 
@@ -230,16 +237,13 @@ def api_submit():
                 "mistakes": []
             }
 
-        # 3. Extract the clean numerical integer from the speed string (e.g., "72 WPM" -> 72)
         raw_wpm_digits = re.sub(r"\D", "", str(speed))
         wpm_value = int(raw_wpm_digits) if raw_wpm_digits else 0
 
-        # 4. Standardize accuracy percentage formatting
         acc_string = str(analysis_result.get("accuracy", "100%"))
         if acc_string == "100/100":
             acc_string = "100%"
 
-        # 5. DATABASE TRANSACTION: Instantiate and commit the record row
         new_run_record = TypingResult(
             user_id=current_user.id,
             speed_wpm=wpm_value,
@@ -251,15 +255,14 @@ def api_submit():
         db.session.add(new_run_record)
         db.session.commit()
 
-        # Update payload metrics mapping dictionary before returning it to the frontend script
         analysis_result["accuracy"] = acc_string
         return jsonify(analysis_result)
 
     except Exception as e:
-        db.session.rollback()  # Clear memory transactional operations if an error occurs
-        import traceback
-        traceback.print_exc()  # Prints the detailed error trace directly to your PyCharm console log window
+        db.session.rollback()
+        traceback.print_exc()
         return jsonify({"error": f"Database recording pipeline error: {str(e)}"}), 500
+
 
 with app.app_context():
     db.create_all()

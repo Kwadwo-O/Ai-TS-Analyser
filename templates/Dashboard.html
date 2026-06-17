@@ -201,7 +201,7 @@
                 Deleting your account will permanently wipe your login credentials and saved configuration keys directly from our database system. This action is irreversible.
             </p>
 
-            <form action="{{ url_for('dashboard') }}" method="POST" onsubmit="return confirm('WARNING: Are you absolutely certain you want to permanently delete your TypeSwift account? This cannot be undone.');">
+            <form action="{{ url_for('dashboard', tab='settings') }}" method="POST" onsubmit="return confirm('WARNING: Are you absolutely certain you want to permanently delete your TypeSwift account? This cannot be undone.');">
                 <input type="hidden" name="action" value="delete_account">
                 <button type="submit" class="btn btn-dashboard" style="border-color: var(--primary); color: var(--primary); display: inline-flex; align-items: center; gap: 0.5rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -218,7 +218,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const toggleInput = document.getElementById("theme-toggle-checkbox");
     if (!toggleInput) return;
 
-    // Read stored attribute preferences directly on interface mount
     const savedTheme = localStorage.getItem("app-ui-theme") || "light";
 
     if (savedTheme === "dark") {
@@ -229,7 +228,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.documentElement.removeAttribute("data-theme");
     }
 
-    // Capture user click selection toggle alterations
     toggleInput.addEventListener("change", function() {
         if (toggleInput.checked) {
             document.documentElement.setAttribute("data-theme", "dark");

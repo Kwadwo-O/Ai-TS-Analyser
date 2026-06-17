@@ -1,6 +1,6 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="login-container dashboard-wrapper">
+<div class="login-container dashboard-wrapper" style="max-width: 1000px; margin: 0 auto;">
 
     <div class="main-card dashboard-banner passive-float">
         <h1 class="title">Typing <span class="title-highlight">Game</span></h1>
@@ -60,6 +60,79 @@
         </div>
     </div>
 
+    <div id="live-keyboard-panel" class="main-card dashboard-card keyboard-matrix" style="margin-top: 1.5rem;">
+        <div class="keyboard-row">
+            <div class="key" id="Backquote">`</div>
+            <div class="key" id="Digit1">1</div>
+            <div class="key" id="Digit2">2</div>
+            <div class="key" id="Digit3">3</div>
+            <div class="key" id="Digit4">4</div>
+            <div class="key" id="Digit5">5</div>
+            <div class="key" id="Digit6">6</div>
+            <div class="key" id="Digit7">7</div>
+            <div class="key" id="Digit8">8</div>
+            <div class="key" id="Digit9">9</div>
+            <div class="key" id="Digit0">0</div>
+            <div class="key" id="Minus">-</div>
+            <div class="key" id="Equal">=</div>
+            <div class="key backspace-key" id="Backspace">⌫</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key tab-key" id="Tab">Tab</div>
+            <div class="key" id="KeyQ">Q</div>
+            <div class="key" id="KeyW">W</div>
+            <div class="key" id="KeyE">E</div>
+            <div class="key" id="KeyR">R</div>
+            <div class="key" id="KeyT">T</div>
+            <div class="key" id="KeyY">Y</div>
+            <div class="key" id="KeyU">U</div>
+            <div class="key" id="KeyI">I</div>
+            <div class="key" id="KeyO">O</div>
+            <div class="key" id="KeyP">P</div>
+            <div class="key" id="BracketLeft">[</div>
+            <div class="key" id="BracketRight">]</div>
+            <div class="key backslash-key" id="Backslash">\</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key capslock-key" id="CapsLock">Caps</div>
+            <div class="key" id="KeyA">A</div>
+            <div class="key" id="KeyS">S</div>
+            <div class="key" id="KeyD">D</div>
+            <div class="key" id="KeyF">F</div>
+            <div class="key" id="KeyG">G</div>
+            <div class="key" id="KeyH">H</div>
+            <div class="key" id="KeyJ">J</div>
+            <div class="key" id="KeyK">K</div>
+            <div class="key" id="KeyL">L</div>
+            <div class="key" id="Semicolon">;</div>
+            <div class="key" id="Quote">'</div>
+            <div class="key enter-key" id="Enter">Enter ↵</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key shift-key" id="ShiftLeft">Shift</div>
+            <div class="key" id="KeyZ">Z</div>
+            <div class="key" id="KeyX">X</div>
+            <div class="key" id="KeyC">C</div>
+            <div class="key" id="KeyV">V</div>
+            <div class="key" id="KeyB">B</div>
+            <div class="key" id="KeyN">N</div>
+            <div class="key" id="KeyM">M</div>
+            <div class="key" id="Comma">,</div>
+            <div class="key" id="Period">.</div>
+            <div class="key" id="Slash">/</div>
+            <div class="key shift-key" id="ShiftRight">Shift</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key ctrl-key" id="ControlLeft">Ctrl</div>
+            <div class="key meta-key" id="MetaLeft">⊞</div>
+            <div class="key alt-key" id="AltLeft">Alt</div>
+            <div class="key space-key" id="Space"></div>
+            <div class="key alt-key" id="AltRight">Alt</div>
+            <div class="key meta-key" id="MetaRight">⊞</div>
+            <div class="key ctrl-key" id="ControlRight">Ctrl</div>
+        </div>
+    </div>
+
     <div id="results-panel" class="main-card alert-card success" style="display: none; max-width: 100%; padding: 2.5rem 2rem;">
         <h3 class="card-section-title" style="color: var(--button-color); font-size: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12 6.477 22 12 22z"></path><path d="M12 6v6l4 2"></path></svg>
@@ -108,6 +181,70 @@
     </div>
 </div>
 
+<style>
+.keyboard-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    user-select: none;
+}
+
+.keyboard-row {
+    display: flex;
+    width: 100%;
+    gap: 0.4rem;
+}
+
+.key {
+    flex: 1;
+    background: rgba(125, 125, 125, 0.06);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 6px;
+    padding: 0.65rem 0;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.04s ease, transform 0.04s ease, border-color 0.04s ease, color 0.04s ease;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Bright yellow highlight accent state that mimics core theme button layouts */
+.key.key-pressed-active {
+    background: var(--button-color, #e2b714) !important;
+    color: #1e2022 !important;
+    border-color: var(--button-color, #e2b714) !important;
+    transform: translateY(2px);
+    box-shadow: 0 0px 0px transparent;
+}
+
+/* UI Structural Scaling Values */
+.backspace-key { flex: 2; }
+.tab-key { flex: 1.5; }
+.backslash-key { flex: 1.5; }
+.capslock-key { flex: 1.75; }
+.enter-key { flex: 2.25; }
+.shift-key { flex: 2.6; }
+.space-key { flex: 8; position: relative; }
+.space-key::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 3px;
+    background: currentColor;
+    left: 35%;
+    top: calc(50% - 1px);
+    border-radius: 2px;
+    opacity: 0.4;
+}
+.ctrl-key, .alt-key, .meta-key { flex: 1.25; font-size: 0.8rem; opacity: 0.8; }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
@@ -140,6 +277,41 @@ document.addEventListener("DOMContentLoaded", function() {
     const difficultyBadge = document.getElementById("difficulty-badge");
 
     const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
+
+    // --- FIXED HARDWARE INTERACTIVE KEYBOARD WATCHERS ---
+    window.addEventListener("keydown", function(e) {
+        const keyElement = document.getElementById(e.code);
+        if (keyElement) {
+            // Prevent default page scrolling for spacebar
+            if (e.code === "Space") {
+                e.preventDefault();
+
+                // Manually inject the space into the catcher if the game is live
+                if (gamePanel.style.display === "block" && !hiddenCatcher.disabled) {
+                    hiddenCatcher.value += " ";
+                    // Manually trigger the input event so the text display updates
+                    hiddenCatcher.dispatchEvent(new Event('input'));
+                }
+            }
+
+            if (e.code === "Tab") {
+                e.preventDefault();
+            }
+
+            keyElement.classList.add("key-pressed-active");
+        }
+    });
+
+    window.addEventListener("keyup", function(e) {
+        const keyElement = document.getElementById(e.code);
+        if (keyElement) {
+            keyElement.classList.remove("key-pressed-active");
+        }
+    });
+
+    window.addEventListener("blur", function() {
+        document.querySelectorAll(".key").forEach(k => k.classList.remove("key-pressed-active"));
+    });
 
     if (difficultyControl) {
         difficultyControl.addEventListener("input", function() {
