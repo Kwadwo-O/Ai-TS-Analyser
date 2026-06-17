@@ -22,6 +22,17 @@ def load_user(user_id):
 
 # --- Routes ---
 
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    TypingResult.query.filter_by(user_id=current_user.id).delete()
+    db.session.delete(current_user)
+    db.session.commit()
+    logout_user()
+    flash('Your account has been deleted successfully.')
+    return redirect(url_for('home'))
+
+
 @app.route('/')
 @login_required
 def home():
@@ -31,34 +42,35 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Clean white space from ends of fields
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
 
-        # 1. Base emptiness checks
+        # 1. Presence Validation
         if not username or not password:
             flash('All input fields are required to establish an account profile.')
             return redirect(url_for('register'))
 
-        # 2. Username structure restrictions
+        # 2. Username Length Check
         if len(username) < 3:
             flash('Your username must be at least 3 characters long.')
             return redirect(url_for('register'))
 
+        # 3. Username Format Character Constraints
         if not re.match(r'^\w+$', username):
             flash('Usernames can only contain standard alphanumeric characters and underscores.')
             return redirect(url_for('register'))
 
-        # 3. Strength metrics evaluation for Password protection
+        # 4. Password Length Check
         if len(password) < 8:
             flash('Security validation failed: Password must be at least 8 characters long.')
             return redirect(url_for('register'))
 
+        # 5. Password Complexity Requirements (Letters + Numbers)
         if not any(char.isdigit() for char in password) or not any(char.isalpha() for char in password):
             flash('Security validation failed: Password must include a mixture of both letters and numeric digits.')
             return redirect(url_for('register'))
 
-        # 4. Check database duplicates
+        # 6. Uniqueness Check against Database
         existing = User.query.filter_by(username=username).first()
         if existing:
             flash('Username already taken.')
@@ -101,10 +113,18 @@ def dashboard():
     db_user = User.query.get(current_user.id)
     current_tab = request.args.get('tab', 'profile')
 
+    # Security check for Admin access
+    if current_tab == 'admin':
+        password_attempt = request.form.get('admin_password') or request.args.get('admin_password')
+        if password_attempt != "Admin112233":
+            flash("Security error: Access Denied. Administrative verification credentials missing or incorrect.")
+            return redirect(url_for('dashboard', tab='profile'))
+
     if request.method == 'POST':
         action = request.form.get('action')
         target_tab = request.args.get('tab', 'profile')
 
+        # --- Standard User Dashboard Form Actions ---
         if action == 'delete_account':
             try:
                 db.session.delete(db_user)
@@ -125,11 +145,9 @@ def dashboard():
 
         elif action == 'save':
             api_key = request.form.get('api_key', '').strip()
-
             if not api_key.startswith("sk-or-v1-"):
                 flash("Invalid format! Key must start with 'sk-or-v1-'")
                 return redirect(url_for('dashboard', tab=target_tab))
-
             try:
                 if verify_openrouter(api_key):
                     db_user.api_key = api_key
@@ -142,8 +160,139 @@ def dashboard():
                 db.session.rollback()
                 flash(f'Connection error during verification: {str(e)}')
 
+        # --- Administrative Operations Suite ---
+        elif action == 'admin_create_user':
+            new_username = request.form.get('username', '').strip()
+            new_password = request.form.get('password', '')
+            new_api_key = request.form.get('api_key', '').strip() or None
+
+            # 1. Presence Validation
+            if not new_username or not new_password:
+                flash('All input fields are required to establish an account profile.')
+
+            # 2. Username Length Check
+            elif len(new_username) < 3:
+                flash('Your username must be at least 3 characters long.')
+
+            # 3. Username Format Character Constraints
+            elif not re.match(r'^\w+$', new_username):
+                flash('Usernames can only contain standard alphanumeric characters and underscores.')
+
+            # 4. Password Length Check
+            elif len(new_password) < 8:
+                flash('Security validation failed: Password must be at least 8 characters long.')
+
+            # 5. Password Complexity Requirements (Letters + Numbers)
+            elif not any(char.isdigit() for char in new_password) or not any(char.isalpha() for char in new_password):
+                flash('Security validation failed: Password must include a mixture of both letters and numeric digits.')
+
+            # 6. Uniqueness Check against Database
+            elif User.query.filter_by(username=new_username).first():
+                flash('Operation error: A user with that identifier already exists.')
+
+            # 7. Safe Database Execution Block
+            else:
+                try:
+                    hashed_pw = generate_password_hash(new_password)
+                    created_user = User(username=new_username, password=hashed_pw, api_key=new_api_key)
+                    db.session.add(created_user)
+                    db.session.commit()
+                    flash(f'Account node profile "{new_username}" successfully appended to database layer.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Database node instantiation failure: {str(e)}')
+
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_modify_user':
+            target_id = request.form.get('user_id')
+            mod_username = request.form.get('username', '').strip()
+            mod_password = request.form.get('password', '')
+            mod_api_key = request.form.get('api_key', '').strip()
+
+            target_account = User.query.get(target_id)
+            if target_account:
+                try:
+                    # Apply validations to modified parameters if modifications are sent
+                    if mod_username:
+                        if len(mod_username) < 3:
+                            flash('Update error: Your username must be at least 3 characters long.')
+                            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+                        if not re.match(r'^\w+$', mod_username):
+                            flash(
+                                'Update error: Usernames can only contain standard alphanumeric characters and underscores.')
+                            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+                        # Check collision if changing to a different user name
+                        if mod_username != target_account.username and User.query.filter_by(
+                                username=mod_username).first():
+                            flash('Update error: A user with that identifier already exists.')
+                            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+                        target_account.username = mod_username
+
+                    if mod_password:
+                        if len(mod_password) < 8:
+                            flash('Update failed: Password must be at least 8 characters long.')
+                            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+                        if not any(char.isdigit() for char in mod_password) or not any(
+                                char.isalpha() for char in mod_password):
+                            flash('Update failed: Password must include a mixture of both letters and numeric digits.')
+                            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+                        target_account.password = generate_password_hash(mod_password)
+
+                    if mod_api_key == "__REMOVE__":
+                        target_account.api_key = None
+                    elif mod_api_key:
+                        target_account.api_key = mod_api_key
+
+                    db.session.commit()
+                    flash(f'Database parameters updated for profile target Node #{target_id}.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Mutation error encountered processing user changes: {str(e)}')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_delete_user':
+            target_id = request.form.get('user_id')
+            if int(target_id) == current_user.id:
+                flash('Security Violation: The active operator instance session cannot be deleted.')
+            else:
+                target_account = User.query.get(target_id)
+                if target_account:
+                    try:
+                        TypingResult.query.filter_by(user_id=target_id).delete()
+                        db.session.delete(target_account)
+                        db.session.commit()
+                        flash(f'Account configuration sequence mapping #{target_id} severed successfully.')
+                    except Exception as e:
+                        db.session.rollback()
+                        flash(f'Error processing account drop: {str(e)}')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_wipe_all_except_self':
+            confirm_phrase = request.form.get('verification_text', '').strip()
+            if confirm_phrase == 'OVERRIDE SYSTEM DELETE ALL':
+                try:
+                    all_other_users = User.query.filter(User.id != current_user.id).all()
+                    count = 0
+                    for u in all_other_users:
+                        TypingResult.query.filter_by(user_id=u.id).delete()
+                        db.session.delete(u)
+                        count += 1
+                    db.session.commit()
+                    flash(f'Global wipe execute clear. Dropped {count} alternate operational accounts.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Critical processing structural error: {str(e)}')
+            else:
+                flash('Verification failed! Nuclear sequence abort.')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
         return redirect(url_for('dashboard', tab=target_tab))
 
+    # --- Data Resolution and Template Preparation ---
     is_valid = False
     if db_user and db_user.api_key:
         try:
@@ -161,6 +310,13 @@ def dashboard():
         avg_wpm = round(sum(speeds) / total_tests)
         highest_wpm = max(speeds)
 
+    # Resolution vectors specifically for the Admin dashboard
+    all_users = []
+    total_metrics_logged = 0
+    if current_tab == 'admin':
+        all_users = User.query.order_by(User.id.asc()).all()
+        total_metrics_logged = TypingResult.query.count()
+
     return render_template(
         'dashboard.html',
         api_key=db_user.api_key,
@@ -170,7 +326,9 @@ def dashboard():
         history=user_history,
         total_tests=total_tests,
         avg_wpm=avg_wpm,
-        highest_wpm=highest_wpm
+        highest_wpm=highest_wpm,
+        all_users=all_users,
+        total_metrics_logged=total_metrics_logged
     )
 
 

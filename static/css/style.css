@@ -15,6 +15,18 @@
     --button-hover-color: #734068;
 }
 
+/* ADDED: Mid-Tone Muted Sepia Theme Variables */
+html[data-theme="sepia"] {
+    --background: #dfd7ca;
+    --surface: #eae3d8;
+    --text-main: #432e39;
+    --text-muted: #7d6b73;
+    --border: #ceafbe;
+    --button-color: #7a3e6a;
+    --button-hover-color: #613054;
+    --primary: #d66b5e;
+}
+
 /* ADDED: Dark Theme Variable Overrides */
 html[data-theme="dark"] {
     --background: #181116;
@@ -24,6 +36,28 @@ html[data-theme="dark"] {
     --border: #3b2b37;
     --button-color: #be7cb0;
     --button-hover-color: #d29ec6;
+}
+
+/* ==========================================================================
+   THEME SELECT CONTAINER DESIGNS
+   ========================================================================== */
+.theme-select-dropdown {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-select-dropdown:focus {
+    border-color: var(--button-color);
 }
 
 /* ==========================================================================
@@ -120,7 +154,8 @@ body {
     background-color: var(--surface);
     padding: 1rem 2rem;
     border-bottom: 2px solid var(--border);
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10;
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
