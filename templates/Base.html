@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TypeSwift{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block styles %}{% endblock %}
-</head>
+    {% block styles %}{% endblock %}</head>
 <script>
     // Executed immediately before standard DOM layouts process to avoid styling flash
     const savedGlobalUserTheme = localStorage.getItem("app-ui-theme") || "light";
@@ -17,13 +16,15 @@
     } else {
         document.documentElement.removeAttribute("data-theme");
     }
+    // Also explicitly force game variables to sync globally across all pages
+    document.documentElement.setAttribute("data-game-theme", savedGlobalUserTheme);
 </script>
 <body>
     <nav class="navbar animate-nav">
         <a href="/" class="nav-logo">
             <svg class="nav-logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;">
                 <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                <line x1="6" y1="8" x2="6" y2="8\"></line>
+                <line x1="6" y1="8" x2="6" y2="8"></line>
                 <line x1="10" y1="8" x2="10" y2="8"></line>
                 <line x1="14" y1="8" x2="14" y2="8"></line>
                 <line x1="18" y1="8" x2="18" y2="8"></line>
@@ -34,16 +35,25 @@
             TypeSwift
         </a>
         <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/play" class="nav-link">Practice Arena</a>
-            <a href="/leaderboard" class="nav-link">Leaderboard</a>
-            <a href="/dashboard" class="nav-link">Dashboard</a>
-            <a href="/logout" class="nav-link">Logout</a>
+            <a href="{{ url_for('play') }}" class="nav-link">Play</a>
+            <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a>
+            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--primary);">Logout</a>
         </div>
     </nav>
 
-    <div class="container main-content-wrapper">
-        {% block content %}{% endblock %}
-    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages-wrapper" style="max-width: 950px; margin: 1rem auto 0 auto; padding: 0 1rem;">
+                {% for message in messages %}
+                    <div class="main-card alert-card passive-float" style="padding: 1rem; border-left: 4px solid var(--button-color); margin-bottom: 0.5rem; text-align: left; background: var(--surface);">
+                        <p style="margin: 0; font-size: 0.95rem; color: var(--text-main); font-weight: 600;">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
 </body>
 </html>
