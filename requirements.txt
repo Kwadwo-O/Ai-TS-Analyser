@@ -1,6 +1,8 @@
 ﻿flask
+flask_login
 pip-system-certs
 psycopg2-binary
+sqlalchemy
 mkdir my-flask-site
 cd my-flask-site
 python -m venv venv
