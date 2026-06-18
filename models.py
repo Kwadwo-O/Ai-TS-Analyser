@@ -6,18 +6,20 @@ db = SQLAlchemy()
 
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    api_key = db.Column(db.String(150), nullable=True)  # Changed to nullable=True as users start without a key
+    api_key = db.Column(db.String(150), nullable=True)
 
 
 class TypingResult(db.Model):
     __tablename__ = 'typing_results'
 
     id = db.Column(db.Integer, primary_key=True)
-    # Connects to user.id and clears history logs automatically if user deletes their account
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    # Connects securely to the users table and auto-deletes history records if the profile is destroyed
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     speed_wpm = db.Column(db.Integer, nullable=False)
     accuracy = db.Column(db.String(10), nullable=False)

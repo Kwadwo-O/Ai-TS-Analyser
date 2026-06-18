@@ -15,6 +15,100 @@
     --button-hover-color: #734068;
 }
 
+/* ADDED: Mid-Tone Muted Sepia Theme Variables */
+html[data-theme="sepia"] {
+    --background: #dfd7ca;
+    --surface: #eae3d8;
+    --text-main: #432e39;
+    --text-muted: #7d6b73;
+    --border: #ceafbe;
+    --button-color: #7a3e6a;
+    --button-hover-color: #613054;
+    --primary: #d66b5e;
+}
+
+/* ADDED: Dark Theme Variable Overrides */
+html[data-theme="dark"] {
+    --background: #181116;
+    --surface: #241921;
+    --text-main: #f5f0f3;
+    --text-muted: #a3929b;
+    --border: #3b2b37;
+    --button-color: #be7cb0;
+    --button-hover-color: #d29ec6;
+}
+
+/* ==========================================================================
+   THEME SELECT CONTAINER DESIGNS
+   ========================================================================== */
+.theme-select-dropdown {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-select-dropdown:focus {
+    border-color: var(--button-color);
+}
+
+/* ==========================================================================
+   ADDITIONAL ADDED SWITCH COMPONENT DESIGNS
+   ========================================================================== */
+.theme-switch-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: background-color .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 34px;
+}
+
+.theme-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .theme-switch-slider {
+    background-color: var(--button-color);
+}
+
+input:checked + .theme-switch-slider:before {
+    transform: translateX(24px);
+}
+
 /* ==========================================================================
    2. GLOBAL LAYOUT & BASE STYLES
    ========================================================================== */
@@ -30,6 +124,7 @@ body {
     color: var(--text-main);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .main-wrapper {
@@ -41,7 +136,6 @@ body {
 /* ==========================================================================
    3. NAVIGATION BAR & KEYFRAMES
    ========================================================================== */
-/* Upgraded transition logic for base layout load states */
 @keyframes slideDownAnimation {
     from {
         opacity: 0;
@@ -60,8 +154,10 @@ body {
     background-color: var(--surface);
     padding: 1rem 2rem;
     border-bottom: 2px solid var(--border);
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .animate-nav {
@@ -165,6 +261,7 @@ body {
     text-align: center;
     box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .title {
@@ -276,7 +373,7 @@ body {
     border-radius: 8px;
     background-color: var(--background);
     color: var(--text-main);
-    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease, background-color 0.3s ease;
 }
 
 .form-input:focus {
@@ -360,6 +457,7 @@ body {
     font-size: 0.85rem;
     font-weight: 700;
     border: 1px solid var(--success-hover);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .status-badge.inactive {
@@ -450,6 +548,7 @@ body {
     font-size: 0.85rem;
     color: var(--text-muted);
     border: 1px solid var(--border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Alert Notification Framework */
@@ -485,6 +584,7 @@ code {
     font-family: monospace;
     font-weight: bold;
     border: 1px solid var(--border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .form-input:disabled {
@@ -503,12 +603,48 @@ code {
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border);
     padding-bottom: 0.5rem;
+    transition: border-color 0.3s ease;
 }
 
 .tab-navigation-row .btn {
     padding: 0.6rem 1.5rem;
     text-decoration: none;
     font-size: 0.95rem;
+}
+
+/* Custom Native Range Slider Extensions */
+.form-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--border);
+    outline: none;
+    transition: background 0.15s ease;
+}
+
+.form-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.15s ease;
+}
+
+.form-range-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.15s ease;
 }
 
 /* ==========================================================================
@@ -526,6 +662,7 @@ code {
     user-select: none;
     word-break: break-word;
     text-align: left;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .char-span {
@@ -590,8 +727,6 @@ code {
 /* ==========================================================================
    8. ACTIVE LOADING ANIMATIONS & PASSIVE MICRO-INTERACTIONS
    ========================================================================== */
-
-/* Circular Processing Spinner Framework */
 .loading-spinner {
     display: inline-block;
     width: 16px;
@@ -608,7 +743,6 @@ code {
     100% { transform: rotate(360deg); }
 }
 
-/* Passive Micro-Interactions: Soft Float Effect */
 .passive-float {
     animation: floatingMotion 6s ease-in-out infinite alternate !important;
 }
@@ -618,7 +752,6 @@ code {
     100% { transform: translateY(-6px); }
 }
 
-/* Snappy Action States for Interactive Items */
 .interactive-hover {
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
                 background-color 0.15s ease,
@@ -633,7 +766,6 @@ code {
     transform: translateY(-1px) scale(0.99) !important;
 }
 
-/* Color Scheme Integration for Inline SVGs */
 .theme-error-icon {
     color: var(--primary);
     flex-shrink: 0;
@@ -650,4 +782,26 @@ code {
     color: var(--success-hover) !important;
     font-weight: 600;
     font-size: 1rem !important;
+}
+
+/* ==========================================================================
+   THEME SELECT CONTAINER DESIGNS
+   ========================================================================== */
+.theme-select-dropdown {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-select-dropdown:focus {
+    border-color: var(--button-color);
 }

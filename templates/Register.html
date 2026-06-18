@@ -23,15 +23,27 @@
         <form action="{{ url_for('register') }}" method="POST" class="login-form">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-input" required placeholder="Choose a username">
+                <input type="text" id="username" name="username" class="form-input" required
+                       minlength="3" pattern="^[A-Za-z0-9_]+$"
+                       title="Only alphanumeric characters and underscores allowed."
+                       placeholder="Choose a username">
+                <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.25rem;">
+                    Minimum 3 characters. Letters, digits, or underscores only.
+                </small>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="margin-top: 1.25rem;">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-input" required placeholder="Choose a password">
+                <input type="password" id="password" name="password" class="form-input" required
+                       minlength="8" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\W_]{8,}$"
+                       title="Must contain at least 8 characters, including a mix of letters and numbers."
+                       placeholder="Choose a password">
+                <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.25rem;">
+                    Minimum 8 characters. Must contain both letters and numbers.
+                </small>
             </div>
 
-            <button type="submit" class="btn btn-play">Create Account</button>
+            <button type="submit" class="btn btn-play" style="margin-top: 1.5rem;">Create Account</button>
         </form>
 
         <p class="form-footer">

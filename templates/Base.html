@@ -7,12 +7,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block styles %}{% endblock %}
 </head>
+<script>
+    // Executed immediately before standard DOM layouts process to avoid styling flash
+    const savedGlobalUserTheme = localStorage.getItem("app-ui-theme") || "light";
+    if (savedGlobalUserTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+    } else if (savedGlobalUserTheme === "sepia") {
+        document.documentElement.setAttribute("data-theme", "sepia");
+    } else {
+        document.documentElement.removeAttribute("data-theme");
+    }
+</script>
 <body>
     <nav class="navbar animate-nav">
         <a href="/" class="nav-logo">
             <svg class="nav-logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;">
                 <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                <line x1="6" y1="8" x2="6" y2="8"></line>
+                <line x1="6" y1="8" x2="6" y2="8\"></line>
                 <line x1="10" y1="8" x2="10" y2="8"></line>
                 <line x1="14" y1="8" x2="14" y2="8"></line>
                 <line x1="18" y1="8" x2="18" y2="8"></line>
@@ -25,20 +36,13 @@
         <div class="nav-links">
             <a href="/" class="nav-link">Home</a>
             <a href="/play" class="nav-link">Play</a>
-
-            {% if current_user.is_authenticated %}
-                <a href="/dashboard" class="nav-link">Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
-            {% else %}
-                <a href="/login" class="nav-link">Login</a>
-                <a href="/register" class="nav-link">Register</a>
-            {% endif %}
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/logout" class="nav-link">Logout</a>
         </div>
     </nav>
 
-    <main class="main-wrapper">
+    <div class="container main-content-wrapper">
         {% block content %}{% endblock %}
-    </main>
-
+    </div>
 </body>
 </html>

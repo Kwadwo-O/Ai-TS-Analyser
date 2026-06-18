@@ -1,10 +1,10 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="login-container dashboard-wrapper">
+<div class="login-container dashboard-wrapper" style="max-width: 1100px; margin: 0 auto; position: relative;">
 
     <div class="main-card dashboard-banner passive-float">
-        <h1 class="title">Typing <span class="title-highlight">Game</span></h1>
-        <p class="description">Test your baseline performance accuracy. Click "Generate Challenge" to fetch an AI synthesized passage text prompt block.</p>
+        <h1 class="title">Typing <span class="title-highlight">Game Engine</span></h1>
+        <p class="description">Test your performance matrix limits. Reveal the collapsible control workspace to tweak reactive key underglows, text animations, and performance visualizers.</p>
     </div>
 
     <div id="setup-panel" class="main-card dashboard-card">
@@ -18,6 +18,14 @@
             </div>
         </div>
 
+        <div class="form-group difficulty-slider-group" style="text-align: left; margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label class="form-label" style="margin-bottom: 0;">Challenge Difficulty Level</label>
+                <span id="difficulty-badge" class="status-badge active" style="text-transform: uppercase;">Medium</span>
+            </div>
+            <input type="range" id="difficulty-control" min="1" max="3" value="2" class="form-range-input" style="width: 100%; cursor: pointer;">
+        </div>
+
         <button id="start-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
             <svg id="start-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             <span id="start-spinner" class="loading-spinner" style="display: none;"></span>
@@ -26,14 +34,24 @@
     </div>
 
     <div id="game-panel" class="main-card dashboard-card" style="display: none;">
-        <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem;">
-            <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
+        <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem; align-items: center;">
+            <div style="display: flex; gap: 1.5rem;">
+                <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
+                </div>
+                <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
+                </div>
             </div>
-            <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
+
+            <div class="cadence-visualizer-container" id="cadence-monitor">
+                <div class="cadence-bar"></div>
+                <div class="cadence-bar"></div>
+                <div class="cadence-bar"></div>
+                <div class="cadence-bar"></div>
+                <div class="cadence-bar"></div>
             </div>
         </div>
 
@@ -49,6 +67,139 @@
                 <svg id="submit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                 <span id="submit-btn-text">Submit for Evaluation</span>
             </button>
+        </div>
+    </div>
+
+    <div id="live-keyboard-panel" class="main-card dashboard-card keyboard-matrix-container" style="margin-top: 1.5rem;">
+
+        <div class="keyboard-toolbar-row">
+            <div class="toolbar-brand">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+                <span>Live Peripheral Hardware Grid Matrix</span>
+            </div>
+
+            <button id="sidebar-toggle-trigger" class="btn btn-dashboard" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 700;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Configure Engine Profile
+            </button>
+        </div>
+
+        <div class="keyboard-drawer-container-wrapper">
+
+            <div class="keyboard-grid-baseboard" id="matrix-grid-element">
+                <div class="keyboard-row">
+                    <div class="key" id="Backquote"><span class="glow-underlay"></span><span class="key-label">`</span></div>
+                    <div class="key" id="Digit1"><span class="glow-underlay"></span><span class="key-label">1</span></div>
+                    <div class="key" id="Digit2"><span class="glow-underlay"></span><span class="key-label">2</span></div>
+                    <div class="key" id="Digit3"><span class="glow-underlay"></span><span class="key-label">3</span></div>
+                    <div class="key" id="Digit4"><span class="glow-underlay"></span><span class="key-label">4</span></div>
+                    <div class="key" id="Digit5"><span class="glow-underlay"></span><span class="key-label">5</span></div>
+                    <div class="key" id="Digit6"><span class="glow-underlay"></span><span class="key-label">6</span></div>
+                    <div class="key" id="Digit7"><span class="glow-underlay"></span><span class="key-label">7</span></div>
+                    <div class="key" id="Digit8"><span class="glow-underlay"></span><span class="key-label">8</span></div>
+                    <div class="key" id="Digit9"><span class="glow-underlay"></span><span class="key-label">9</span></div>
+                    <div class="key" id="Digit0"><span class="glow-underlay"></span><span class="key-label">0</span></div>
+                    <div class="key" id="Minus"><span class="glow-underlay"></span><span class="key-label">-</span></div>
+                    <div class="key" id="Equal"><span class="glow-underlay"></span><span class="key-label">=</span></div>
+                    <div class="key backspace-key" id="Backspace"><span class="glow-underlay"></span><span class="key-label">⌫</span></div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key tab-key" id="Tab"><span class="glow-underlay"></span><span class="key-label">Tab</span></div>
+                    <div class="key" id="KeyQ"><span class="glow-underlay"></span><span class="key-label">Q</span></div>
+                    <div class="key" id="KeyW"><span class="glow-underlay"></span><span class="key-label">W</span></div>
+                    <div class="key" id="KeyE"><span class="glow-underlay"></span><span class="key-label">E</span></div>
+                    <div class="key" id="KeyR"><span class="glow-underlay"></span><span class="key-label">R</span></div>
+                    <div class="key" id="KeyT"><span class="glow-underlay"></span><span class="key-label">T</span></div>
+                    <div class="key" id="KeyY"><span class="glow-underlay"></span><span class="key-label">Y</span></div>
+                    <div class="key" id="KeyU"><span class="glow-underlay"></span><span class="key-label">U</span></div>
+                    <div class="key" id="KeyI"><span class="glow-underlay"></span><span class="key-label">I</span></div>
+                    <div class="key" id="KeyO"><span class="glow-underlay"></span><span class="key-label">O</span></div>
+                    <div class="key" id="KeyP"><span class="glow-underlay"></span><span class="key-label">P</span></div>
+                    <div class="key" id="BracketLeft"><span class="glow-underlay"></span><span class="key-label">[</span></div>
+                    <div class="key" id="BracketRight"><span class="glow-underlay"></span><span class="key-label">]</span></div>
+                    <div class="key backslash-key" id="Backslash"><span class="glow-underlay"></span><span class="key-label">\</span></div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key capslock-key" id="CapsLock"><span class="glow-underlay"></span><span class="key-label">Caps</span></div>
+                    <div class="key" id="KeyA"><span class="glow-underlay"></span><span class="key-label">A</span></div>
+                    <div class="key" id="KeyS"><span class="glow-underlay"></span><span class="key-label">S</span></div>
+                    <div class="key" id="KeyD"><span class="glow-underlay"></span><span class="key-label">D</span></div>
+                    <div class="key" id="KeyF"><span class="glow-underlay"></span><span class="key-label">F</span></div>
+                    <div class="key" id="KeyG"><span class="glow-underlay"></span><span class="key-label">G</span></div>
+                    <div class="key" id="KeyH"><span class="glow-underlay"></span><span class="key-label">H</span></div>
+                    <div class="key" id="KeyJ"><span class="glow-underlay"></span><span class="key-label">J</span></div>
+                    <div class="key" id="KeyK"><span class="glow-underlay"></span><span class="key-label">K</span></div>
+                    <div class="key" id="KeyL"><span class="glow-underlay"></span><span class="key-label">L</span></div>
+                    <div class="key" id="Semicolon"><span class="glow-underlay"></span><span class="key-label">;</span></div>
+                    <div class="key" id="Quote"><span class="glow-underlay"></span><span class="key-label">'</span></div>
+                    <div class="key enter-key" id="Enter"><span class="glow-underlay"></span><span class="key-label">Enter ↵</span></div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key shift-key" id="ShiftLeft"><span class="glow-underlay"></span><span class="key-label">Shift</span></div>
+                    <div class="key" id="KeyZ"><span class="glow-underlay"></span><span class="key-label">Z</span></div>
+                    <div class="key" id="KeyX"><span class="glow-underlay"></span><span class="key-label">X</span></div>
+                    <div class="key" id="KeyC"><span class="glow-underlay"></span><span class="key-label">C</span></div>
+                    <div class="key" id="KeyV"><span class="glow-underlay"></span><span class="key-label">V</span></div>
+                    <div class="key" id="KeyB"><span class="glow-underlay"></span><span class="key-label">B</span></div>
+                    <div class="key" id="KeyN"><span class="glow-underlay"></span><span class="key-label">N</span></div>
+                    <div class="key" id="KeyM"><span class="glow-underlay"></span><span class="key-label">M</span></div>
+                    <div class="key" id="Comma"><span class="glow-underlay"></span><span class="key-label">,</span></div>
+                    <div class="key" id="Period"><span class="glow-underlay"></span><span class="key-label">.</span></div>
+                    <div class="key" id="Slash"><span class="glow-underlay"></span><span class="key-label">/</span></div>
+                    <div class="key shift-key" id="ShiftRight"><span class="glow-underlay"></span><span class="key-label">Shift</span></div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key ctrl-key" id="ControlLeft"><span class="glow-underlay"></span><span class="key-label">Ctrl</span></div>
+                    <div class="key meta-key" id="MetaLeft"><span class="glow-underlay"></span><span class="key-label">⊞</span></div>
+                    <div class="key alt-key" id="AltLeft"><span class="glow-underlay"></span><span class="key-label">Alt</span></div>
+                    <div class="key space-key" id="Space"><span class="glow-underlay"></span></div>
+                    <div class="key alt-key" id="AltRight"><span class="glow-underlay"></span><span class="key-label">Alt</span></div>
+                    <div class="key meta-key" id="MetaRight"><span class="glow-underlay"></span><span class="key-label">⊞</span></div>
+                    <div class="key ctrl-key" id="ControlRight"><span class="glow-underlay"></span><span class="key-label">Ctrl</span></div>
+                </div>
+            </div>
+
+            <div id="keyboard-collapsible-sidebar" class="keyboard-control-sidebar collapsed">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                    <h4 class="sidebar-section-title" style="margin: 0;">Glow Engine FX</h4>
+                    <button id="sidebar-close-trigger" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0 0.25rem;">&times;</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
+                    <label class="toggle-control-label">
+                        <input type="checkbox" id="keyboard-animations-toggle" checked>
+                        <span>Enable Matrix Underglow</span>
+                    </label>
+                    <label class="toggle-control-label">
+                        <input type="checkbox" id="text-animations-toggle" checked>
+                        <span>Animated Cursor Track</span>
+                    </label>
+                </div>
+
+                <div class="profile-buttons-grid-selector">
+                    <button type="button" class="fx-picker-btn active" data-fx="fx-pop-accent">
+                        <strong>01. Color Shock</strong>
+                        <span>Sudden peripheral accent pop</span>
+                    </button>
+                    <button type="button" class="fx-picker-btn" data-fx="fx-neon-aura">
+                        <strong>02. Neon Halo</strong>
+                        <span>High exposure primary bloom</span>
+                    </button>
+                    <button type="button" class="fx-picker-btn" data-fx="fx-pop-sink">
+                        <strong>03. Mechanical Sink</strong>
+                        <span>Deep shadow structural compression</span>
+                    </button>
+                    <button type="button" class="fx-picker-btn" data-fx="fx-rgb-cycle">
+                        <strong>04. Ambient Sweep</strong>
+                        <span>Continuous background spectrum flow</span>
+                    </button>
+                    <button type="button" class="fx-picker-btn" data-fx="fx-rgb-breathe">
+                        <strong>05. Lumens Breath</strong>
+                        <span>Synchronized fading glow pulse</span>
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -87,12 +238,221 @@
             <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;"></div>
         </div>
 
-        <button id="reset-btn" class="btn btn-dashboard full-width-btn interactive-hover" style="margin-top: 2rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            Run Another Speed Challenge
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
+            <button id="reset-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Run Another Speed Challenge
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                Go to Dashboard
+            </a>
+        </div>
     </div>
 </div>
+
+<style>
+.keyboard-toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.toolbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.toggle-control-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    font-weight: 600;
+    user-select: none;
+}
+
+.cadence-visualizer-container {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 24px;
+    padding: 0 0.5rem;
+}
+
+.cadence-bar {
+    width: 4px;
+    height: 6px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    transition: height 0.1s ease, background-color 0.1s ease;
+}
+
+.cadence-visualizer-container.active .cadence-bar {
+    background: var(--primary);
+}
+.cadence-visualizer-container.active .cadence-bar:nth-child(1) { height: 18px; }
+.cadence-visualizer-container.active .cadence-bar:nth-child(2) { height: 12px; }
+.cadence-visualizer-container.active .cadence-bar:nth-child(3) { height: 22px; }
+.cadence-visualizer-container.active .cadence-bar:nth-child(4) { height: 15px; }
+.cadence-visualizer-container.active .cadence-bar:nth-child(5) { height: 20px; }
+
+/* --- OPTIMIZED RECONSTRUCTED TYPING NODES --- */
+.char-span {
+    display: inline-block;
+    position: relative;
+    border-bottom: 2px solid transparent;
+}
+
+.char-span.whitespace-node {
+    color: var(--text-muted);
+    opacity: 0.35;
+    margin: 0 1px;
+}
+
+.char-span.correct {
+    color: var(--success-hover);
+    opacity: 1 !important;
+}
+
+.char-span.incorrect {
+    color: var(--primary) !important;
+    opacity: 1 !important;
+    background: rgba(239, 130, 117, 0.15);
+    border-radius: 3px;
+}
+
+/* TYPING STYLES AND DIRECT TRACKING FX */
+#text-display.animated-text .char-span.active-cursor {
+    border-bottom-color: var(--button-color);
+    background: rgba(138, 79, 125, 0.1);
+    color: var(--button-color);
+}
+
+.keyboard-matrix-container {
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.keyboard-drawer-container-wrapper {
+    display: flex;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.keyboard-grid-baseboard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    user-select: none;
+}
+
+.keyboard-control-sidebar {
+    position: absolute;
+    top: 0; right: 0; width: 280px; height: 100%;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 0 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+    transform: translateX(0);
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.keyboard-control-sidebar.collapsed {
+    transform: translateX(105%);
+    pointer-events: none;
+    width: 0; padding: 0;
+}
+
+.sidebar-section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.profile-buttons-grid-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.fx-picker-btn {
+    width: 100%; text-align: left;
+    background: rgba(125, 125, 125, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.5rem 0.75rem;
+    cursor: pointer; display: flex; flex-direction: column;
+}
+
+.fx-picker-btn strong { font-size: 0.85rem; color: var(--text-main); }
+.fx-picker-btn span { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+.fx-picker-btn:hover { background: rgba(125, 125, 125, 0.08); }
+.fx-picker-btn.active { background: var(--button-color) !important; border-color: var(--button-color) !important; }
+.fx-picker-btn.active strong { color: #fff !important; }
+.fx-picker-btn.active span { color: rgba(255, 255, 255, 0.75) !important; }
+
+/* --- PER-KEY STATIC UNDERGLOW MATRIX SHEETS --- */
+.key {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-main); border-radius: 6px; padding: 0.65rem 0;
+    text-align: center; font-family: monospace; font-size: 0.95rem;
+    font-weight: 600; position: relative;
+}
+
+.key-label { position: relative; z-index: 5; }
+
+.glow-underlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 5px; pointer-events: none; z-index: 1; opacity: 0;
+    transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.keyboard-row { display: flex; width: 100%; gap: 0.4rem; }
+
+/* STATIC CHROMA CONSTANTS */
+.keyboard-grid-baseboard.fx-rgb-cycle .glow-underlay {
+    opacity: 0.35; box-shadow: 0 0 6px var(--primary);
+}
+.keyboard-grid-baseboard.fx-rgb-breathe .glow-underlay {
+    opacity: 0.4; box-shadow: 0 0 8px var(--button-color);
+}
+
+.backspace-key { flex: 2; }
+.tab-key { flex: 1.5; }
+.backslash-key { flex: 1.5; }
+.capslock-key { flex: 1.75; }
+.enter-key { flex: 2.25; }
+.shift-key { flex: 2.6; }
+.space-key { flex: 8; position: relative; }
+.space-key::after {
+    content: ''; position: absolute; width: 30%; height: 3px;
+    background: currentColor; left: 35%; top: calc(50% - 1px);
+    border-radius: 2px; opacity: 0.4; z-index: 6;
+}
+.ctrl-key, .alt-key, .meta-key { flex: 1.25; font-size: 0.8rem; opacity: 0.8; }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -121,6 +481,108 @@ document.addEventListener("DOMContentLoaded", function() {
     const hiddenCatcher = document.getElementById("hidden-keyboard-catcher");
     const timerLabel = document.getElementById("timer-label");
     const liveWpmLabel = document.getElementById("live-wpm");
+    const cadenceMonitor = document.getElementById("cadence-monitor");
+
+    const difficultyControl = document.getElementById("difficulty-control");
+    const difficultyBadge = document.getElementById("difficulty-badge");
+    const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
+
+    const sidebarToggle = document.getElementById("sidebar-toggle-trigger");
+    const sidebarClose = document.getElementById("sidebar-close-trigger");
+    const sidebarElement = document.getElementById("keyboard-collapsible-sidebar");
+
+    sidebarToggle.addEventListener("click", () => sidebarElement.classList.toggle("collapsed"));
+    sidebarClose.addEventListener("click", () => sidebarElement.classList.add("collapsed"));
+
+    const animToggle = document.getElementById("keyboard-animations-toggle");
+    const textAnimToggle = document.getElementById("text-animations-toggle");
+    const fxButtons = document.querySelectorAll(".fx-picker-btn");
+    const matrixGrid = document.getElementById("matrix-grid-element");
+
+    let activeProfileValue = "fx-pop-accent";
+    let visualizerTimeout = null;
+
+    fxButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            fxButtons.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            activeProfileValue = this.getAttribute("data-fx");
+            syncActiveFXClasses();
+        });
+    });
+
+    function syncActiveFXClasses() {
+        matrixGrid.className = "keyboard-grid-baseboard";
+        if (animToggle.checked && (activeProfileValue === 'fx-rgb-cycle' || activeProfileValue === 'fx-rgb-breathe')) {
+            matrixGrid.classList.add(activeProfileValue);
+        }
+    }
+
+    textAnimToggle.addEventListener("change", function() {
+        textDisplay.classList.toggle("animated-text", this.checked);
+    });
+
+    animToggle.addEventListener("change", syncActiveFXClasses);
+
+    function triggerCadenceVisualization() {
+        cadenceMonitor.classList.add("active");
+        clearTimeout(visualizerTimeout);
+        visualizerTimeout = setTimeout(() => cadenceMonitor.classList.remove("active"), 180);
+    }
+
+    // --- STREAMLINED LIGHTWEIGHT KEYBOARD HIT ENGINE ---
+    function executeEngineMatrixRendering(keyElement) {
+        triggerCadenceVisualization();
+        if (!animToggle.checked) return;
+
+        const underlay = keyElement.querySelector(".glow-underlay");
+        if (!underlay) return;
+
+        underlay.style.opacity = "1";
+        if (activeProfileValue === "fx-pop-accent") {
+            underlay.style.boxShadow = "0 0 10px 3px var(--button-color)";
+            underlay.style.backgroundColor = "rgba(138, 79, 125, 0.25)";
+        } else if (activeProfileValue === "fx-neon-aura") {
+            underlay.style.boxShadow = "0 0 16px 5px var(--primary)";
+            underlay.style.backgroundColor = "rgba(239, 130, 117, 0.2)";
+        } else if (activeProfileValue === "fx-pop-sink") {
+            underlay.style.boxShadow = "inset 0 3px 6px rgba(0,0,0,0.25)";
+            underlay.style.backgroundColor = "rgba(0,0,0,0.06)";
+        }
+
+        if (activeProfileValue !== "fx-rgb-cycle" && activeProfileValue !== "fx-rgb-breathe") {
+            setTimeout(() => {
+                underlay.style.opacity = "";
+                underlay.style.boxShadow = "";
+                underlay.style.backgroundColor = "";
+            }, 140);
+        }
+    }
+
+    window.addEventListener("keydown", function(e) {
+        const keyElement = document.getElementById(e.code);
+        if (keyElement) {
+            if (e.code === "Space") {
+                e.preventDefault();
+                if (gamePanel.style.display === "block" && !hiddenCatcher.disabled) {
+                    hiddenCatcher.value += " ";
+                    hiddenCatcher.dispatchEvent(new Event('input'));
+                }
+            }
+            if (e.code === "Tab") e.preventDefault();
+            executeEngineMatrixRendering(keyElement);
+        }
+    });
+
+    if (difficultyControl) {
+        difficultyControl.addEventListener("input", function() {
+            const mappedVal = difficultyMap[difficultyControl.value];
+            difficultyBadge.textContent = mappedVal;
+            difficultyBadge.style.borderColor = mappedVal === "easy" ? "var(--success-hover)" : mappedVal === "medium" ? "var(--button-color)" : "var(--primary)";
+            difficultyBadge.style.color = mappedVal === "easy" ? "var(--success-hover)" : mappedVal === "medium" ? "var(--button-color)" : "var(--primary)";
+            difficultyBadge.style.backgroundColor = mappedVal === "easy" ? "rgba(136, 160, 150, 0.12)" : mappedVal === "medium" ? "rgba(138, 79, 125, 0.12)" : "rgba(239, 130, 117, 0.12)";
+        });
+    }
 
     let rawChallengeText = "";
     let timeElapsed = 0;
@@ -132,6 +594,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return Math.round((characterCount / 5) / (secondsElapsed / 60));
     }
 
+    // --- GENERATE PASSAGE WITH TIMEOUT GUARD ---
     if (startBtn) {
         startBtn.addEventListener("click", async function() {
             startBtn.disabled = true;
@@ -140,38 +603,32 @@ document.addEventListener("DOMContentLoaded", function() {
             startBtnText.textContent = "Fetching Challenge Text...";
             errorFallback.style.display = "none";
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Strict 10-second timeout
+
             try {
-                const response = await fetch("/api/generate");
+                const activeDifficulty = difficultyMap[difficultyControl.value] || "medium";
+                const response = await fetch(`/api/generate?difficulty=${activeDifficulty}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
 
-                if (response.status === 429) {
-                    throw new Error("RATE_LIMIT_HIT");
-                }
-
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error(`Server returned non-JSON payload (${response.status}).`);
-                }
-
+                if (response.status === 429) throw new Error("RATE_LIMIT_HIT");
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.error || "Failed text configuration setup.");
-
-                // CRITICAL FIX: Explicitly intercept rate limit text strings hiding inside successful 200 OK responses
-                let textToVerify = result.sentence || "";
-                if (typeof textToVerify === "object") {
-                    textToVerify = JSON.stringify(textToVerify);
-                }
-
-                if (textToVerify.includes("429") || textToVerify.toLowerCase().includes("rate limit")) {
-                    throw new Error("RATE_LIMIT_HIT");
-                }
 
                 rawChallengeText = result.sentence;
                 textDisplay.innerHTML = "";
 
                 rawChallengeText.split("").forEach((char, idx) => {
                     const span = document.createElement("span");
-                    span.textContent = char;
                     span.classList.add("char-span");
+                    if (char === " ") {
+                        span.textContent = "·";
+                        span.classList.add("whitespace-node");
+                    } else {
+                        span.textContent = char;
+                    }
                     if (idx === 0) span.classList.add("active-cursor");
                     textDisplay.appendChild(span);
                 });
@@ -186,26 +643,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 setupPanel.style.display = "none";
                 gamePanel.style.display = "block";
-
                 document.body.addEventListener("click", focusCatcher);
                 focusCatcher();
 
             } catch (err) {
-                // Route everything back into the menu layout card
-                if (err.message === "RATE_LIMIT_HIT") {
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') {
+                    errorTitle.textContent = "Engine Timeout";
+                    errorText.textContent = "The AI generation service failed to respond within 10 seconds. Please try again.";
+                } else if (err.message === "RATE_LIMIT_HIT") {
                     errorTitle.textContent = "Rate Limit Exceeded";
-                    errorText.textContent = "You've run out of daily free AI model requests. Please add credits or wait for your daily limit counter reset.";
+                    errorText.textContent = "You've run out of daily free AI requests. Please wait for reset counters.";
                 } else {
                     errorTitle.textContent = "Generation Error";
                     errorText.textContent = err.message;
                 }
-
                 errorFallback.style.display = "block";
-
-                // Keep the menu visible and restore button usability
-                setupPanel.style.display = "block";
-                gamePanel.style.display = "none";
-
                 startBtn.disabled = false;
                 startIcon.style.display = "inline-block";
                 startSpinner.style.display = "none";
@@ -234,185 +687,109 @@ document.addEventListener("DOMContentLoaded", function() {
         spans.forEach((span, idx) => {
             span.classList.remove("correct", "incorrect", "active-cursor");
             if (idx < val.length) {
-                if (val[idx] === rawChallengeText[idx]) {
-                    span.classList.add("correct");
-                } else {
-                    span.classList.add("incorrect");
-                }
+                span.classList.add(val[idx] === rawChallengeText[idx] ? "correct" : "incorrect");
             } else if (idx === val.length) {
                 span.classList.add("active-cursor");
             }
         });
 
         liveWpmLabel.textContent = `${calculateStandardWPM(val.length, timeElapsed)} WPM`;
-
-        if (val.length >= rawChallengeText.length) {
-            submitBtn.style.display = "inline-flex";
-        } else {
-            submitBtn.style.display = "none";
-        }
+        submitBtn.style.display = (val.length >= rawChallengeText.length) ? "inline-flex" : "none";
     });
 
     hiddenCatcher.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            if (hiddenCatcher.value.length >= rawChallengeText.length && !submitBtn.disabled) {
-                submitBtn.click();
-            }
+        if (event.key === "Enter" && hiddenCatcher.value.length >= rawChallengeText.length && !submitBtn.disabled) {
+            submitBtn.click();
         }
     });
 
-    submitBtn.addEventListener("click", async function() {
-        clearInterval(timerInterval);
-        document.body.removeEventListener("click", focusCatcher);
+    // --- SUBMIT CHALLENGE WITH TIMEOUT GUARD ---
+    if (submitBtn) {
+        submitBtn.addEventListener("click", async function() {
+            clearInterval(timerInterval);
+            document.body.removeEventListener("click", focusCatcher);
 
-        submitBtn.disabled = true;
-        submitIcon.style.display = "none";
-        submitSpinner.style.display = "inline-block";
-        submitBtnText.textContent = "AI Analysis Processing...";
-        hiddenCatcher.disabled = true;
+            submitBtn.disabled = true;
+            submitIcon.style.display = "none";
+            submitSpinner.style.display = "inline-block";
+            submitBtnText.textContent = "AI Analysis Processing...";
+            hiddenCatcher.disabled = true;
 
-        try {
-            const exactFinalWPM = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
+            const finalWpmString = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Strict 10-second timeout
 
-            const response = await fetch("/api/submit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    original_sentence: rawChallengeText,
-                    user_sentence: hiddenCatcher.value,
-                    time: `${timeElapsed} seconds`,
-                    typing_speed: exactFinalWPM
-                })
-            });
+            try {
+                const response = await fetch("/api/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        original_sentence: rawChallengeText,
+                        user_sentence: hiddenCatcher.value,
+                        time: `${timeElapsed}s`,
+                        typing_speed: finalWpmString
+                    }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
 
-            const submitContentType = response.headers.get("content-type");
-            if (!submitContentType || !submitContentType.includes("application/json")) {
-                throw new Error(`The evaluation processor returned unexpected data formatting.`);
-            }
+                if (!response.ok) throw new Error("Submission evaluation rejected.");
+                const metrics = await response.json();
 
-            let parsedData = await response.json();
-            parsedData = parsedData || {};
+                document.getElementById("res-speed").textContent = finalWpmString;
+                document.getElementById("res-accuracy").textContent = metrics.accuracy || "100%";
+                document.getElementById("res-score").textContent = metrics.score || "100/100";
+                document.getElementById("res-rating").textContent = metrics.user_rating || "Pro";
+                document.getElementById("res-analysis").textContent = metrics.text_analysis || "Run completed.";
 
-            if (typeof parsedData === 'string' || !parsedData.accuracy) {
-                const normString = (typeof parsedData === 'string' ? parsedData : JSON.stringify(parsedData))
-                                    .replace(/\\n/g, '\n').replace(/[{}"']/g, '');
+                const mistakesWrapper = document.getElementById("mistakes-wrapper");
+                const mistakesLog = document.getElementById("res-mistakes");
+                mistakesLog.innerHTML = "";
 
-                const extractMetric = (key) => {
-                    const match = normString.match(new RegExp(key + "\\s*:\\s*([^\\n,\\r]+)", "i"));
-                    return match ? match[1].trim() : null;
-                };
-
-                let accuracyVal = extractMetric("accuracy") || "100%";
-                if (accuracyVal === "100/100") accuracyVal = "100%";
-
-                parsedData = {
-                    text_analysis: extractMetric("text_analysis") || "Analysis complete.",
-                    user_rating: extractMetric("user rating") || "Pro",
-                    score: extractMetric("score") || "100/100",
-                    accuracy: accuracyVal,
-                    mistakes: parsedData.mistakes || []
-                };
-            }
-
-            document.getElementById("res-speed").textContent = exactFinalWPM;
-            document.getElementById("res-accuracy").textContent = parsedData.accuracy || "100%";
-            document.getElementById("res-score").textContent = parsedData.score || "100/100";
-            document.getElementById("res-rating").textContent = parsedData.user_rating || "Pro";
-            document.getElementById("res-analysis").textContent = parsedData.text_analysis || "Analysis complete.";
-
-            const mistakeLog = document.getElementById("res-mistakes");
-            const mistakesWrapper = document.getElementById("mistakes-wrapper");
-
-            if (mistakeLog && mistakesWrapper) {
-                mistakeLog.innerHTML = "";
-                mistakesWrapper.style.display = "block";
-
-                const mistakeList = parsedData.mistakes || [];
-                if (Array.isArray(mistakeList) && mistakeList.length > 0) {
-                    mistakeList.forEach(item => {
-                        if (item && typeof item === 'object') {
-                            const keys = Object.keys(item);
-                            if (keys.length > 0) {
-                                const correctWord = keys[0];
-                                const userWord = item[correctWord];
-
-                                const errorRow = document.createElement("div");
-                                errorRow.className = "mistake-entry-row";
-                                // STYLE FIX: Added inline high-contrast var values so 'Expected' words are readable against a light background
-                                errorRow.innerHTML = `
-                                    <svg class="theme-error-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    <span style="color: #333333; font-weight: 500;">Expected:</span> <strong class="expected-word-text" style="color: #111111; font-weight: 700; background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${correctWord}</strong> <span class="divider-bar" style="color: #888888; margin: 0 4px;">|</span> <span style="color: #333333; font-weight: 500;">Typed:</span> <span class="typed-error-text" style="color: var(--primary); font-weight: 600;">${userWord}</span>
-                                `;
-                                mistakeLog.appendChild(errorRow);
-                            }
-                        }
+                if (metrics.mistakes && metrics.mistakes.length > 0) {
+                    metrics.mistakes.forEach(errItem => {
+                        const row = document.createElement("div");
+                        row.innerHTML = `<span style="color:var(--text-muted); text-decoration:line-through;">${errItem.expected || ""}</span> <span style="color:var(--primary); font-weight:bold;">➔ ${errItem.typed || ""}</span>`;
+                        mistakesLog.appendChild(row);
                     });
                 } else {
-                    const successRow = document.createElement("div");
-                    successRow.className = "mistake-entry-row perfect-run-row";
-                    successRow.innerHTML = `
-                        <svg class="theme-success-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Perfect typing execution! No word discrepancies detected.
-                    `;
-                    mistakeLog.appendChild(successRow);
+                    mistakesLog.innerHTML = `<div>✨ Flawless Run! No discrepancies recorded.</div>`;
                 }
+                mistakesWrapper.style.display = "block";
+
+                gamePanel.style.display = "none";
+                resultsPanel.style.display = "block";
+
+                if (window.confetti) confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+
+            } catch (err) {
+                clearTimeout(timeoutId);
+                errorTitle.textContent = err.name === 'AbortError' ? "Evaluation Timeout" : "Evaluation Processing Failure";
+                errorText.textContent = err.name === 'AbortError' ? "The evaluation engine took longer than 10 seconds to respond." : err.message;
+                errorFallback.style.display = "block";
+                gamePanel.style.display = "none";
+                setupPanel.style.display = "block";
+            } finally {
+                submitBtn.disabled = false;
+                submitIcon.style.display = "inline-block";
+                submitSpinner.style.display = "none";
+                submitBtnText.textContent = "Submit for Evaluation";
             }
+        });
+    }
 
-            if (typeof confetti === 'function') {
-                confetti({ particleCount: 140, spread: 80, origin: { y: 0.6 } });
-            }
-
-            if (!document.getElementById("nav-dashboard-shortcut")) {
-                const dashboardBtn = document.createElement("button");
-                dashboardBtn.id = "nav-dashboard-shortcut";
-                dashboardBtn.className = "btn btn-play interactive-hover";
-                dashboardBtn.style.marginTop = "1rem";
-                dashboardBtn.style.width = "100%";
-                dashboardBtn.style.backgroundColor = "transparent";
-                dashboardBtn.style.border = "2px solid var(--button-color)";
-                dashboardBtn.style.color = "var(--button-color)";
-                dashboardBtn.innerHTML = `📊 View Run Metrics on Historical Dashboard`;
-                dashboardBtn.onclick = () => { window.location.href = "/dashboard"; };
-                resetBtn.parentNode.insertBefore(dashboardBtn, resetBtn);
-            }
-
-            gamePanel.style.display = "none";
-            resultsPanel.style.display = "block";
-
-        } catch (err) {
-            alert(`Evaluation Processing Exception Error: ${err.message}`);
-            submitBtn.disabled = false;
-            submitIcon.style.display = "inline-block";
-            submitSpinner.style.display = "none";
-            submitBtnText.textContent = "Submit for Evaluation";
-            hiddenCatcher.disabled = false;
-            document.body.addEventListener("click", focusCatcher);
-            focusCatcher();
-        }
-    });
-
-    resetBtn.addEventListener("click", function() {
-        resultsPanel.style.display = "none";
-        setupPanel.style.display = "block";
-        hiddenCatcher.value = "";
-        hiddenCatcher.disabled = false;
-
-        submitBtn.disabled = false;
-        submitIcon.style.display = "inline-block";
-        submitSpinner.style.display = "none";
-        submitBtnText.textContent = "Submit for Evaluation";
-
-        const shortcut = document.getElementById("nav-dashboard-shortcut");
-        if (shortcut) shortcut.remove();
-
-        if (startBtn) {
+    if (resetBtn) {
+        resetBtn.addEventListener("click", function() {
+            resultsPanel.style.display = "none";
+            setupPanel.style.display = "block";
             startBtn.disabled = false;
             startIcon.style.display = "inline-block";
             startSpinner.style.display = "none";
             startBtnText.textContent = "Generate Challenge Passage";
-        }
-    });
+        });
+    }
+
+    syncActiveFXClasses();
 });
 </script>
 {% endblock %}
