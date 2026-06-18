@@ -73,7 +73,7 @@ def verify_openrouter(api_key: str = API_KEY):
 
 
 def backend_generate(api_key: str = API_KEY, difficulty=None):
-
+    print("api key: ", api_key)
     global max_sentence
     if difficulty == 1:
         max_sentence = 20

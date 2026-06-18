@@ -1,723 +1,438 @@
 {% extends "Base.html" %}
 {% block content %}
-<div class="login-container dashboard-wrapper" style="max-width: 1100px; margin: 0 auto; position: relative;">
+<div class="login-container dashboard-wrapper" style="max-width: 1240px; margin: 0 auto; position: relative;">
 
-    <div class="main-card dashboard-banner passive-float">
-        <h1 class="title">Typing <span class="title-highlight">Game Engine</span></h1>
-        <p class="description">Test your performance matrix limits. Reveal the collapsible control workspace to tweak reactive key underglows, text animations, and performance visualizers.</p>
-    </div>
+    <div class="layout-split-container">
 
-    <div id="setup-panel" class="main-card dashboard-card">
-        <div id="error-fallback" class="main-card alert-card failure" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--primary); background: rgba(255, 0, 0, 0.05); padding: 1rem 1.25rem; border-radius: 8px; text-align: left;">
-            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                <svg style="color: var(--primary); flex-shrink: 0; margin-top: 2px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <div>
-                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.25rem;" id="error-title">Generation Error</strong>
-                    <span id="error-text" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;"></span>
-                </div>
-            </div>
-        </div>
+        <div class="primary-workspace-stack">
 
-        <div class="form-group difficulty-slider-group" style="text-align: left; margin-bottom: 1.75rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <label class="form-label" style="margin-bottom: 0;">Challenge Difficulty Level</label>
-                <span id="difficulty-badge" class="status-badge active" style="text-transform: uppercase;">Medium</span>
-            </div>
-            <input type="range" id="difficulty-control" min="1" max="3" value="2" class="form-range-input" style="width: 100%; cursor: pointer;">
-        </div>
-
-        <button id="start-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <svg id="start-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            <span id="start-spinner" class="loading-spinner" style="display: none;"></span>
-            <span id="start-btn-text">Generate Challenge Passage</span>
-        </button>
-    </div>
-
-    <div id="game-panel" class="main-card dashboard-card" style="display: none;">
-        <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem; align-items: center;">
-            <div style="display: flex; gap: 1.5rem;">
-                <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
-                </div>
-                <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                    Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
-                </div>
+            <div class="main-card dashboard-banner passive-float">
+                <h1 class="title">Typing <span class="title-highlight">Game Engine</span></h1>
+                <p class="description">Test your performance matrix limits. Customize text presentation scale dynamically using the configuration options on the right, and choose between explicit built-in high-contrast presets.</p>
             </div>
 
-            <div class="cadence-visualizer-container" id="cadence-monitor">
-                <div class="cadence-bar"></div>
-                <div class="cadence-bar"></div>
-                <div class="cadence-bar"></div>
-                <div class="cadence-bar"></div>
-                <div class="cadence-bar"></div>
-            </div>
-        </div>
+            <div id="setup-panel" class="main-card dashboard-card">
+                <div id="error-fallback" class="main-card alert-card failure" style="display: none; margin-bottom: 1.5rem; border: 2px solid var(--primary); background: rgba(255, 0, 0, 0.05); padding: 1rem 1.25rem; border-radius: 8px; text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <svg style="color: var(--primary); flex-shrink: 0; margin-top: 2px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <div>
+                            <strong style="color: var(--text-main); display: block; margin-bottom: 0.25rem;" id="error-title">Generation Error</strong>
+                            <span id="error-text" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;"></span>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="form-group" style="margin-top: 1.5rem; position: relative;">
-            <label class="form-label">Challenge Target Text (Type anywhere on screen to begin)</label>
-            <div id="text-display" class="monospace-font"></div>
-            <input type="text" id="hidden-keyboard-catcher" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px;">
-        </div>
+                <div class="form-group difficulty-slider-group" style="text-align: left; margin-bottom: 1.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label class="form-label" style="margin-bottom: 0;">Challenge Difficulty Level</label>
+                        <span id="difficulty-badge" class="status-badge active" style="text-transform: uppercase;">Medium</span>
+                    </div>
+                    <input type="range" id="difficulty-control" min="1" max="3" value="2" class="form-range-input" style="width: 100%; cursor: pointer;">
+                </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
-            <button id="submit-btn" class="btn btn-play interactive-hover" style="display: none; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem;">
-                <span id="submit-spinner" class="loading-spinner" style="display: none; border-left-color: #fff;"></span>
-                <svg id="submit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                <span id="submit-btn-text">Submit for Evaluation</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="live-keyboard-panel" class="main-card dashboard-card keyboard-matrix-container" style="margin-top: 1.5rem;">
-
-        <div class="keyboard-toolbar-row">
-            <div class="toolbar-brand">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
-                <span>Live Peripheral Hardware Grid Matrix</span>
+                <button id="start-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg id="start-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <span id="start-spinner" class="loading-spinner" style="display: none;"></span>
+                    <span id="start-btn-text">Generate Challenge Passage</span>
+                </button>
             </div>
 
-            <button id="sidebar-toggle-trigger" class="btn btn-dashboard" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 700;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                Configure Engine Profile
-            </button>
-        </div>
-
-        <div class="keyboard-drawer-container-wrapper">
-
-            <div class="keyboard-grid-baseboard" id="matrix-grid-element">
-                <div class="keyboard-row">
-                    <div class="key" id="Backquote"><span class="glow-underlay"></span><span class="key-label">`</span></div>
-                    <div class="key" id="Digit1"><span class="glow-underlay"></span><span class="key-label">1</span></div>
-                    <div class="key" id="Digit2"><span class="glow-underlay"></span><span class="key-label">2</span></div>
-                    <div class="key" id="Digit3"><span class="glow-underlay"></span><span class="key-label">3</span></div>
-                    <div class="key" id="Digit4"><span class="glow-underlay"></span><span class="key-label">4</span></div>
-                    <div class="key" id="Digit5"><span class="glow-underlay"></span><span class="key-label">5</span></div>
-                    <div class="key" id="Digit6"><span class="glow-underlay"></span><span class="key-label">6</span></div>
-                    <div class="key" id="Digit7"><span class="glow-underlay"></span><span class="key-label">7</span></div>
-                    <div class="key" id="Digit8"><span class="glow-underlay"></span><span class="key-label">8</span></div>
-                    <div class="key" id="Digit9"><span class="glow-underlay"></span><span class="key-label">9</span></div>
-                    <div class="key" id="Digit0"><span class="glow-underlay"></span><span class="key-label">0</span></div>
-                    <div class="key" id="Minus"><span class="glow-underlay"></span><span class="key-label">-</span></div>
-                    <div class="key" id="Equal"><span class="glow-underlay"></span><span class="key-label">=</span></div>
-                    <div class="key backspace-key" id="Backspace"><span class="glow-underlay"></span><span class="key-label">⌫</span></div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key tab-key" id="Tab"><span class="glow-underlay"></span><span class="key-label">Tab</span></div>
-                    <div class="key" id="KeyQ"><span class="glow-underlay"></span><span class="key-label">Q</span></div>
-                    <div class="key" id="KeyW"><span class="glow-underlay"></span><span class="key-label">W</span></div>
-                    <div class="key" id="KeyE"><span class="glow-underlay"></span><span class="key-label">E</span></div>
-                    <div class="key" id="KeyR"><span class="glow-underlay"></span><span class="key-label">R</span></div>
-                    <div class="key" id="KeyT"><span class="glow-underlay"></span><span class="key-label">T</span></div>
-                    <div class="key" id="KeyY"><span class="glow-underlay"></span><span class="key-label">Y</span></div>
-                    <div class="key" id="KeyU"><span class="glow-underlay"></span><span class="key-label">U</span></div>
-                    <div class="key" id="KeyI"><span class="glow-underlay"></span><span class="key-label">I</span></div>
-                    <div class="key" id="KeyO"><span class="glow-underlay"></span><span class="key-label">O</span></div>
-                    <div class="key" id="KeyP"><span class="glow-underlay"></span><span class="key-label">P</span></div>
-                    <div class="key" id="BracketLeft"><span class="glow-underlay"></span><span class="key-label">[</span></div>
-                    <div class="key" id="BracketRight"><span class="glow-underlay"></span><span class="key-label">]</span></div>
-                    <div class="key backslash-key" id="Backslash"><span class="glow-underlay"></span><span class="key-label">\</span></div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key capslock-key" id="CapsLock"><span class="glow-underlay"></span><span class="key-label">Caps</span></div>
-                    <div class="key" id="KeyA"><span class="glow-underlay"></span><span class="key-label">A</span></div>
-                    <div class="key" id="KeyS"><span class="glow-underlay"></span><span class="key-label">S</span></div>
-                    <div class="key" id="KeyD"><span class="glow-underlay"></span><span class="key-label">D</span></div>
-                    <div class="key" id="KeyF"><span class="glow-underlay"></span><span class="key-label">F</span></div>
-                    <div class="key" id="KeyG"><span class="glow-underlay"></span><span class="key-label">G</span></div>
-                    <div class="key" id="KeyH"><span class="glow-underlay"></span><span class="key-label">H</span></div>
-                    <div class="key" id="KeyJ"><span class="glow-underlay"></span><span class="key-label">J</span></div>
-                    <div class="key" id="KeyK"><span class="glow-underlay"></span><span class="key-label">K</span></div>
-                    <div class="key" id="KeyL"><span class="glow-underlay"></span><span class="key-label">L</span></div>
-                    <div class="key" id="Semicolon"><span class="glow-underlay"></span><span class="key-label">;</span></div>
-                    <div class="key" id="Quote"><span class="glow-underlay"></span><span class="key-label">'</span></div>
-                    <div class="key enter-key" id="Enter"><span class="glow-underlay"></span><span class="key-label">Enter ↵</span></div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key shift-key" id="ShiftLeft"><span class="glow-underlay"></span><span class="key-label">Shift</span></div>
-                    <div class="key" id="KeyZ"><span class="glow-underlay"></span><span class="key-label">Z</span></div>
-                    <div class="key" id="KeyX"><span class="glow-underlay"></span><span class="key-label">X</span></div>
-                    <div class="key" id="KeyC"><span class="glow-underlay"></span><span class="key-label">C</span></div>
-                    <div class="key" id="KeyV"><span class="glow-underlay"></span><span class="key-label">V</span></div>
-                    <div class="key" id="KeyB"><span class="glow-underlay"></span><span class="key-label">B</span></div>
-                    <div class="key" id="KeyN"><span class="glow-underlay"></span><span class="key-label">N</span></div>
-                    <div class="key" id="KeyM"><span class="glow-underlay"></span><span class="key-label">M</span></div>
-                    <div class="key" id="Comma"><span class="glow-underlay"></span><span class="key-label">,</span></div>
-                    <div class="key" id="Period"><span class="glow-underlay"></span><span class="key-label">.</span></div>
-                    <div class="key" id="Slash"><span class="glow-underlay"></span><span class="key-label">/</span></div>
-                    <div class="key shift-key" id="ShiftRight"><span class="glow-underlay"></span><span class="key-label">Shift</span></div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key ctrl-key" id="ControlLeft"><span class="glow-underlay"></span><span class="key-label">Ctrl</span></div>
-                    <div class="key meta-key" id="MetaLeft"><span class="glow-underlay"></span><span class="key-label">⊞</span></div>
-                    <div class="key alt-key" id="AltLeft"><span class="glow-underlay"></span><span class="key-label">Alt</span></div>
-                    <div class="key space-key" id="Space"><span class="glow-underlay"></span></div>
-                    <div class="key alt-key" id="AltRight"><span class="glow-underlay"></span><span class="key-label">Alt</span></div>
-                    <div class="key meta-key" id="MetaRight"><span class="glow-underlay"></span><span class="key-label">⊞</span></div>
-                    <div class="key ctrl-key" id="ControlRight"><span class="glow-underlay"></span><span class="key-label">Ctrl</span></div>
-                </div>
-            </div>
-
-            <div id="keyboard-collapsible-sidebar" class="keyboard-control-sidebar collapsed">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
-                    <h4 class="sidebar-section-title" style="margin: 0;">Glow Engine FX</h4>
-                    <button id="sidebar-close-trigger" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0 0.25rem;">&times;</button>
+            <div id="game-panel" class="main-card dashboard-card" style="display: none;">
+                <div class="card-header-row" style="border-bottom: 2px solid var(--border); padding-bottom: 1rem; align-items: center; display: flex; justify-content: space-between;">
+                    <div style="display: flex; gap: 1.5rem;">
+                        <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Elapsed Time: <strong id="timer-label" style="color: var(--text-main);">0s</strong>
+                        </div>
+                        <div style="font-size: 1.05rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                            Live Pace: <strong id="live-wpm" style="color: var(--button-color);">0 WPM</strong>
+                        </div>
+                    </div>
+                    <div class="cadence-visualizer-container" id="cadence-monitor">
+                        <div class="cadence-bar"></div><div class="cadence-bar"></div><div class="cadence-bar"></div><div class="cadence-bar"></div><div class="cadence-bar"></div>
+                    </div>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <label class="toggle-control-label">
-                        <input type="checkbox" id="keyboard-animations-toggle" checked>
-                        <span>Enable Matrix Underglow</span>
-                    </label>
-                    <label class="toggle-control-label">
-                        <input type="checkbox" id="text-animations-toggle" checked>
-                        <span>Animated Cursor Track</span>
-                    </label>
+                <div class="form-group" style="margin-top: 1.5rem; position: relative;">
+                    <label class="form-label">Challenge Target Text (Type anywhere on screen to begin)</label>
+                    <div id="text-display"></div>
+                    <textarea id="hidden-keyboard-catcher" autocomplete="off" autocapitalize="off" spellcheck="false" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px; height: 0; width: 0;"></textarea>
                 </div>
 
-                <div class="profile-buttons-grid-selector">
-                    <button type="button" class="fx-picker-btn active" data-fx="fx-pop-accent">
-                        <strong>01. Color Shock</strong>
-                        <span>Sudden peripheral accent pop</span>
-                    </button>
-                    <button type="button" class="fx-picker-btn" data-fx="fx-neon-aura">
-                        <strong>02. Neon Halo</strong>
-                        <span>High exposure primary bloom</span>
-                    </button>
-                    <button type="button" class="fx-picker-btn" data-fx="fx-pop-sink">
-                        <strong>03. Mechanical Sink</strong>
-                        <span>Deep shadow structural compression</span>
-                    </button>
-                    <button type="button" class="fx-picker-btn" data-fx="fx-rgb-cycle">
-                        <strong>04. Ambient Sweep</strong>
-                        <span>Continuous background spectrum flow</span>
-                    </button>
-                    <button type="button" class="fx-picker-btn" data-fx="fx-rgb-breathe">
-                        <strong>05. Lumens Breath</strong>
-                        <span>Synchronized fading glow pulse</span>
+                <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button id="submit-btn" class="btn btn-play interactive-hover" style="display: none; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem;">
+                        <span id="submit-spinner" class="loading-spinner" style="display: none;"></span>
+                        <svg id="submit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <span id="submit-btn-text">Submit for Evaluation</span>
                     </button>
                 </div>
             </div>
 
-        </div>
-    </div>
-
-    <div id="results-panel" class="main-card alert-card success" style="display: none; max-width: 100%; padding: 2.5rem 2rem;">
-        <h3 class="card-section-title" style="color: var(--button-color); font-size: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12 6.477 22 12 22z"></path><path d="M12 6v6l4 2"></path></svg>
-            AI Evaluation Breakdown
-        </h3>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom: 2rem; width: 100%;">
-            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Final Speed</div>
-                <div id="res-speed" style="font-size: 1.4rem; font-weight: 700; color: var(--button-color); margin-top: 0.25rem;">--</div>
+            <div id="live-keyboard-panel" class="main-card dashboard-card keyboard-matrix-container">
+                <div class="keyboard-toolbar-row">
+                    <div class="toolbar-brand">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--button-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+                        <span>Live Peripheral Hardware Grid Matrix</span>
+                    </div>
+                </div>
+                <div class="keyboard-drawer-container-wrapper">
+                    <div class="keyboard-grid-baseboard" id="matrix-grid-element">
+                        <div class="keyboard-row">
+                            <div class="key" id="Backquote"><span class="key-label">`</span></div><div class="key" id="Digit1"><span class="key-label">1</span></div><div class="key" id="Digit2"><span class="key-label">2</span></div><div class="key" id="Digit3"><span class="key-label">3</span></div><div class="key" id="Digit4"><span class="key-label">4</span></div><div class="key" id="Digit5"><span class="key-label">5</span></div><div class="key" id="Digit6"><span class="key-label">6</span></div><div class="key" id="Digit7"><span class="key-label">7</span></div><div class="key" id="Digit8"><span class="key-label">8</span></div><div class="key" id="Digit9"><span class="key-label">9</span></div><div class="key" id="Digit0"><span class="key-label">0</span></div><div class="key" id="Minus"><span class="key-label">-</span></div><div class="key" id="Equal"><span class="key-label">=</span></div><div class="key backspace-key" id="Backspace"><span class="key-label">⌫</span></div>
+                        </div>
+                        <div class="keyboard-row">
+                            <div class="key tab-key" id="Tab"><span class="key-label">Tab</span></div><div class="key" id="KeyQ"><span class="key-label">Q</span></div><div class="key" id="KeyW"><span class="key-label">W</span></div><div class="key" id="KeyE"><span class="key-label">E</span></div><div class="key" id="KeyR"><span class="key-label">R</span></div><div class="key" id="KeyT"><span class="key-label">T</span></div><div class="key" id="KeyY"><span class="key-label">Y</span></div><div class="key" id="KeyU"><span class="key-label">U</span></div><div class="key" id="KeyI"><span class="key-label">I</span></div><div class="key" id="KeyO"><span class="key-label">O</span></div><div class="key" id="KeyP"><span class="key-label">P</span></div><div class="key" id="BracketLeft"><span class="key-label">[</span></div><div class="key" id="BracketRight"><span class="key-label">]</span></div><div class="key backslash-key" id="Backslash"><span class="key-label">\</span></div>
+                        </div>
+                        <div class="keyboard-row">
+                            <div class="key capslock-key" id="CapsLock"><span class="key-label">Caps</span></div><div class="key" id="KeyA"><span class="key-label">A</span></div><div class="key" id="KeyS"><span class="key-label">S</span></div><div class="key" id="KeyD"><span class="key-label">D</span></div><div class="key" id="KeyF"><span class="key-label">F</span></div><div class="key" id="KeyG"><span class="key-label">G</span></div><div class="key" id="KeyH"><span class="key-label">H</span></div><div class="key" id="KeyJ"><span class="key-label">J</span></div><div class="key" id="KeyK"><span class="key-label">K</span></div><div class="key" id="KeyL"><span class="key-label">L</span></div><div class="key" id="Semicolon"><span class="key-label">;</span></div><div class="key" id="Quote"><span class="key-label">'</span></div><div class="key enter-key" id="Enter"><span class="key-label">Enter ↵</span></div>
+                        </div>
+                        <div class="keyboard-row">
+                            <div class="key shift-key" id="ShiftLeft"><span class="key-label">Shift</span></div><div class="key" id="KeyZ"><span class="key-label">Z</span></div><div class="key" id="KeyX"><span class="key-label">X</span></div><div class="key" id="KeyC"><span class="key-label">C</span></div><div class="key" id="KeyV"><span class="key-label">V</span></div><div class="key" id="KeyB"><span class="key-label">B</span></div><div class="key" id="KeyN"><span class="key-label">N</span></div><div class="key" id="KeyM"><span class="key-label">M</span></div><div class="key" id="Comma"><span class="key-label">,</span></div><div class="key" id="Period"><span class="key-label">.</span></div><div class="key" id="Slash"><span class="key-label">/</span></div><div class="key shift-key" id="ShiftRight"><span class="key-label">Shift</span></div>
+                        </div>
+                        <div class="keyboard-row">
+                            <div class="key ctrl-key" id="ControlLeft"><span class="key-label">Ctrl</span></div><div class="key meta-key" id="MetaLeft"><span class="key-label">⊞</span></div><div class="key alt-key" id="AltLeft"><span class="key-label">Alt</span></div><div class="key space-key" id="Space"></div><div class="key alt-key" id="AltRight"><span class="key-label">Alt</span></div><div class="key meta-key" id="MetaRight"><span class="key-label">⊞</span></div><div class="key ctrl-key" id="ControlRight"><span class="key-label">Ctrl</span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Accuracy</div>
-                <div id="res-accuracy" style="font-size: 1.4rem; font-weight: 700; color: var(--success-hover); margin-top: 0.25rem;">--</div>
-            </div>
-            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Overall Score</div>
-                <div id="res-score" style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">--</div>
-            </div>
-            <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Tier Status</div>
-                <div id="res-rating" style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-top: 0.4rem; text-transform: capitalize;">--</div>
+
+            <div id="results-panel" class="main-card alert-card success" style="display: none; padding: 2.5rem 2rem;">
+                <h3 class="card-section-title" style="color: var(--button-color); font-size: 1.5rem; margin-bottom: 1.5rem;">AI Evaluation Breakdown</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Final Speed</div>
+                        <div id="res-speed" style="font-size: 1.4rem; font-weight: 700; color: var(--button-color); margin-top: 0.25rem;">--</div>
+                    </div>
+                    <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Accuracy</div>
+                        <div id="res-accuracy" style="font-size: 1.4rem; font-weight: 700; color: var(--success); margin-top: 0.25rem;">--</div>
+                    </div>
+                    <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Overall Score</div>
+                        <div id="res-score" style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">--</div>
+                    </div>
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label">Qualitative Performance Analysis</label>
+                    <p id="res-analysis" style="color: var(--text-main); line-height: 1.6; background-color: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border);"></p>
+                </div>
+                <div id="mistakes-wrapper" class="form-group" style="margin-top: 1.5rem; display: none; text-align: left;">
+                    <label class="form-label" style="color: var(--primary);">Identified Word Discrepancies</label>
+                    <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px;"></div>
+                </div>
+                <button id="reset-btn" class="btn btn-play full-width-btn interactive-hover" style="margin-top: 1.5rem;">Run Another Speed Challenge</button>
             </div>
         </div>
 
-        <div class="form-group" style="text-align: left;">
-            <label class="form-label">Qualitative Performance Analysis</label>
-            <p id="res-analysis" style="color: var(--text-main); line-height: 1.6; background-color: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); font-size: 1rem; margin-top: 0.5rem;"></p>
-        </div>
+        <div class="persistent-right-control-panel">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">
+                Engine Configuration
+            </h3>
 
-        <div id="mistakes-wrapper" class="form-group" style="margin-top: 1.5rem; display: none; text-align: left;">
-            <label class="form-label" style="color: var(--primary);">Identified Word Discrepancies</label>
-            <div id="res-mistakes" style="display: grid; gap: 0.5rem; background-color: var(--background); border: 2px solid var(--primary); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;"></div>
-        </div>
+            <div class="form-group" style="text-align: left; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <label class="form-label" style="margin-bottom: 0; font-size: 0.9rem;">Text Presentation Scale</label>
+                    <span id="text-size-badge" class="status-badge active">1.25rem</span>
+                </div>
+                <input type="range" id="text-size-slider" min="1.0" max="2.2" step="0.05" value="1.25" class="form-range-input" style="cursor: pointer;">
+            </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
-            <button id="reset-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                Run Another Speed Challenge
-            </button>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-                Go to Dashboard
-            </a>
+            <div class="switch-wrapper-row">
+                <div class="switch-label-stack"><span class="switch-title">Keyboard Glow FX</span><span class="switch-desc">Reactive key lighting tracks</span></div>
+                <label class="engine-ui-switch"><input type="checkbox" id="keyboard-animations-toggle" checked><span class="switch-slider"></span></label>
+            </div>
+            <div class="switch-wrapper-row">
+                <div class="switch-label-stack"><span class="switch-title">Hardware Ripple Wave</span><span class="switch-desc">Staggered canvas ripples</span></div>
+                <label class="engine-ui-switch"><input type="checkbox" id="ripple-animations-toggle" checked><span class="switch-slider"></span></label>
+            </div>
+
+            <h4 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; margin: 1.5rem 0 0.5rem 0;">Select Active Theme</h4>
+            <div class="theme-selector-grid-stack">
+                <button type="button" class="theme-tile-btn" data-theme="light">
+                    <span class="theme-title-text">Original: Light</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #ffffff;"></div><div class="color-dot" style="background: #8a4f7d;"></div><div class="color-dot" style="background: #ef8275;"></div></div>
+                </button>
+                <button type="button" class="theme-tile-btn" data-theme="dark">
+                    <span class="theme-title-text">Original: Dark</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #1e141b;"></div><div class="color-dot" style="background: #e59ad7;"></div><div class="color-dot" style="background: #ff8a7d;"></div></div>
+                </button>
+                <button type="button" class="theme-tile-btn" data-theme="sepia">
+                    <span class="theme-title-text">Original: Sepia</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #eae3d8;"></div><div class="color-dot" style="background: #7a3e6a;"></div><div class="color-dot" style="background: #c23b2b;"></div></div>
+                </button>
+                <button type="button" class="theme-tile-btn" data-theme="cyber-shock">
+                    <span class="theme-title-text">01. Cyber Shock</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #130a1c;"></div><div class="color-dot" style="background: #ff0055;"></div><div class="color-dot" style="background: #00ffcc;"></div></div>
+                </button>
+                <button type="button" class="theme-tile-btn" data-theme="deep-nebula">
+                    <span class="theme-title-text">02. Deep Nebula</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #110d22;"></div><div class="color-dot" style="background: #8c52ff;"></div><div class="color-dot" style="background: #4deeea;"></div></div>
+                </button>
+                <button type="button" class="theme-tile-btn" data-theme="monochrome-mint">
+                    <span class="theme-title-text">03. Mono Mint</span>
+                    <div class="theme-palette-preview"><div class="color-dot" style="background: #1c1c1c;"></div><div class="color-dot" style="background: #00ff87;"></div><div class="color-dot" style="background: #64ffda;"></div></div>
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-.keyboard-toolbar-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.toolbar-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text-main);
-}
-
-.toggle-control-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--text-main);
-    font-weight: 600;
-    user-select: none;
-}
-
-.cadence-visualizer-container {
-    display: inline-flex;
-    align-items: flex-end;
-    gap: 3px;
-    height: 24px;
-    padding: 0 0.5rem;
-}
-
-.cadence-bar {
-    width: 4px;
-    height: 6px;
-    background: var(--text-muted);
-    border-radius: 2px;
-    transition: height 0.1s ease, background-color 0.1s ease;
-}
-
-.cadence-visualizer-container.active .cadence-bar {
-    background: var(--primary);
-}
-.cadence-visualizer-container.active .cadence-bar:nth-child(1) { height: 18px; }
-.cadence-visualizer-container.active .cadence-bar:nth-child(2) { height: 12px; }
-.cadence-visualizer-container.active .cadence-bar:nth-child(3) { height: 22px; }
-.cadence-visualizer-container.active .cadence-bar:nth-child(4) { height: 15px; }
-.cadence-visualizer-container.active .cadence-bar:nth-child(5) { height: 20px; }
-
-/* --- OPTIMIZED RECONSTRUCTED TYPING NODES --- */
-.char-span {
-    display: inline-block;
-    position: relative;
-    border-bottom: 2px solid transparent;
-}
-
-.char-span.whitespace-node {
-    color: var(--text-muted);
-    opacity: 0.35;
-    margin: 0 1px;
-}
-
-.char-span.correct {
-    color: var(--success-hover);
-    opacity: 1 !important;
-}
-
-.char-span.incorrect {
-    color: var(--primary) !important;
-    opacity: 1 !important;
-    background: rgba(239, 130, 117, 0.15);
-    border-radius: 3px;
-}
-
-/* TYPING STYLES AND DIRECT TRACKING FX */
-#text-display.animated-text .char-span.active-cursor {
-    border-bottom-color: var(--button-color);
-    background: rgba(138, 79, 125, 0.1);
-    color: var(--button-color);
-}
-
-.keyboard-matrix-container {
-    padding: 1.25rem;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-}
-
-.keyboard-drawer-container-wrapper {
-    display: flex;
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
-
-.keyboard-grid-baseboard {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    user-select: none;
-}
-
-.keyboard-control-sidebar {
-    position: absolute;
-    top: 0; right: 0; width: 280px; height: 100%;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    padding: 0 0 0 1rem;
-    display: flex;
-    flex-direction: column;
-    z-index: 20;
-    transform: translateX(0);
-    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.keyboard-control-sidebar.collapsed {
-    transform: translateX(105%);
-    pointer-events: none;
-    width: 0; padding: 0;
-}
-
-.sidebar-section-title {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    font-weight: 700;
-}
-
-.profile-buttons-grid-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.fx-picker-btn {
-    width: 100%; text-align: left;
-    background: rgba(125, 125, 125, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 6px; padding: 0.5rem 0.75rem;
-    cursor: pointer; display: flex; flex-direction: column;
-}
-
-.fx-picker-btn strong { font-size: 0.85rem; color: var(--text-main); }
-.fx-picker-btn span { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
-.fx-picker-btn:hover { background: rgba(125, 125, 125, 0.08); }
-.fx-picker-btn.active { background: var(--button-color) !important; border-color: var(--button-color) !important; }
-.fx-picker-btn.active strong { color: #fff !important; }
-.fx-picker-btn.active span { color: rgba(255, 255, 255, 0.75) !important; }
-
-/* --- PER-KEY STATIC UNDERGLOW MATRIX SHEETS --- */
-.key {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    color: var(--text-main); border-radius: 6px; padding: 0.65rem 0;
-    text-align: center; font-family: monospace; font-size: 0.95rem;
-    font-weight: 600; position: relative;
-}
-
-.key-label { position: relative; z-index: 5; }
-
-.glow-underlay {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 5px; pointer-events: none; z-index: 1; opacity: 0;
-    transition: opacity 0.15s ease, box-shadow 0.15s ease;
-}
-
+/* Layout Scannable Inline Blocks */
+.keyboard-toolbar-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 0.75rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.toolbar-brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+.cadence-visualizer-container { display: inline-flex; align-items: flex-end; gap: 3px; height: 24px; }
+.cadence-bar { width: 4px; height: 6px; background: var(--text-muted); border-radius: 2px; transition: all 0.1s ease; }
+.cadence-monitor.active .cadence-bar { background: var(--primary); }
+.keyboard-matrix-container { padding: 1.25rem; background: var(--surface); border: 2px solid var(--border); border-radius: 12px; margin-top: 1.5rem; }
+.keyboard-drawer-container-wrapper { display: flex; width: 100%; overflow: hidden; }
+.keyboard-grid-baseboard { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
 .keyboard-row { display: flex; width: 100%; gap: 0.4rem; }
-
-/* STATIC CHROMA CONSTANTS */
-.keyboard-grid-baseboard.fx-rgb-cycle .glow-underlay {
-    opacity: 0.35; box-shadow: 0 0 6px var(--primary);
-}
-.keyboard-grid-baseboard.fx-rgb-breathe .glow-underlay {
-    opacity: 0.4; box-shadow: 0 0 8px var(--button-color);
-}
-
-.backspace-key { flex: 2; }
-.tab-key { flex: 1.5; }
-.backslash-key { flex: 1.5; }
-.capslock-key { flex: 1.75; }
-.enter-key { flex: 2.25; }
-.shift-key { flex: 2.6; }
-.space-key { flex: 8; position: relative; }
-.space-key::after {
-    content: ''; position: absolute; width: 30%; height: 3px;
-    background: currentColor; left: 35%; top: calc(50% - 1px);
-    border-radius: 2px; opacity: 0.4; z-index: 6;
-}
+.key { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; padding: 0.65rem 0; text-align: center; font-family: monospace; font-size: 0.95rem; font-weight: 600; position: relative; overflow: hidden; }
+.key-label { position: relative; z-index: 5; pointer-events: none; }
+.backspace-key { flex: 2; } .tab-key { flex: 1.5; } .backslash-key { flex: 1.5; } .capslock-key { flex: 1.75; } .enter-key { flex: 2.25; } .shift-key { flex: 2.6; } .space-key { flex: 8; }
 .ctrl-key, .alt-key, .meta-key { flex: 1.25; font-size: 0.8rem; opacity: 0.8; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const startBtn = document.getElementById("start-btn");
     const startIcon = document.getElementById("start-icon");
     const startSpinner = document.getElementById("start-spinner");
     const startBtnText = document.getElementById("start-btn-text");
-
     const submitBtn = document.getElementById("submit-btn");
     const submitIcon = document.getElementById("submit-icon");
     const submitSpinner = document.getElementById("submit-spinner");
     const submitBtnText = document.getElementById("submit-btn-text");
-
     const resetBtn = document.getElementById("reset-btn");
     const errorFallback = document.getElementById("error-fallback");
     const errorTitle = document.getElementById("error-title");
     const errorText = document.getElementById("error-text");
-
     const setupPanel = document.getElementById("setup-panel");
     const gamePanel = document.getElementById("game-panel");
     const resultsPanel = document.getElementById("results-panel");
-
     const textDisplay = document.getElementById("text-display");
     const hiddenCatcher = document.getElementById("hidden-keyboard-catcher");
     const timerLabel = document.getElementById("timer-label");
     const liveWpmLabel = document.getElementById("live-wpm");
-    const cadenceMonitor = document.getElementById("cadence-monitor");
-
     const difficultyControl = document.getElementById("difficulty-control");
     const difficultyBadge = document.getElementById("difficulty-badge");
-    const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
-
-    const sidebarToggle = document.getElementById("sidebar-toggle-trigger");
-    const sidebarClose = document.getElementById("sidebar-close-trigger");
-    const sidebarElement = document.getElementById("keyboard-collapsible-sidebar");
-
-    sidebarToggle.addEventListener("click", () => sidebarElement.classList.toggle("collapsed"));
-    sidebarClose.addEventListener("click", () => sidebarElement.classList.add("collapsed"));
-
     const animToggle = document.getElementById("keyboard-animations-toggle");
-    const textAnimToggle = document.getElementById("text-animations-toggle");
-    const fxButtons = document.querySelectorAll(".fx-picker-btn");
-    const matrixGrid = document.getElementById("matrix-grid-element");
+    const rippleToggle = document.getElementById("ripple-animations-toggle");
+    const themeButtons = document.querySelectorAll(".theme-tile-btn");
 
-    let activeProfileValue = "fx-pop-accent";
-    let visualizerTimeout = null;
-
-    fxButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            fxButtons.forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
-            activeProfileValue = this.getAttribute("data-fx");
-            syncActiveFXClasses();
-        });
-    });
-
-    function syncActiveFXClasses() {
-        matrixGrid.className = "keyboard-grid-baseboard";
-        if (animToggle.checked && (activeProfileValue === 'fx-rgb-cycle' || activeProfileValue === 'fx-rgb-breathe')) {
-            matrixGrid.classList.add(activeProfileValue);
-        }
-    }
-
-    textAnimToggle.addEventListener("change", function() {
-        textDisplay.classList.toggle("animated-text", this.checked);
-    });
-
-    animToggle.addEventListener("change", syncActiveFXClasses);
-
-    function triggerCadenceVisualization() {
-        cadenceMonitor.classList.add("active");
-        clearTimeout(visualizerTimeout);
-        visualizerTimeout = setTimeout(() => cadenceMonitor.classList.remove("active"), 180);
-    }
-
-    // --- STREAMLINED LIGHTWEIGHT KEYBOARD HIT ENGINE ---
-    function executeEngineMatrixRendering(keyElement) {
-        triggerCadenceVisualization();
-        if (!animToggle.checked) return;
-
-        const underlay = keyElement.querySelector(".glow-underlay");
-        if (!underlay) return;
-
-        underlay.style.opacity = "1";
-        if (activeProfileValue === "fx-pop-accent") {
-            underlay.style.boxShadow = "0 0 10px 3px var(--button-color)";
-            underlay.style.backgroundColor = "rgba(138, 79, 125, 0.25)";
-        } else if (activeProfileValue === "fx-neon-aura") {
-            underlay.style.boxShadow = "0 0 16px 5px var(--primary)";
-            underlay.style.backgroundColor = "rgba(239, 130, 117, 0.2)";
-        } else if (activeProfileValue === "fx-pop-sink") {
-            underlay.style.boxShadow = "inset 0 3px 6px rgba(0,0,0,0.25)";
-            underlay.style.backgroundColor = "rgba(0,0,0,0.06)";
-        }
-
-        if (activeProfileValue !== "fx-rgb-cycle" && activeProfileValue !== "fx-rgb-breathe") {
-            setTimeout(() => {
-                underlay.style.opacity = "";
-                underlay.style.boxShadow = "";
-                underlay.style.backgroundColor = "";
-            }, 140);
-        }
-    }
-
-    window.addEventListener("keydown", function(e) {
-        const keyElement = document.getElementById(e.code);
-        if (keyElement) {
-            if (e.code === "Space") {
-                e.preventDefault();
-                if (gamePanel.style.display === "block" && !hiddenCatcher.disabled) {
-                    hiddenCatcher.value += " ";
-                    hiddenCatcher.dispatchEvent(new Event('input'));
-                }
-            }
-            if (e.code === "Tab") e.preventDefault();
-            executeEngineMatrixRendering(keyElement);
-        }
-    });
-
-    if (difficultyControl) {
-        difficultyControl.addEventListener("input", function() {
-            const mappedVal = difficultyMap[difficultyControl.value];
-            difficultyBadge.textContent = mappedVal;
-            difficultyBadge.style.borderColor = mappedVal === "easy" ? "var(--success-hover)" : mappedVal === "medium" ? "var(--button-color)" : "var(--primary)";
-            difficultyBadge.style.color = mappedVal === "easy" ? "var(--success-hover)" : mappedVal === "medium" ? "var(--button-color)" : "var(--primary)";
-            difficultyBadge.style.backgroundColor = mappedVal === "easy" ? "rgba(136, 160, 150, 0.12)" : mappedVal === "medium" ? "rgba(138, 79, 125, 0.12)" : "rgba(239, 130, 117, 0.12)";
-        });
-    }
+    // TEXT PRESENTATION CONTROL HOOKS
+    const textSizeSlider = document.getElementById("text-size-slider");
+    const textSizeBadge = document.getElementById("text-size-badge");
 
     let rawChallengeText = "";
     let timeElapsed = 0;
     let timerInterval = null;
     let timingStarted = false;
+    const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
 
-    function calculateStandardWPM(characterCount, secondsElapsed) {
-        if (secondsElapsed <= 0) return 0;
-        return Math.round((characterCount / 5) / (secondsElapsed / 60));
+    // TEXT Presentation Sizing Engine Execution Track
+    const savedSize = localStorage.getItem("game-engine-text-size") || "1.25";
+    textSizeSlider.value = savedSize;
+    textSizeBadge.textContent = `${savedSize}rem`;
+    textDisplay.style.fontSize = `${savedSize}rem`;
+
+    textSizeSlider.addEventListener("input", function() {
+        const value = this.value;
+        textSizeBadge.textContent = `${value}rem`;
+        textDisplay.style.fontSize = `${value}rem`;
+        localStorage.setItem("game-engine-text-size", value);
+    });
+
+    // CUSTOM SELECTION PALETTE CONFIGURATION ENGINE
+    const savedTheme = localStorage.getItem("selected-game-theme") || "light";
+    applyThemeEngineConfiguration(savedTheme);
+
+    themeButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            applyThemeEngineConfiguration(this.getAttribute("data-theme"));
+        });
+    });
+
+    function applyThemeEngineConfiguration(themeName) {
+        document.documentElement.setAttribute("data-game-theme", themeName);
+        localStorage.setItem("selected-game-theme", themeName);
+        themeButtons.forEach(b => b.classList.toggle("active", b.getAttribute("data-theme") === themeName));
     }
 
-    // --- GENERATE PASSAGE WITH TIMEOUT GUARD ---
-    if (startBtn) {
-        startBtn.addEventListener("click", async function() {
-            startBtn.disabled = true;
-            startIcon.style.display = "none";
-            startSpinner.style.display = "inline-block";
-            startBtnText.textContent = "Fetching Challenge Text...";
-            errorFallback.style.display = "none";
+    // MULTI-LINE SUPPORT TEXT PARSER GRID RENDERING
+    function renderChallengeTextToDOM(text) {
+        textDisplay.innerHTML = "";
+        const lines = text.split("\n");
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // Strict 10-second timeout
+        lines.forEach((line, lineIdx) => {
+            const lineContainer = document.createElement("div");
+            lineContainer.classList.add("code-line-block");
 
-            try {
-                const activeDifficulty = difficultyMap[difficultyControl.value] || "medium";
-                const response = await fetch(`/api/generate?difficulty=${activeDifficulty}`, {
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (response.status === 429) throw new Error("RATE_LIMIT_HIT");
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || "Failed text configuration setup.");
-
-                rawChallengeText = result.sentence;
-                textDisplay.innerHTML = "";
-
-                rawChallengeText.split("").forEach((char, idx) => {
-                    const span = document.createElement("span");
-                    span.classList.add("char-span");
-                    if (char === " ") {
-                        span.textContent = "·";
-                        span.classList.add("whitespace-node");
-                    } else {
-                        span.textContent = char;
-                    }
-                    if (idx === 0) span.classList.add("active-cursor");
-                    textDisplay.appendChild(span);
-                });
-
-                timeElapsed = 0;
-                timingStarted = false;
-                timerLabel.textContent = "0s";
-                liveWpmLabel.textContent = "0 WPM";
-                submitBtn.style.display = "none";
-                hiddenCatcher.value = "";
-                hiddenCatcher.disabled = false;
-
-                setupPanel.style.display = "none";
-                gamePanel.style.display = "block";
-                document.body.addEventListener("click", focusCatcher);
-                focusCatcher();
-
-            } catch (err) {
-                clearTimeout(timeoutId);
-                if (err.name === 'AbortError') {
-                    errorTitle.textContent = "Engine Timeout";
-                    errorText.textContent = "The AI generation service failed to respond within 10 seconds. Please try again.";
-                } else if (err.message === "RATE_LIMIT_HIT") {
-                    errorTitle.textContent = "Rate Limit Exceeded";
-                    errorText.textContent = "You've run out of daily free AI requests. Please wait for reset counters.";
+            line.split("").forEach((char) => {
+                const span = document.createElement("span");
+                span.classList.add("char-span");
+                if (char === " ") {
+                    span.textContent = "·";
+                    span.classList.add("whitespace-node");
                 } else {
-                    errorTitle.textContent = "Generation Error";
-                    errorText.textContent = err.message;
+                    span.textContent = char;
                 }
-                errorFallback.style.display = "block";
-                startBtn.disabled = false;
-                startIcon.style.display = "inline-block";
-                startSpinner.style.display = "none";
-                startBtnText.textContent = "Generate Challenge Passage";
+                lineContainer.appendChild(span);
+            });
+
+            // Append explicitly isolated carriage returns representation nodes
+            if (lineIdx < lines.length - 1) {
+                const breakSpan = document.createElement("span");
+                breakSpan.classList.add("char-span", "whitespace-node");
+                breakSpan.textContent = "↵\n";
+                lineContainer.appendChild(breakSpan);
             }
+            textDisplay.appendChild(lineContainer);
+        });
+
+        const firstChar = textDisplay.querySelector(".char-span");
+        if (firstChar) firstChar.classList.add("active-cursor");
+    }
+
+    // MULTI-ROW SEQUENCING HARDWARE INTERCEPTORS
+    window.addEventListener("keydown", function(e) {
+        let code = e.code;
+        if (e.key === " ") code = "Space";
+
+        const keyElement = document.getElementById(code);
+        if (keyElement) {
+            if (animToggle.checked) keyElement.classList.add("hardware-pressed");
+            if (rippleToggle.checked) {
+                const rect = keyElement.getBoundingClientRect();
+                document.querySelectorAll(".key").forEach(k => {
+                    if (k === keyElement) return;
+                    const r = k.getBoundingClientRect();
+                    const dist = Math.hypot((r.left+r.width/2)-(rect.left+rect.width/2), (r.top+r.height/2)-(rect.top+rect.height/2));
+                    setTimeout(() => {
+                        k.style.borderColor = "var(--button-color)";
+                        setTimeout(() => k.style.borderColor = "", 100);
+                    }, dist * 0.35);
+                });
+            }
+        }
+
+        if (gamePanel.style.display === "block" && !hiddenCatcher.disabled) {
+            if (document.activeElement !== hiddenCatcher) hiddenCatcher.focus();
+
+            if (code === "Space" && e.target !== hiddenCatcher) e.preventDefault();
+            if (code === "Tab" || code === "Backspace") e.preventDefault();
+
+            if (code === "Backspace") {
+                hiddenCatcher.value = hiddenCatcher.value.slice(0, -1);
+                hiddenCatcher.dispatchEvent(new Event('input'));
+            } else if (code === "Tab") {
+                hiddenCatcher.value += "    "; // Append code tab indentation blocks
+                hiddenCatcher.dispatchEvent(new Event('input'));
+            } else if (code === "Enter") {
+                // Determine if code block requires new row sequence arrays
+                if (rawChallengeText.includes("\n") || rawChallengeText.includes("    ")) {
+                    hiddenCatcher.value += "\n";
+                    hiddenCatcher.dispatchEvent(new Event('input'));
+                } else if (hiddenCatcher.value.length >= rawChallengeText.length) {
+                    submitBtn.click();
+                }
+            } else if (e.key.length === 1) {
+                if (document.activeElement !== hiddenCatcher) {
+                    hiddenCatcher.value += e.key;
+                    hiddenCatcher.dispatchEvent(new Event('input'));
+                }
+            }
+        }
+    });
+
+    window.addEventListener("keyup", function(e) {
+        let code = e.code; if (e.key === " ") code = "Space";
+        const keyElement = document.getElementById(code);
+        if (keyElement) keyElement.classList.remove("hardware-pressed");
+    });
+
+    if (difficultyControl) {
+        difficultyControl.addEventListener("input", function() {
+            difficultyBadge.textContent = difficultyMap[this.value];
         });
     }
 
-    function focusCatcher() {
-        if (gamePanel.style.display === "block") hiddenCatcher.focus();
-    }
-
+    // ENGINE REAL-TIME MATRIX EVALUATION SYNCHRONIZATION RUNNERS
     hiddenCatcher.addEventListener("input", function() {
-        const val = hiddenCatcher.value;
+        const val = this.value;
 
         if (!timingStarted && val.length > 0) {
             timingStarted = true;
             timerInterval = setInterval(() => {
                 timeElapsed++;
                 timerLabel.textContent = `${timeElapsed}s`;
-                liveWpmLabel.textContent = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
+                liveWpmLabel.textContent = `${Math.round((hiddenCatcher.value.length / 5) / (timeElapsed / 60))} WPM`;
             }, 1000);
         }
 
         const spans = textDisplay.querySelectorAll(".char-span");
-        spans.forEach((span, idx) => {
+        let idx = 0;
+
+        spans.forEach((span) => {
             span.classList.remove("correct", "incorrect", "active-cursor");
+            let targetChar = span.textContent;
+            if (span.classList.contains("whitespace-node")) {
+                targetChar = span.textContent.includes("↵") ? "\n" : " ";
+            }
+
             if (idx < val.length) {
-                span.classList.add(val[idx] === rawChallengeText[idx] ? "correct" : "incorrect");
+                if (val[idx] === targetChar) {
+                    span.classList.add("correct");
+                } else {
+                    span.classList.add("incorrect");
+                }
             } else if (idx === val.length) {
                 span.classList.add("active-cursor");
             }
+            idx++;
         });
 
-        liveWpmLabel.textContent = `${calculateStandardWPM(val.length, timeElapsed)} WPM`;
-        submitBtn.style.display = (val.length >= rawChallengeText.length) ? "inline-flex" : "none";
+        liveWpmLabel.textContent = `${Math.round((val.length / 5) / ((timeElapsed || 1) / 60))} WPM`;
+        submitBtn.style.display = (val.length >= spans.length) ? "inline-flex" : "none";
     });
 
-    hiddenCatcher.addEventListener("keydown", function(event) {
-        if (event.key === "Enter" && hiddenCatcher.value.length >= rawChallengeText.length && !submitBtn.disabled) {
-            submitBtn.click();
-        }
-    });
+    // DATA DISPATCHERS
+    if (startBtn) {
+        startBtn.addEventListener("click", async function() {
+            startBtn.disabled = true; startIcon.style.display = "none"; startSpinner.style.display = "inline-block"; startBtnText.textContent = "Fetching...";
+            errorFallback.style.display = "none";
 
-    // --- SUBMIT CHALLENGE WITH TIMEOUT GUARD ---
+            try {
+                const difficulty = difficultyMap[difficultyControl.value] || "medium";
+                const response = await fetch(`/api/generate?difficulty=${difficulty}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Failed layout configurations.");
+
+                rawChallengeText = result.sentence;
+                renderChallengeTextToDOM(rawChallengeText);
+
+                timeElapsed = 0; timingStarted = false;
+                timerLabel.textContent = "0s"; liveWpmLabel.textContent = "0 WPM";
+                hiddenCatcher.value = ""; hiddenCatcher.disabled = false;
+                setupPanel.style.display = "none"; gamePanel.style.display = "block";
+
+                document.body.addEventListener("click", () => { if(gamePanel.style.display === "block") hiddenCatcher.focus(); });
+                hiddenCatcher.focus();
+            } catch (err) {
+                errorText.textContent = err.message; errorFallback.style.display = "block";
+            } finally {
+                startBtn.disabled = false; startIcon.style.display = "inline-block"; startSpinner.style.display = "none"; startBtnText.textContent = "Generate Challenge Passage";
+            }
+        });
+    }
+
     if (submitBtn) {
         submitBtn.addEventListener("click", async function() {
             clearInterval(timerInterval);
-            document.body.removeEventListener("click", focusCatcher);
-
-            submitBtn.disabled = true;
-            submitIcon.style.display = "none";
-            submitSpinner.style.display = "inline-block";
-            submitBtnText.textContent = "AI Analysis Processing...";
-            hiddenCatcher.disabled = true;
-
-            const finalWpmString = `${calculateStandardWPM(hiddenCatcher.value.length, timeElapsed)} WPM`;
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // Strict 10-second timeout
+            submitBtn.disabled = true; submitIcon.style.display = "none"; submitSpinner.style.display = "inline-block";
 
             try {
                 const response = await fetch("/api/submit", {
@@ -727,69 +442,44 @@ document.addEventListener("DOMContentLoaded", function() {
                         original_sentence: rawChallengeText,
                         user_sentence: hiddenCatcher.value,
                         time: `${timeElapsed}s`,
-                        typing_speed: finalWpmString
-                    }),
-                    signal: controller.signal
+                        typing_speed: liveWpmLabel.textContent
+                    })
                 });
-                clearTimeout(timeoutId);
-
-                if (!response.ok) throw new Error("Submission evaluation rejected.");
                 const metrics = await response.json();
 
-                document.getElementById("res-speed").textContent = finalWpmString;
+                document.getElementById("res-speed").textContent = liveWpmLabel.textContent;
                 document.getElementById("res-accuracy").textContent = metrics.accuracy || "100%";
                 document.getElementById("res-score").textContent = metrics.score || "100/100";
-                document.getElementById("res-rating").textContent = metrics.user_rating || "Pro";
-                document.getElementById("res-analysis").textContent = metrics.text_analysis || "Run completed.";
+                document.getElementById("res-analysis").textContent = metrics.text_analysis || "Completed.";
 
-                const mistakesWrapper = document.getElementById("mistakes-wrapper");
-                const mistakesLog = document.getElementById("res-mistakes");
-                mistakesLog.innerHTML = "";
-
+                const wrapper = document.getElementById("res-mistakes"); wrapper.innerHTML = "";
                 if (metrics.mistakes && metrics.mistakes.length > 0) {
-                    metrics.mistakes.forEach(errItem => {
+                    metrics.mistakes.forEach(m => {
                         const row = document.createElement("div");
-                        row.innerHTML = `<span style="color:var(--text-muted); text-decoration:line-through;">${errItem.expected || ""}</span> <span style="color:var(--primary); font-weight:bold;">➔ ${errItem.typed || ""}</span>`;
-                        mistakesLog.appendChild(row);
+                        row.innerHTML = `<span style="color:var(--text-muted); text-decoration:line-through;">${m.expected}</span> <span style="color:var(--primary); font-weight:bold;">➔ ${m.typed}</span>`;
+                        wrapper.appendChild(row);
                     });
+                    document.getElementById("mistakes-wrapper").style.display = "block";
                 } else {
-                    mistakesLog.innerHTML = `<div>✨ Flawless Run! No discrepancies recorded.</div>`;
+                    document.getElementById("mistakes-wrapper").style.display = "none";
                 }
-                mistakesWrapper.style.display = "block";
 
-                gamePanel.style.display = "none";
-                resultsPanel.style.display = "block";
-
+                gamePanel.style.display = "none"; resultsPanel.style.display = "block";
                 if (window.confetti) confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
-
             } catch (err) {
-                clearTimeout(timeoutId);
-                errorTitle.textContent = err.name === 'AbortError' ? "Evaluation Timeout" : "Evaluation Processing Failure";
-                errorText.textContent = err.name === 'AbortError' ? "The evaluation engine took longer than 10 seconds to respond." : err.message;
-                errorFallback.style.display = "block";
-                gamePanel.style.display = "none";
-                setupPanel.style.display = "block";
+                errorText.textContent = err.message; errorFallback.style.display = "block";
+                gamePanel.style.display = "none"; setupPanel.style.display = "block";
             } finally {
-                submitBtn.disabled = false;
-                submitIcon.style.display = "inline-block";
-                submitSpinner.style.display = "none";
-                submitBtnText.textContent = "Submit for Evaluation";
+                submitBtn.disabled = false; submitIcon.style.display = "inline-block"; submitSpinner.style.display = "none";
             }
         });
     }
 
     if (resetBtn) {
         resetBtn.addEventListener("click", function() {
-            resultsPanel.style.display = "none";
-            setupPanel.style.display = "block";
-            startBtn.disabled = false;
-            startIcon.style.display = "inline-block";
-            startSpinner.style.display = "none";
-            startBtnText.textContent = "Generate Challenge Passage";
+            resultsPanel.style.display = "none"; setupPanel.style.display = "block";
         });
     }
-
-    syncActiveFXClasses();
 });
 </script>
 {% endblock %}

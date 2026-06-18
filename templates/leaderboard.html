@@ -1,0 +1,105 @@
+{% extends "Base.html" %}
+{% block title %}Leaderboard & Stats - TypeSwift{% endblock %}
+
+{% block content %}
+<div class="main-wrapper" style="max-width: 1100px; margin: 0 auto; padding: 2rem 1rem;">
+    
+    <div class="main-card dashboard-banner passive-float" style="max-width: 100%; text-align: left; padding: 2rem; margin-bottom: 2rem;">
+        <h1 class="title" style="font-size: 2.25rem;">Performance <span class="title-highlight">Analytics Dashboard</span></h1>
+        <p class="description" style="margin-bottom: 0;">Review competitive community high-scores alongside your granular profile milestones and speed progression histories.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="main-card" style="max-width: 100%; padding: 1.5rem; border-left: 4px solid var(--button-color); text-align: left;">
+            <span style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700;">Personal Best Speed</span>
+            <h2 style="font-size: 2.5rem; color: var(--button-color); margin-top: 0.5rem; font-weight: 800;">{{ pb_wpm }} <span style="font-size: 1.2rem; font-weight: 500;">WPM</span></h2>
+        </div>
+        <div class="main-card" style="max-width: 100%; padding: 1.5rem; border-left: 4px solid var(--success); text-align: left;">
+            <span style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700;">Max Accuracy Run</span>
+            <h2 style="font-size: 2.5rem; color: var(--success-hover); margin-top: 0.5rem; font-weight: 800;">{{ pb_acc }}</h2>
+        </div>
+        <div class="main-card" style="max-width: 100%; padding: 1.5rem; border-left: 4px solid var(--primary); text-align: left;">
+            <span style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700;">Highest AI Evaluation</span>
+            <h2 style="font-size: 2.5rem; color: var(--primary); margin-top: 0.5rem; font-weight: 800;">{{ pb_score }}</h2>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem;">
+        
+        <div class="main-card dashboard-card" style="max-width: 100%; padding: 2rem; text-align: left;">
+            <div class="card-header-row" style="margin-bottom: 1.5rem;">
+                <h3 class="card-section-title">🏆 Global Top 10 WPM</h3>
+                <span class="status-badge active">Live Standings</span>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
+                            <th style="padding: 0.75rem 0.5rem;">Rank</th>
+                            <th style="padding: 0.75rem 0.5rem;">Typist</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Speed</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Accuracy</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: center;">Tier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in global_top %}
+                        <tr style="border-bottom: 1px solid var(--border); font-size: 0.95rem; {% if loop.index <= 3 %}font-weight: 600; background: rgba(138, 79, 125, 0.02);{% endif %}">
+                            <td style="padding: 1rem 0.5rem; color: var(--text-muted);">
+                                {% if loop.index == 1 %}🥇 1st{% elif loop.index == 2 %}🥈 2nd{% elif loop.index == 3 %}🥉 3rd{% else %}{{ loop.index }}th{% endif %}
+                            </td>
+                            <td style="padding: 1rem 0.5rem; color: var(--text-main);">{{ row.username }}</td>
+                            <td style="padding: 1rem 0.5rem; text-align: right; color: var(--button-color); font-weight: 700;">{{ row.speed_wpm }} WPM</td>
+                            <td style="padding: 1rem 0.5rem; text-align: right; color: var(--text-muted);">{{ row.accuracy }}</td>
+                            <td style="padding: 1rem 0.5rem; text-align: center;">
+                                <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--background);">{{ row.tier_status }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">No records registered yet. Go practice!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="main-card dashboard-card" style="max-width: 100%; padding: 2rem; text-align: left;">
+            <div class="card-header-row" style="margin-bottom: 1.5rem;">
+                <h3 class="card-section-title">📈 Your Recent Activity</h3>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Last 15 Sessions</span>
+            </div>
+            
+            <div style="overflow-x: auto; max-height: 450px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
+                            <th style="padding: 0.75rem 0.5rem;">Run ID</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Speed</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Accuracy</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in history %}
+                        <tr class="interactive-hover" style="border-bottom: 1px solid var(--border); font-size: 0.95rem;">
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-family: monospace;">#{{ run.id }}</td>
+                            <td style="padding: 0.85rem 0.5rem; text-align: right; color: var(--button-color); font-weight: 600;">{{ run.speed_wpm }} WPM</td>
+                            <td style="padding: 0.85rem 0.5rem; text-align: right; color: var(--success-hover);">{{ run.accuracy }}</td>
+                            <td style="padding: 0.85rem 0.5rem; text-align: right; color: var(--primary);">{{ run.score }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No personal attempts recorded yet. Click play to begin!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

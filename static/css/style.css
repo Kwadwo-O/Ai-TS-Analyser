@@ -1,41 +1,67 @@
 /* ==========================================================================
-   1. COLOR PALETTE & VARIABLES
+   1. COLOR PALETTE & VARIABLES (MAXIMUM CONTRAST ACCESSIBILITY INVERSIONS)
    ========================================================================== */
 :root {
-    --primary: #ef8275;
-    --primary-hover: #e06d60;
+    --primary: #d64a3a; /* Boosted visibility from #ef8275 */
+    --primary-hover: #b5382a;
     --background: #f4f6f5;
     --surface: #ffffff;
     --text-main: #2d1628;
-    --text-muted: #887880;
-    --border: #e6e0d3;
-    --success: #88a096;
-    --success-hover: #6e867c;
+    --text-muted: #62525c; /* Enhanced contrast text string density from #887880 */
+    --border: #bcaaa4;     /* Darkened border canvas structure lines from #e6e0d3 */
+    --success: #3d594e;    /* Enhanced text structural pass contrast from #88a096 */
+    --success-hover: #293d35;
+    --button-color: #8a4f7d;
+    --button-hover-color: #734068;
+    --ripple-color: rgba(138, 79, 125, 0.25);
+    --key-glow: 0 0 8px rgba(138, 79, 125, 0.4);
+}
+
+/* ORIGINAL BUILT-IN THEME: Light Theme Explicit Selector Mapping */
+html[data-game-theme="light"] {
+    --primary: #d64a3a;
+    --primary-hover: #b5382a;
+    --background: #f4f6f5;
+    --surface: #ffffff;
+    --text-main: #2d1628;
+    --text-muted: #62525c;
+    --border: #bcaaa4;
+    --success: #3d594e;
+    --success-hover: #293d35;
     --button-color: #8a4f7d;
     --button-hover-color: #734068;
 }
 
-/* ADDED: Mid-Tone Muted Sepia Theme Variables */
-html[data-theme="sepia"] {
+/* ORIGINAL BUILT-IN THEME: Mid-Tone Muted Sepia Theme Variables */
+html[data-game-theme="sepia"] {
     --background: #dfd7ca;
     --surface: #eae3d8;
-    --text-main: #432e39;
-    --text-muted: #7d6b73;
-    --border: #ceafbe;
+    --text-main: #26161f; /* Darkened for accessibility ratio standards */
+    --text-muted: #5e4f56; /* Darkened for accessible visual scanning pass */
+    --border: #ab8b9b;     /* Darkened frame borders */
     --button-color: #7a3e6a;
     --button-hover-color: #613054;
-    --primary: #d66b5e;
+    --primary: #b84336;    /* Enhanced visibility red */
+    --success: #293d35;    /* Stabilized rich emerald green pass */
+    --success-hover: #1b2923;
+    --ripple-color: rgba(122, 62, 106, 0.35);
+    --key-glow: 0 0 8px rgba(122, 62, 106, 0.4);
 }
 
-/* ADDED: Dark Theme Variable Overrides */
-html[data-theme="dark"] {
-    --background: #181116;
-    --surface: #241921;
-    --text-main: #f5f0f3;
-    --text-muted: #a3929b;
-    --border: #3b2b37;
-    --button-color: #be7cb0;
-    --button-hover-color: #d29ec6;
+/* ORIGINAL BUILT-IN THEME: Dark Theme Variable Overrides */
+html[data-game-theme="dark"] {
+    --background: #120c10; /* Deepened background grid opacity */
+    --surface: #1e141b;    /* Darkened surface panels */
+    --text-main: #ffffff;   /* Flipped to absolute crisp white */
+    --text-muted: #ccaec0;  /* Brightened text contrast string node */
+    --border: #4d3647;     /* High-visibility deep border cuts */
+    --button-color: #e292d3; /* Vibrant accent button tint */
+    --button-hover-color: #fca6ec;
+    --primary: #ff8a7d;     /* High-impact notification warning red */
+    --success: #a1c7b7;     /* High-impact glowing structural green */
+    --success-hover: #c4ebd9;
+    --ripple-color: rgba(226, 146, 211, 0.35);
+    --key-glow: 0 0 10px rgba(226, 146, 211, 0.5);
 }
 
 /* ==========================================================================
@@ -648,48 +674,68 @@ code {
 }
 
 /* ==========================================================================
-   7. TYPING ENGINE TEXT RENDERING & CONTRAST RULES
+   7. TYPING ENGINE TEXT RENDERING & CONTRAST RULES (DYNAMIC SCALING MODS)
    ========================================================================== */
 #text-display {
-    background-color: var(--surface);
+    background: var(--background) !important;
     border: 2px solid var(--border);
-    padding: 1.5rem;
+    padding: 1.75rem;
     border-radius: 12px;
-    font-size: 1.4rem;
-    line-height: 2;
-    font-weight: 500;
-    letter-spacing: 1px;
+    font-family: 'Fira Code', 'Courier New', Courier, monospace !important;
+    font-size: 1.25rem; /* Dynamic target scaling property node handled via slider variable matrix */
+    line-height: 1.8 !important;
+    letter-spacing: 0px !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
     user-select: none;
-    word-break: break-word;
     text-align: left;
     transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.code-line-block {
+    display: block;
+    width: 100%;
+    min-height: 1.5em;
 }
 
 .char-span {
     position: relative;
     color: var(--text-muted);
-    transition: background-color 0.1s, color 0.1s;
+    font-weight: 600; /* Increased font stroke weight density for optical scanning readability */
+    transition: background-color 0.08s, color 0.08s;
     border-radius: 3px;
-    padding: 0 1px;
+    padding: 0 0.5px;
 }
 
+/* Maximum accessibility color text inversions */
 .char-span.correct {
-    color: var(--success-hover);
-    background-color: rgba(136, 160, 150, 0.15);
+    color: var(--success) !important;
+    background-color: rgba(136, 160, 150, 0.18);
+    text-shadow: 0px 0px 1px var(--success);
 }
 
 .char-span.incorrect {
-    color: var(--primary);
-    background-color: rgba(239, 130, 117, 0.2);
+    color: #ffffff !important;
+    background-color: var(--primary) !important;
+    text-shadow: none !important;
+}
+
+/* Structural code format and whitespace characters */
+.char-span.whitespace-node {
+    opacity: 0.45;
+    font-size: 0.95em;
 }
 
 .char-span.active-cursor {
-    border-bottom: 3px solid var(--button-color);
+    border-bottom: none;
+    background-color: rgba(138, 79, 125, 0.25);
+    border-left: 3px solid var(--button-color);
+    margin-left: -3px;
     animation: cursorBlink 0.8s infinite steps(2, start);
 }
 
 @keyframes cursorBlink {
-    to { border-bottom-color: transparent; }
+    to { border-left-color: transparent; }
 }
 
 /* Mistake Log Data-Row Formatting */
@@ -785,23 +831,269 @@ code {
 }
 
 /* ==========================================================================
-   THEME SELECT CONTAINER DESIGNS
+   9. CUSTOM GAME THEMES & CONTROLS INTERFACES
    ========================================================================== */
-.theme-select-dropdown {
+
+/* CYBER SHOCK THEME OVERRIDES */
+html[data-game-theme="cyber-shock"] {
+    --background: #09050d;
+    --surface: #130a1c;
+    --text-main: #ffffff;
+    --text-muted: #aa99bc;
+    --border: #442657;
+    --button-color: #ff0055;
+    --button-hover-color: #cc0044;
+    --primary: #ff3366;
+    --success: #00ffcc;
+    --success-hover: #33ffdd;
+    --ripple-color: rgba(255, 0, 85, 0.45);
+    --key-glow: 0 0 12px rgba(255, 0, 85, 0.6);
+}
+
+/* DEEP NEBULA THEME OVERRIDES */
+html[data-game-theme="deep-nebula"] {
+    --background: #0a0812;
+    --surface: #110d22;
+    --text-main: #ffffff;
+    --text-muted: #9c94c7;
+    --border: #3b2d72;
+    --button-color: #8c52ff;
+    --button-hover-color: #6a39cc;
+    --primary: #e5a4fc;
+    --success: #4deeea;
+    --success-hover: #80fffb;
+    --ripple-color: rgba(140, 82, 255, 0.4);
+    --key-glow: 0 0 12px rgba(140, 82, 255, 0.6);
+}
+
+/* MONOCHROME MINT THEME OVERRIDES */
+html[data-game-theme="monochrome-mint"] {
+    --background: #101010;
+    --surface: #1c1c1c;
+    --text-main: #ffffff;
+    --text-muted: #b8b8b8;
+    --border: #4a4a4a;
+    --button-color: #00ff87;
+    --button-hover-color: #00b35f;
+    --primary: #ff5e97;
+    --success: #00ff87;
+    --success-hover: #64ffda;
+    --ripple-color: rgba(0, 255, 135, 0.35);
+    --key-glow: 0 0 12px rgba(0, 255, 135, 0.6);
+}
+
+/* WARM AMBER THEME OVERRIDES */
+html[data-game-theme="warm-amber"] {
+    --background: #1a1410;
+    --surface: #281e18;
+    --text-main: #ffffff;
+    --text-muted: #cca991;
+    --border: #5e4839;
+    --button-color: #ff9f1c;
+    --button-hover-color: #cc7a00;
+    --primary: #ff595e;
+    --success: #2ec4b6;
+    --success-hover: #3fcbc0;
+    --ripple-color: rgba(255, 159, 28, 0.4);
+    --key-glow: 0 0 12px rgba(255, 159, 28, 0.6);
+}
+
+/* FROST OBSIDIAN THEME OVERRIDES */
+html[data-game-theme="frost-obsidian"] {
+    --background: #0e121a;
+    --surface: #151e2a;
+    --text-main: #ffffff;
+    --text-muted: #a6bdd8;
+    --border: #354c68;
+    --button-color: #3a86ff;
+    --button-hover-color: #1c63da;
+    --primary: #ff006e;
+    --success: #00f5d4;
+    --success-hover: #33f7dc;
+    --ripple-color: rgba(58, 134, 255, 0.45);
+    --key-glow: 0 0 12px rgba(58, 134, 255, 0.6);
+}
+
+/* PERSISTENT SUB-MENU ROW SPLIT LAYOUT */
+.layout-split-container {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
     width: 100%;
-    max-width: 200px;
-    padding: 0.6rem 1rem;
-    font-size: 0.95rem;
-    font-weight: 600;
+}
+
+.primary-workspace-stack {
+    flex: 1;
+    min-width: 0;
+}
+
+.persistent-right-control-panel {
+    width: 320px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* LABELS AND TOGGLES SUB-PANEL MATRICES */
+.switch-wrapper-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.switch-wrapper-row:last-of-type {
+    border-bottom: none;
+}
+
+.switch-label-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-align: left;
+}
+
+.switch-title {
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--text-main);
+}
+
+.switch-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.engine-ui-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.engine-ui-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--border);
+    transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 24px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
     background-color: var(--surface);
+    transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+    background-color: var(--button-color);
+}
+
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+
+/* THEME SELECTION INTERACTIVE TILES */
+.theme-selector-grid-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.theme-tile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0.9rem;
+    background: var(--background);
     border: 2px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: left;
+    transition: all 0.2s ease;
+    width: 100%;
 }
 
-.theme-select-dropdown:focus {
+.theme-tile-btn:hover {
     border-color: var(--button-color);
+}
+
+.theme-tile-btn.active {
+    border-color: var(--button-color);
+    background: var(--button-color);
+}
+
+.theme-tile-btn.active .theme-title-text {
+    color: #ffffff;
+}
+
+.theme-title-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    transition: color 0.15s ease;
+}
+
+.theme-palette-preview {
+    display: flex;
+    gap: 4px;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* HARDWARE KEYBOARD LIGHTING ANIMATIONS */
+.key {
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+}
+
+.key.hardware-pressed {
+    background-color: var(--button-color) !important;
+    color: #ffffff !important;
+    border-color: var(--button-color) !important;
+    box-shadow: var(--key-glow) !important;
+    transform: scale(0.94) translateY(1px);
+}
+
+.key .ripple-wave-element {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--ripple-color);
+    transform: scale(0);
+    animation: keyRippleEffect 0.45s cubic-bezier(0.1, 0.8, 0.3, 1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes keyRippleEffect {
+    to {
+        transform: scale(3.5);
+        opacity: 0;
+    }
 }

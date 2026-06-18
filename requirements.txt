@@ -1,5 +1,6 @@
 ﻿flask
 pip-system-certs
+psycopg2-binary
 mkdir my-flask-site
 cd my-flask-site
 python -m venv venv

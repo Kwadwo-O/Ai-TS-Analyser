@@ -10,15 +10,15 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    api_key = db.Column(db.String(150), nullable=True)
+    # Increased to 500 to handle modern secure scrypt password hashes safely
+    password = db.Column(db.String(500), nullable=False)
+    api_key = db.Column(db.String(500), nullable=True)
 
 
 class TypingResult(db.Model):
     __tablename__ = 'typing_results'
 
     id = db.Column(db.Integer, primary_key=True)
-    # Connects securely to the users table and auto-deletes history records if the profile is destroyed
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     speed_wpm = db.Column(db.Integer, nullable=False)
@@ -27,5 +27,4 @@ class TypingResult(db.Model):
     tier_status = db.Column(db.String(30), nullable=False)
     date_recorded = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship linking back to the primary User model
-    user = db.relationship('User', backref=db.backref('typing_runs', lazy=True, cascade="all, delete-orphan"))
+    user = db.relationship('User', backref=db.backref('results', cascade='all, delete-orphan'))

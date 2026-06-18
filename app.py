@@ -1,17 +1,34 @@
 import re
 import traceback
-import requests  # Added for OpenRouter dynamic metadata resolution API requests
+import requests
+import os
+from sqlalchemy import func
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from backend import backend_generate, backend_send, verify_openrouter, change_model
-from models import TypingResult, db, User
+from models import db, User, TypingResult
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://neondb_owner:npg_Z3rleqh6iGSY@ep-cool-cell-abkr7bne-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+# 🔥 GLOBAL SERVER SETUP SCHEMA MIGRATION: Ensures columns widen to 500 characters instantly on any Flask startup approach 🔥
+with app.app_context():
+    db.create_all()
+    try:
+        from sqlalchemy import text
+        db.session.execute(text("ALTER TABLE users ALTER COLUMN password TYPE VARCHAR(500);"))
+        db.session.execute(text("ALTER TABLE users ALTER COLUMN api_key TYPE VARCHAR(500);"))
+        db.session.commit()
+        print("🚀 DATABASE SUCCESS: Columns successfully upgraded to VARCHAR(500) on Neon cloud cluster!")
+    except Exception as e:
+        db.session.rollback()
+        print(f"⚠️ Neon column adjustment notice (Safe if already modified): {e}")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -259,7 +276,7 @@ def dashboard():
                 return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
 
     # ---------------------------------------------------------
-    # CRASH-PROOF IMPORT RECOVERY LOGICFOR ACTIVE MODEL POINTER
+    # CRASH-PROOF IMPORT RECOVERY LOGIC FOR ACTIVE MODEL POINTER
     # ---------------------------------------------------------
     try:
         import backend
@@ -352,6 +369,60 @@ def register():
         return redirect(url_for('home'))
     return render_template('register.html')
 
+@app.route('/leaderboard')
+@login_required
+def leaderboard():
+    try:
+        # 1. Fetch the absolute highest speed achieved per distinct user account
+        subquery = db.session.query(
+            TypingResult.user_id,
+            func.max(TypingResult.speed_wpm).label('max_wpm')
+        ).group_by(TypingResult.user_id).subquery()
+
+        # 2. Extract full run profiles matching those historical personal records
+        top_results = db.session.query(
+            User.username,
+            TypingResult.speed_wpm,
+            TypingResult.accuracy,
+            TypingResult.score,
+            TypingResult.tier_status
+        ).join(TypingResult, User.id == TypingResult.user_id) \
+         .join(subquery, (TypingResult.user_id == subquery.c.user_id) & (TypingResult.speed_wpm == subquery.c.max_wpm)) \
+         .order_by(TypingResult.speed_wpm.desc()) \
+         .limit(10).all()
+
+        # Convert query rows into a structured object structure that Jinja2 looks for
+        global_top_runs = []
+        for row in top_results:
+            global_top_runs.append({
+                'username': row.username,
+                'speed_wpm': row.speed_wpm,
+                'accuracy': row.accuracy,
+                'score': row.score,
+                'tier_status': row.tier_status
+            })
+
+        # 3. Calculate individual milestones across metrics for the current session user
+        pb_wpm = db.session.query(func.max(TypingResult.speed_wpm)).filter(TypingResult.user_id == current_user.id).scalar() or 0
+        pb_acc = db.session.query(func.max(TypingResult.accuracy)).filter(TypingResult.user_id == current_user.id).scalar() or "0%"
+        pb_score = db.session.query(func.max(TypingResult.score)).filter(TypingResult.user_id == current_user.id).scalar() or "0/100"
+
+        # 4. Pull the most recent 15 attempts logged by this user for the history list
+        personal_history = TypingResult.query.filter_by(user_id=current_user.id).order_by(TypingResult.id.desc()).limit(15).all()
+
+        return render_template(
+            'leaderboard.html',
+            global_top=global_top_runs,
+            pb_wpm=pb_wpm,
+            pb_acc=pb_acc,
+            pb_score=pb_score,
+            history=personal_history
+        )
+
+    except Exception as e:
+        print(f"❌ Leaderboard query sequence failure: {e}")
+        traceback.print_exc()
+        return render_template('leaderboard.html', global_top=[], pb_wpm=0, pb_acc="0%", pb_score="0/100", history=[])
 
 @app.route('/logout')
 @login_required
@@ -360,9 +431,6 @@ def logout():
     flash('Logged out successfully.')
     return redirect(url_for('login'))
 
-
-with app.app_context():
-    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
