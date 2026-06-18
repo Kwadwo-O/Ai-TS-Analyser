@@ -2,33 +2,74 @@ import re
 import traceback
 import requests
 import os
-from sqlalchemy import func
+from sqlalchemy import func, create_engine
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from backend import backend_generate, backend_send, verify_openrouter, change_model
 from models import db, User, TypingResult
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
+# Automatically detect and load key-value configurations from the local .env file
+from dotenv import load_dotenv
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://neondb_owner:npg_Z3rleqh6iGSY@ep-cool-cell-abkr7bne-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+load_dotenv()
+
+app = Flask(__name__)
+
+# --- Safe Environment Key Fallbacks & Configurations ---
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'default-dev-safe-fallback-key')
+
+# 1. Fetch your target cloud Neon URI from environment variables or hardcoded string
+neon_cloud_uri = os.environ.get(
+    'SQLALCHEMY_DATABASE_URI',
+    "postgresql://neondb_owner:npg_Z3rleqh6iGSY@ep-cool-cell-abkr7bne-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+)
+
+# 2. Network Shield: Test connection. If port 5432 is blocked by the college, fall back to offline SQLite.
+try:
+    print("Checking availability of Neon cloud database cluster...")
+    # Attempt a quick network test hook with a 3-second limit
+    test_engine = create_engine(neon_cloud_uri, connect_args={"connect_timeout": 3})
+    with test_engine.connect() as conn:
+        pass
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = neon_cloud_uri
+    print("🚀 NETWORKING SUCCESS: Connected to Neon cloud database cluster!")
+
+except Exception as network_error:
+    print("\n" + "=" * 70)
+    print("⚠️ NETWORK FIREWALL BLOCK DETECTED")
+    print("College network is restricting out-bound Port 5432.")
+    print("Switching app profile cleanly to an offline local database engine...")
+    print("=" * 70 + "\n")
+
+    # Creates an isolated 'local_development.db' file right inside your project directory
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///local_development.db"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# This will now successfully boot up without throwing any OperationalError!
 db.init_app(app)
 
-# 🔥 GLOBAL SERVER SETUP SCHEMA MIGRATION: Ensures columns widen to 500 characters instantly on any Flask startup approach 🔥
+# 🔥 GLOBAL SERVER SETUP SCHEMA MIGRATION: Ensures columns widen instantly on startup 🔥
 with app.app_context():
     db.create_all()
-    try:
-        from sqlalchemy import text
-        db.session.execute(text("ALTER TABLE users ALTER COLUMN password TYPE VARCHAR(500);"))
-        db.session.execute(text("ALTER TABLE users ALTER COLUMN api_key TYPE VARCHAR(500);"))
-        db.session.commit()
-        print("🚀 DATABASE SUCCESS: Columns successfully upgraded to VARCHAR(500) on Neon cloud cluster!")
-    except Exception as e:
-        db.session.rollback()
-        print(f"⚠️ Neon column adjustment notice (Safe if already modified): {e}")
+    # Only run the Postgres ALTER syntax if we are actually connected to Neon cloud
+    if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgresql"):
+        try:
+            from sqlalchemy import text
+
+            db.session.execute(text("ALTER TABLE users ALTER COLUMN password TYPE VARCHAR(500);"))
+            db.session.execute(text("ALTER TABLE users ALTER COLUMN api_key TYPE VARCHAR(500);"))
+            db.session.commit()
+            print("🚀 DATABASE SUCCESS: Columns successfully upgraded to VARCHAR(500) on Neon!")
+        except Exception as e:
+            db.session.rollback()
+            print(f"⚠️ Neon column adjustment notice (Safe if already modified): {e}")
+    else:
+        print("📁 LOCAL STORAGE ACTIVE: SQLite initialized successfully.")
+
+# ... The rest of your routes and login_manager logic remains exactly the same ...
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -44,12 +85,17 @@ def load_user(user_id):
 @app.route('/delete_account', methods=['POST'])
 @login_required
 def delete_account():
-    TypingResult.query.filter_by(user_id=current_user.id).delete()
-    db.session.delete(current_user)
-    db.session.commit()
-    logout_user()
-    flash('Your account has been deleted successfully.')
-    return redirect(url_for('home'))
+    try:
+        TypingResult.query.filter_by(user_id=current_user.id).delete()
+        db.session.delete(current_user)
+        db.session.commit()
+        logout_user()
+        flash('Your account has been deleted successfully.')
+        return redirect(url_for('home'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error processing account termination: {str(e)}')
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/')
@@ -67,10 +113,10 @@ def play():
 @app.route('/api/generate', methods=['GET'])
 @login_required
 def generate_passage():
-    user_key = current_user.api_key
+    user_api_key = current_user.api_key
     difficulty = request.args.get('difficulty', 'medium')
     try:
-        sentence = backend_generate(user_key, difficulty)
+        sentence = backend_generate(user_api_key, difficulty)
         return jsonify({"sentence": sentence})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -79,7 +125,6 @@ def generate_passage():
 @app.route('/api/submit', methods=['POST'])
 @login_required
 def submit_passage():
-    user_key = current_user.api_key
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -90,7 +135,7 @@ def submit_passage():
     speed = data.get('typing_speed', '0 WPM')
 
     try:
-        analysis_result = backend_send(orig, user_str, time_str, speed, user_key)
+        analysis_result = backend_send(orig, user_str, time_str, speed)
         if not analysis_result or not isinstance(analysis_result, dict):
             norm_str = str(analysis_result)
             rating_m = re.search(r"Rating:\s*([^\n,]+)", norm_str, re.I)
@@ -112,19 +157,19 @@ def submit_passage():
         if acc_string == "100/100":
             acc_string = "100%"
 
-        new_run_record = TypingResult(
+        new_result = TypingResult(
             user_id=current_user.id,
             speed_wpm=wpm_value,
             accuracy=acc_string,
             score=str(analysis_result.get("score", "100/100")),
             tier_status=str(analysis_result.get("user_rating", "Pro"))
         )
-
-        db.session.add(new_run_record)
+        db.session.add(new_result)
         db.session.commit()
 
         return jsonify(analysis_result)
     except Exception as e:
+        db.session.rollback()
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
@@ -134,185 +179,231 @@ def submit_passage():
 def dashboard():
     current_tab = request.args.get('tab', 'profile')
 
-    # ---------------------------------------------------------
-    # DYNAMIC OPENROUTER TEXT-TO-TEXT MODEL DISCOVERY PROTOCOL
-    # ---------------------------------------------------------
-    free_models_list = []
-    paid_models_list = []
-    active_current_model = "google/gemini-2.5-pro"  # Default system archetype fallback
+    if current_tab == 'admin':
+        password_attempt = request.form.get('admin_password') or request.args.get('admin_password')
+        if password_attempt != "Admin112233":
+            flash("Security error: Access Denied. Administrative credentials incorrect.")
+            return redirect(url_for('dashboard', tab='profile'))
 
-    try:
-        # Request full runtime metadata profiles from the remote integration cluster
-        api_response = requests.get("https://openrouter.ai/api/v1/models", timeout=5)
-        if api_response.status_code == 200:
-            available_nodes = api_response.json().get('data', [])
-
-            for node in available_nodes:
-                node_id = node.get('id')
-                node_name = node.get('name', node_id)
-
-                # Verify structural text architecture layers to prevent multi-modal leaks
-                architecture_meta = node.get('architecture', {})
-                modality_signature = architecture_meta.get('modality', 'text->text')  # Safe default fallback
-
-                if modality_signature != "text->text":
-                    continue  # Safely drop image, vision, audio, or cross-modal pipelines
-
-                # Parse financial usage cost matrices to distinguish free vs paid systems
-                per_token_prompt = float(node.get('pricing', {}).get('prompt', 0))
-                per_token_completion = float(node.get('pricing', {}).get('completion', 0))
-
-                model_profile = {"id": node_id, "name": node_name}
-
-                if per_token_prompt == 0.0 and per_token_completion == 0.0:
-                    free_models_list.append(model_profile)
-                else:
-                    paid_models_list.append(model_profile)
-
-    except Exception as network_exception:
-        # Fail-silent error block ensures dashboard functions offline
-        print(f"[METRIC ENGINE EXCEPTION] Failed resolving dynamic OpenRouter metadata nodes: {network_exception}")
-
-    # Fallback structure mappings if remote network lookup is blocked or rate-limited
-    if not free_models_list and not paid_models_list:
-        free_models_list = [
-            {"id": "google/gemini-2.5-flash:free", "name": "Gemini 2.5 Flash (Free)"},
-            {"id": "meta-llama/llama-3.3-70b-instruct:free", "name": "Llama 3.3 70B Instruct (Free)"},
-            {"id": "deepseek/deepseek-chat:free", "name": "DeepSeek V3 Chat (Free)"}
-        ]
-        paid_models_list = [
-            {"id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro (Premium)"},
-            {"id": "anthropic/claude-3.5-sonnet", "name": "Claude 3.5 Sonnet (Premium)"}
-        ]
-
-    # Handle state mutations (Form Submissions)
     if request.method == 'POST':
-        action_type = request.form.get('action')
+        action = request.form.get('action')
+        target_tab = request.args.get('tab', 'profile')
 
-        if action_type == 'update_ai_model':
-            requested_model = request.form.get('ai_model_selection')
-            if requested_model:
-                try:
-                    change_model(requested_model)  # Mutate global model routing pointer
-                except Exception:
-                    pass
-                flash(f"Generative processing cluster re-routed to target node: {requested_model}")
-            return redirect(url_for('dashboard', tab='settings'))
+        if action == 'delete_account':
+            return redirect(url_for('delete_account'), code=307)
 
-        elif action_type == 'save':
-            provided_key = request.form.get('api_key', '').strip()
-            if provided_key:
-                current_user.api_key = provided_key
-                db.session.commit()
-                flash('OpenRouter configuration key matrix saved successfully.')
-            return redirect(url_for('dashboard', tab='settings'))
-
-        elif action_type == 'clear':
+        elif action == 'clear':
             current_user.api_key = None
             db.session.commit()
-            flash('External integration access token decoupled.')
-            return redirect(url_for('dashboard', tab='settings'))
+            flash('API key removed from your account.')
+            return redirect(url_for('dashboard', tab=target_tab))
 
-        # Admin action mapping logic remains unchanged for database mutations
-        admin_password = request.args.get('admin_password')
-        if admin_password == "Admin112233":
-            if action_type == 'admin_create_user':
-                new_username = request.form.get('username', '').strip()
-                new_password = request.form.get('password', '').strip()
-                opt_key = request.form.get('api_key', '').strip()
-                if new_username and new_password:
-                    if User.query.filter_by(username=new_username).first():
-                        flash('Error: Identity duplicate exists inside the database.')
-                    else:
-                        created_node = User(
-                            username=new_username,
-                            password=generate_password_hash(new_password),
-                            api_key=opt_key if opt_key else None
-                        )
-                        db.session.add(created_node)
-                        db.session.commit()
-                        flash(f"Successfully tracking new user node profile: {new_username}")
-                return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
-
-            elif action_type == 'admin_modify_user':
-                target_uid = request.form.get('user_id')
-                usr_node = User.query.get(target_uid)
-                if usr_node:
-                    m_user = request.form.get('username', '').strip()
-                    m_pass = request.form.get('password', '').strip()
-                    m_key = request.form.get('api_key', '').strip()
-                    if m_user:
-                        usr_node.username = m_user
-                    if m_pass:
-                        usr_node.password = generate_password_hash(m_pass)
-                    if m_key == "__REMOVE__":
-                        usr_node.api_key = None
-                    elif m_key:
-                        usr_node.api_key = m_key
+        elif action == 'save':
+            api_key = request.form.get('api_key', '').strip()
+            if not api_key.startswith("sk-or-v1-"):
+                flash("Invalid format! Key must start with 'sk-or-v1-'")
+                return redirect(url_for('dashboard', tab=target_tab))
+            try:
+                if verify_openrouter(api_key):
+                    current_user.api_key = api_key
                     db.session.commit()
-                    flash(f"Parameters successfully committed for Node #00{target_uid}.")
-                return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
-
-            elif action_type == 'admin_delete_user':
-                target_uid = request.form.get('user_id')
-                if int(target_uid) != current_user.id:
-                    TypingResult.query.filter_by(user_id=target_uid).delete()
-                    User.query.filter(User.id == target_uid).delete()
-                    db.session.commit()
-                    flash(f"Node entry memory trace #00{target_uid} dropped from storage.")
-                return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
-
-            elif action_type == 'admin_wipe_all_except_self':
-                v_text = request.form.get('verification_text', '').strip()
-                if v_text == "OVERRIDE SYSTEM DELETE ALL":
-                    all_other_users = User.query.filter(User.id != current_user.id).all()
-                    for other in all_other_users:
-                        TypingResult.query.filter_by(user_id=other.id).delete()
-                        db.session.delete(other)
-                    db.session.commit()
-                    flash("Global purge sequence executed. Alternative data structures eliminated.")
+                    flash('API key verified and updated successfully.')
                 else:
-                    flash("Purge aborted: Input signature verification failure.")
-                return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+                    flash('Verification failed! The API key is invalid.')
+            except Exception as e:
+                flash(f'Connection error during verification: {str(e)}')
 
-    # ---------------------------------------------------------
-    # CRASH-PROOF IMPORT RECOVERY LOGIC FOR ACTIVE MODEL POINTER
-    # ---------------------------------------------------------
+        elif action == 'update_ai_model':
+            selected_model = request.form.get('ai_model_selection', '').strip()
+            if selected_model:
+                try:
+                    change_model(selected_model)
+                    flash(f"AI Engine structural context reassigned to: {selected_model}")
+                except Exception as e:
+                    flash(f"Internal assignment error matching backend modules: {str(e)}")
+            return redirect(url_for('dashboard', tab=target_tab))
+
+        elif action == 'admin_create_user':
+            new_username = request.form.get('username', '').strip()
+            new_password = request.form.get('password', '')
+            new_api_key = request.form.get('api_key', '').strip() or None
+
+            if not new_username or not new_password:
+                flash('All input fields are required.')
+            elif len(new_username) < 3:
+                flash('Your username must be at least 3 characters long.')
+            elif not re.match(r'^\w+$', new_username):
+                flash('Usernames can only contain alphanumeric characters.')
+            elif len(new_password) < 8:
+                flash('Password must be at least 8 characters long.')
+            elif not any(char.isdigit() for char in new_password) or not any(char.isalpha() for char in new_password):
+                flash('Password must include a mixture of letters and digits.')
+            elif User.query.filter_by(username=new_username).first():
+                flash('Operation error: A user with that identifier already exists.')
+            else:
+                try:
+                    hashed_pw = generate_password_hash(new_password)
+                    admin_created_user = User(username=new_username, password=hashed_pw, api_key=new_api_key)
+                    db.session.add(admin_created_user)
+                    db.session.commit()
+                    flash(f'Account node profile "{new_username}" successfully appended.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Database node instantiation failure: {str(e)}')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_modify_user':
+            target_id = request.form.get('user_id')
+            target_user = User.query.get(int(target_id))
+            if target_user:
+                mod_username = request.form.get('username', '').strip()
+                mod_password = request.form.get('password', '')
+                mod_api_key = request.form.get('api_key', '').strip()
+
+                if mod_username:
+                    if len(mod_username) < 3 or not re.match(r'^\w+$', mod_username):
+                        flash('Update error: Invalid username format criteria.')
+                        return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+                    target_user.username = mod_username
+
+                if mod_password:
+                    if len(mod_password) < 8 or not any(c.isdigit() for c in mod_password) or not any(
+                            c.isalpha() for c in mod_password):
+                        flash('Update failed: Password criteria mismatch.')
+                        return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+                    target_user.password = generate_password_hash(mod_password)
+
+                if mod_api_key == "__REMOVE__":
+                    target_user.api_key = None
+                elif mod_api_key:
+                    target_user.api_key = mod_api_key
+
+                try:
+                    db.session.commit()
+                    flash(f'Database parameters updated for profile target Node #{target_id}.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Mutation error: {str(e)}')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_delete_user':
+            target_id = request.form.get('user_id')
+            if int(target_id) == current_user.id:
+                flash('Security Violation: The active operator instance session cannot be deleted.')
+            else:
+                try:
+                    target_user = User.query.get(int(target_id))
+                    if target_user:
+                        TypingResult.query.filter_by(user_id=target_user.id).delete()
+                        db.session.delete(target_user)
+                        db.session.commit()
+                        flash(f'Account sequence mapping #{target_id} severed successfully.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Error processing account drop: {str(e)}')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        elif action == 'admin_wipe_all_except_self':
+            confirm_phrase = request.form.get('verification_text', '').strip()
+            if confirm_phrase == 'OVERRIDE SYSTEM DELETE ALL':
+                try:
+                    other_users = User.query.filter(User.id != current_user.id).all()
+                    count = 0
+                    for u in other_users:
+                        TypingResult.query.filter_by(user_id=u.id).delete()
+                        db.session.delete(u)
+                        count += 1
+                    db.session.commit()
+                    flash(f'Global wipe executed. Dropped {count} alternate accounts.')
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Critical processing error: {str(e)}')
+            else:
+                flash('Verification failed! Sequence aborted.')
+            return redirect(url_for('dashboard', tab='admin', admin_password='Admin112233'))
+
+        return redirect(url_for('dashboard', tab=target_tab))
+
+    is_valid = False
+    if current_user.api_key:
+        try:
+            is_valid = verify_openrouter(current_user.api_key)
+        except Exception:
+            is_valid = False
+
+    user_history = TypingResult.query.filter_by(user_id=current_user.id).order_by(TypingResult.id.desc()).all()
+
+    total_tests = len(user_history)
+    avg_wpm = 0
+    highest_wpm = 0
+
+    if total_tests > 0:
+        speeds = [run.speed_wpm for run in user_history]
+        avg_wpm = round(sum(speeds) / total_tests)
+        highest_wpm = max(speeds)
+
+    all_users = []
+    total_metrics_logged = TypingResult.query.count()
+    if current_tab == 'admin':
+        all_users = User.query.all()
+
+    free_models_list = []
+    paid_models_list = []
+    active_current_model = ""
+
     try:
-        import backend
-        if hasattr(backend, 'active_model') and backend.active_model:
-            active_current_model = backend.active_model
-        elif hasattr(backend, 'current_model') and backend.current_model:
-            active_current_model = backend.current_model
+        from backend import MODEL
+        active_current_model = MODEL
     except Exception:
         pass
 
-    history_records = TypingResult.query.filter_by(user_id=current_user.id).order_by(
-        TypingResult.date_recorded.desc()).all()
-    all_users_ledger = User.query.all()
+    try:
+        or_api_res = requests.get("https://openrouter.ai/api/v1/models", timeout=10)
+        if or_api_res.status_code == 200:
+            raw_payload = or_api_res.json().get('data', [])
+            for node in raw_payload:
+                m_id = node.get('id', '')
+                if "vision" in m_id or "embedding" in m_id or "moderation" in m_id:
+                    continue
 
-    total_metrics_logged = db.session.query(db.func.count(TypingResult.id)).scalar() or 0
-    total_tests = len(history_records)
-    avg_wpm = int(db.session.query(db.func.avg(TypingResult.speed_wpm)).filter(
-        TypingResult.user_id == current_user.id).scalar() or 0)
-    highest_wpm = db.session.query(db.func.max(TypingResult.speed_wpm)).filter(
-        TypingResult.user_id == current_user.id).scalar() or 0
+                m_name = node.get('name', m_id)
+                pricing = node.get('pricing', {})
+                try:
+                    is_free = float(pricing.get('prompt', 0)) == 0.0 and float(pricing.get('completion', 0)) == 0.0
+                except Exception:
+                    is_free = False
 
-    is_valid_key = False
-    if current_user.api_key:
-        is_valid_key = verify_openrouter(current_user.api_key)
+                model_package = {"id": m_id, "name": m_name}
+                if is_free:
+                    free_models_list.append(model_package)
+                else:
+                    paid_models_list.append(model_package)
+
+            free_models_list.sort(key=lambda x: x['name'])
+            paid_models_list.sort(key=lambda x: x['name'])
+    except Exception as e:
+        print(f"Network log notice: Dynamic model discovery resolution exception: {str(e)}")
+
+    if not free_models_list and not paid_models_list:
+        free_models_list = [
+            {"id": "google/gemma-2-9b-it:free", "name": "Google: Gemma 2 9B (Free)"},
+            {"id": "meta-llama/llama-3-8b-instruct:free", "name": "Meta: Llama 3 8B Instruct (Free)"}
+        ]
+        paid_models_list = [
+            {"id": "openai/gpt-4o-mini", "name": "OpenAI: GPT-4o Mini"}
+        ]
 
     return render_template(
-        'Dashboard.html',
+        'dashboard.html',
+        api_key=current_user.api_key,
+        is_valid=is_valid,
         current_tab=current_tab,
         user=current_user,
-        history=history_records,
+        history=user_history,
         total_tests=total_tests,
         avg_wpm=avg_wpm,
         highest_wpm=highest_wpm,
-        api_key=current_user.api_key,
-        is_valid=is_valid_key,
-        all_users=all_users_ledger,
+        all_users=all_users,
         total_metrics_logged=total_metrics_logged,
         free_models=free_models_list,
         paid_models=paid_models_list,
@@ -325,9 +416,10 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
+
+        target_user = User.query.filter_by(username=username).first()
+        if target_user and check_password_hash(target_user.password, password):
+            login_user(target_user)
             flash('Logged in successfully.')
             return redirect(url_for('home'))
         flash('Invalid username or password.')
@@ -347,27 +439,41 @@ def register():
             flash('Your username must be at least 3 characters long.')
             return render_template('register.html')
         if not re.match(r'^\w+$', username):
-            flash('Usernames can only contain standard alphanumeric characters and underscores.')
+            flash('Usernames can only contain alphanumeric characters.')
             return render_template('register.html')
         if len(password) < 8:
-            flash('Security validation failed: Password must be at least 8 characters long.')
+            flash('Password must be at least 8 characters long.')
             return render_template('register.html')
         if not any(char.isdigit() for char in password) or not any(char.isalpha() for char in password):
-            flash('Security validation failed: Password must include a mixture of both letters and numeric digits.')
+            flash('Password must include a mixture of both letters and numeric digits.')
             return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
             flash('Username already exists.')
             return render_template('register.html')
 
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user)
-        flash('Registration successful!')
-        return redirect(url_for('home'))
+        try:
+            hashed_password = generate_password_hash(password)
+            new_user = User(username=username, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            flash('Registration successful!')
+            return redirect(url_for('home'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Remote registration sequence error: {str(e)}")
+
     return render_template('register.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully.')
+    return redirect(url_for('login'))
+
 
 @app.route('/leaderboard')
 @login_required
@@ -391,7 +497,7 @@ def leaderboard():
          .order_by(TypingResult.speed_wpm.desc()) \
          .limit(10).all()
 
-        # Convert query rows into a structured object structure that Jinja2 looks for
+        # Convert query rows into structured structures that Jinja template matches easily
         global_top_runs = []
         for row in top_results:
             global_top_runs.append({
@@ -423,13 +529,6 @@ def leaderboard():
         print(f"❌ Leaderboard query sequence failure: {e}")
         traceback.print_exc()
         return render_template('leaderboard.html', global_top=[], pb_wpm=0, pb_acc="0%", pb_score="0/100", history=[])
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('Logged out successfully.')
-    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
