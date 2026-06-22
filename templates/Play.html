@@ -28,6 +28,13 @@
                         <span id="difficulty-badge" class="status-badge active" style="text-transform: uppercase;">Medium</span>
                     </div>
                     <input type="range" id="difficulty-control" min="1" max="3" value="2" class="form-range-input" style="width: 100%; cursor: pointer;">
+                                    <div class="switch-wrapper-row" style="margin-bottom: 1.75rem;">
+                    <div class="switch-label-stack"><span class="switch-title">Game Mode</span><span class="switch-desc">Toggle between typing and memory</span></div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="mode-typing" class="btn btn-play" style="flex:1; opacity:0.6;">Typing Test</button>
+                        <button id="mode-memory" class="btn" style="flex:1; opacity:0.6;">Memory Mode</button>
+                    </div>
+                </div>
                 </div>
 
                 <button id="start-btn" class="btn btn-play full-width-btn interactive-hover" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
@@ -178,6 +185,47 @@
     </div>
 </div>
 
+    <!-- Memory Mode Panel -->
+<!-- Memory Mode Panel -->
+<div id="memory-panel" class="main-card dashboard-card" style="display:none;">
+  <h2>Memory Challenge</h2>
+  <p style="color:var(--text-muted); margin-bottom:1rem;">A sentence will appear for 30 seconds. Memorize it, then type what you remember.</p>
+
+  <div id="memoryDisplay" style="margin-top:1rem;">
+    <div id="memorySentence" class="sentence-display" style="font-size:1.25rem; min-height:2em; padding:1rem; background:var(--background); border-radius:8px; border:2px solid var(--border); text-align:center;"></div>
+    <div id="memoryCountdown" style="height:8px; background:#eee; margin-top:.5rem; border-radius:4px; overflow:hidden;">
+      <div id="memoryProgress" style="height:100%; width:100%; background:var(--primary); transition:width 0.1s linear;"></div>
+    </div>
+    <div id="memoryTimer" style="text-align:center; margin-top:0.5rem; font-weight:700; color:var(--text-muted);">Memorizing: <span id="memoryTimeLeft">30</span>s</div>
+  </div>
+
+  <div id="memoryInputContainer" style="display:none; margin-top:1rem;">
+    <label class="form-label">Type what you remember:</label>
+    <textarea id="memoryInput" rows="4" style="width:100%; font-size:1rem;" placeholder="Type the sentence here..."></textarea>
+    <div style="margin-top:.5rem; display:flex; gap:0.5rem;">
+      <button id="memorySubmit" class="btn btn-play" style="flex:1;">Submit Recall</button>
+      <button id="memoryReset" class="btn" style="flex:1;">Try Another</button>
+    </div>
+  </div>
+
+  <div id="memoryResult" class="main-card alert-card success" style="display:none; margin-top:1rem; padding:1.5rem;">
+    <h3 style="color:var(--button-color); margin-bottom:1rem;">Memory Recall Results</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom:1rem;">
+      <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Accuracy</div>
+        <div id="res-mem-accuracy" style="font-size: 1.4rem; font-weight: 700; color: var(--success); margin-top: 0.25rem;">--</div>
+      </div>
+      <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Score</div>
+        <div id="res-mem-score" style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">--</div>
+      </div>
+    </div>
+    <div id="res-mem-mistakes" style="background: var(--background); padding:1rem; border-radius:8px; border:2px solid var(--border); font-size:0.9rem;"></div>
+  </div>
+</div>
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='js/memory.js') }}" defer></script>
+    {% endblock %}
 <style>
 /* Layout Scannable Inline Blocks */
 .keyboard-toolbar-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 0.75rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
@@ -198,6 +246,7 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // ========== EXISTING TYPING GAME VARIABLES ==========
     const startBtn = document.getElementById("start-btn");
     const startIcon = document.getElementById("start-icon");
     const startSpinner = document.getElementById("start-spinner");
@@ -223,7 +272,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const rippleToggle = document.getElementById("ripple-animations-toggle");
     const themeButtons = document.querySelectorAll(".theme-tile-btn");
 
-    // TEXT PRESENTATION CONTROL HOOKS
+    // ========== NEW MEMORY MODE VARIABLES ==========
+    const modeTypingBtn = document.getElementById("mode-typing");
+    const modeMemoryBtn = document.getElementById("mode-memory");
+    const memoryPanel = document.getElementById("memory-panel");
+    const memorySentenceEl = document.getElementById("memorySentence");
+    const memoryProgressEl = document.getElementById("memoryProgress");
+    const memoryTimerEl = document.getElementById("memoryTimeLeft");
+    const memoryInputContainer = document.getElementById("memoryInputContainer");
+    const memoryInputEl = document.getElementById("memoryInput");
+    const memorySubmitBtn = document.getElementById("memorySubmit");
+    const memoryResetBtn = document.getElementById("memoryReset");
+    const memoryResultEl = document.getElementById("memoryResult");
+
     const textSizeSlider = document.getElementById("text-size-slider");
     const textSizeBadge = document.getElementById("text-size-badge");
 
@@ -232,8 +293,15 @@ document.addEventListener("DOMContentLoaded", function() {
     let timerInterval = null;
     let timingStarted = false;
     const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
+    let currentMode = "typing"; // track which mode we're in
 
-    // TEXT Presentation Sizing Engine Execution Track
+    // Memory mode variables
+    let memoryDisplayTimeout = null;
+    let memoryHideTimeout = null;
+    let memoryProgressInterval = null;
+    const MEMORY_DISPLAY_MS = 30000; // 30 seconds
+
+    // TEXT PRESENTATION SIZING
     const savedSize = localStorage.getItem("game-engine-text-size") || "1.25";
     textSizeSlider.value = savedSize;
     textSizeBadge.textContent = `${savedSize}rem`;
@@ -246,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.setItem("game-engine-text-size", value);
     });
 
-    // CUSTOM SELECTION PALETTE CONFIGURATION ENGINE
+    // THEME CONFIGURATION
     const savedTheme = localStorage.getItem("selected-game-theme") || "light";
     applyThemeEngineConfiguration(savedTheme);
 
@@ -262,7 +330,141 @@ document.addEventListener("DOMContentLoaded", function() {
         themeButtons.forEach(b => b.classList.toggle("active", b.getAttribute("data-theme") === themeName));
     }
 
-    // MULTI-LINE SUPPORT TEXT PARSER GRID RENDERING
+    // ========== MODE SWITCHING ==========
+    function switchMode(newMode) {
+        currentMode = newMode;
+        if(newMode === "typing") {
+            modeTypingBtn.style.opacity = "1";
+            modeMemoryBtn.style.opacity = "0.6";
+            memoryPanel.style.display = "none";
+            setupPanel.style.display = "block";
+            gamePanel.style.display = "none";
+            resultsPanel.style.display = "none";
+        } else if(newMode === "memory") {
+            modeTypingBtn.style.opacity = "0.6";
+            modeMemoryBtn.style.opacity = "1";
+            memoryPanel.style.display = "block";
+            setupPanel.style.display = "none";
+            gamePanel.style.display = "none";
+            resultsPanel.style.display = "none";
+            // Start memory round immediately
+            startMemoryRound();
+        }
+    }
+
+    if(modeTypingBtn) {
+        modeTypingBtn.addEventListener("click", () => switchMode("typing"));
+    }
+    if(modeMemoryBtn) {
+        modeMemoryBtn.addEventListener("click", () => switchMode("memory"));
+    }
+
+    // ========== MEMORY MODE FUNCTIONS ==========
+    async function startMemoryRound() {
+        // Use the already-generated rawChallengeText
+        if(!rawChallengeText) {
+            // If no sentence was generated yet, generate one
+            try {
+                const difficulty = difficultyMap[difficultyControl.value] || "medium";
+                const response = await fetch(`/api/generate?difficulty=${difficulty}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Failed to generate sentence.");
+                rawChallengeText = result.sentence;
+            } catch(err) {
+                memoryResultEl.style.display = "block";
+                memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${err.message}</p>`;
+                return;
+            }
+        }
+
+        // Show the sentence
+        memorySentenceEl.textContent = rawChallengeText;
+        memoryInputContainer.style.display = "none";
+        memoryResultEl.style.display = "none";
+        memoryProgressEl.style.width = "100%";
+
+        // Animate the 30-second countdown
+        let timeRemaining = 30;
+        memoryTimerEl.textContent = "30";
+
+        const startTime = Date.now();
+        memoryProgressInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const pctRemaining = Math.max(0, 100 - (elapsed / MEMORY_DISPLAY_MS) * 100);
+            memoryProgressEl.style.width = pctRemaining + "%";
+
+            const secondsLeft = Math.ceil((MEMORY_DISPLAY_MS - elapsed) / 1000);
+            memoryTimerEl.textContent = Math.max(0, secondsLeft);
+
+            if(elapsed >= MEMORY_DISPLAY_MS) {
+                clearInterval(memoryProgressInterval);
+                // Hide sentence and show input
+                memorySentenceEl.textContent = "";
+                memoryInputContainer.style.display = "block";
+                memoryInputEl.value = "";
+                memoryInputEl.focus();
+            }
+        }, 100);
+    }
+
+    if(memorySubmitBtn) {
+        memorySubmitBtn.addEventListener("click", async function() {
+            const recalled = memoryInputEl.value || "";
+            const payload = {
+                original_sentence: rawChallengeText,
+                recalled_sentence: recalled,
+                difficulty: parseInt(difficultyControl.value, 10)
+            };
+
+            try {
+                const response = await fetch("/api/submit_memory", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if(data.error) {
+                    memoryResultEl.style.display = "block";
+                    memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${data.error}</p>`;
+                    return;
+                }
+
+                // Display results
+                document.getElementById("res-mem-accuracy").textContent = `${data.accuracy}%`;
+                document.getElementById("res-mem-score").textContent = `${data.score}`;
+
+                let mistakesHtml = "<strong>Mistakes:</strong> ";
+                if(data.mistakes && data.mistakes.length > 0) {
+                    mistakesHtml += `<div style="margin-top:0.5rem;">`;
+                    data.mistakes.forEach(m => {
+                        mistakesHtml += `<div><span style="text-decoration:line-through;color:var(--text-muted);">"${m.correct}"</span> <span style="color:var(--primary);font-weight:bold;">➔ "${m.entered}"</span></div>`;
+                    });
+                    mistakesHtml += `</div>`;
+                } else {
+                    mistakesHtml = "<strong>Perfect recall!</strong>";
+                }
+                document.getElementById("res-mem-mistakes").innerHTML = mistakesHtml;
+                memoryInputContainer.style.display = "none";
+                memoryResultEl.style.display = "block";
+            } catch(err) {
+                memoryResultEl.style.display = "block";
+                memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${err.message}</p>`;
+            }
+        });
+    }
+
+    if(memoryResetBtn) {
+        memoryResetBtn.addEventListener("click", () => {
+            clearInterval(memoryProgressInterval);
+            rawChallengeText = ""; // Clear so next round generates new sentence
+            startMemoryRound();
+        });
+    }
+
+    // ========== EXISTING TYPING GAME LOGIC BELOW ==========
+    // (rest of the existing typing game code stays the same)
+
     function renderChallengeTextToDOM(text) {
         textDisplay.innerHTML = "";
         const lines = text.split("\n");
@@ -283,7 +485,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 lineContainer.appendChild(span);
             });
 
-            // Append explicitly isolated carriage returns representation nodes
             if (lineIdx < lines.length - 1) {
                 const breakSpan = document.createElement("span");
                 breakSpan.classList.add("char-span", "whitespace-node");
@@ -297,7 +498,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (firstChar) firstChar.classList.add("active-cursor");
     }
 
-    // MULTI-ROW SEQUENCING HARDWARE INTERCEPTORS
     window.addEventListener("keydown", function(e) {
         let code = e.code;
         if (e.key === " ") code = "Space";
@@ -329,10 +529,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 hiddenCatcher.value = hiddenCatcher.value.slice(0, -1);
                 hiddenCatcher.dispatchEvent(new Event('input'));
             } else if (code === "Tab") {
-                hiddenCatcher.value += "    "; // Append code tab indentation blocks
+                hiddenCatcher.value += "    ";
                 hiddenCatcher.dispatchEvent(new Event('input'));
             } else if (code === "Enter") {
-                // Determine if code block requires new row sequence arrays
                 if (rawChallengeText.includes("\n") || rawChallengeText.includes("    ")) {
                     hiddenCatcher.value += "\n";
                     hiddenCatcher.dispatchEvent(new Event('input'));
@@ -360,7 +559,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // ENGINE REAL-TIME MATRIX EVALUATION SYNCHRONIZATION RUNNERS
     hiddenCatcher.addEventListener("input", function() {
         const val = this.value;
 
@@ -399,7 +597,6 @@ document.addEventListener("DOMContentLoaded", function() {
         submitBtn.style.display = (val.length >= spans.length) ? "inline-flex" : "none";
     });
 
-    // DATA DISPATCHERS
     if (startBtn) {
         startBtn.addEventListener("click", async function() {
             startBtn.disabled = true; startIcon.style.display = "none"; startSpinner.style.display = "inline-block"; startBtnText.textContent = "Fetching...";
@@ -481,5 +678,4 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
-</script>
-{% endblock %}
+</script>{% endblock %}

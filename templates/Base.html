@@ -53,7 +53,8 @@
             </div>
         {% endif %}
     {% endwith %}
-
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     {% block content %}{% endblock %}
 </body>
 </html>

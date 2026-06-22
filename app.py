@@ -8,7 +8,8 @@ from flask_login import LoginManager, current_user, login_required, login_user, 
 from werkzeug.security import check_password_hash, generate_password_hash
 from backend import backend_generate, backend_send, verify_openrouter, change_model
 from models import db, User, TypingResult
-
+from flask import jsonify, request
+import difflib
 # Automatically detect and load key-value configurations from the local .env file
 from dotenv import load_dotenv
 
@@ -529,6 +530,65 @@ def leaderboard():
         print(f"❌ Leaderboard query sequence failure: {e}")
         traceback.print_exc()
         return render_template('leaderboard.html', global_top=[], pb_wpm=0, pb_acc="0%", pb_score="0/100", history=[])
+
+
+@app.route('/api/generate_memory', methods=['GET'])
+@login_required
+def generate_memory():
+    """Return a sentence tailored for memory mode.
+       Query param: difficulty (1=easy,2=medium,3=hard,4=long)
+    """
+    difficulty = int(request.args.get('difficulty', '1'))
+    # If you modify backend.backend_generate to accept memory_mode, pass it; otherwise reuse difficulty mapping:
+    user_api_key = current_user.api_key
+    # If backend_generate accepts memory_mode: backend_generate(user_api_key, difficulty, memory_mode=True)
+    sentence = backend_generate(user_api_key, difficulty)  # you may want to update backend_generate to return shorter sentences for memory mode
+    return jsonify({"sentence": sentence})
+
+@app.route('/api/submit_memory', methods=['POST'])
+@login_required
+def submit_memory():
+    """
+    Accepts JSON:
+    { "original_sentence": "...", "recalled_sentence": "...", "time_shown": seconds, "recall_time": seconds, "difficulty": n }
+    Returns JSON: { accuracy, score, mistakes: [ {position, entered, correct} ], levenshtein_ratio }
+    """
+    data = request.get_json() or {}
+    orig = data.get('original_sentence', '').strip()
+    recalled = data.get('recalled_sentence', '').strip()
+
+    # Fallback validation
+    if not orig:
+        return jsonify({"error": "No original_sentence provided"}), 400
+
+    # Character-level similarity using difflib
+    seq = difflib.SequenceMatcher(a=orig, b=recalled)
+    ratio = seq.ratio()  # 0..1
+    accuracy_pct = round(ratio * 100, 2)
+
+    # Word-level mistake extraction (simple positional comparison)
+    orig_words = orig.split()
+    rec_words = recalled.split()
+    mistakes = []
+    max_len = max(len(orig_words), len(rec_words))
+    for i in range(max_len):
+        o = orig_words[i] if i < len(orig_words) else None
+        r = rec_words[i] if i < len(rec_words) else None
+        if o != r:
+            mistakes.append({"position": i, "entered": r, "correct": o})
+
+    # Scoring: you can tune this formula
+    # base score = accuracy_pct, penalize missing/extra words
+    penalty = len(mistakes) * 1.5  # each mistake reduces score
+    score = max(0, int(round(accuracy_pct - penalty)))
+
+    return jsonify({
+        "accuracy": accuracy_pct,
+        "score": score,
+        "mistakes": mistakes,
+        "lev_ratio": ratio
+    })
+
 
 
 if __name__ == '__main__':
