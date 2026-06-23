@@ -64,6 +64,86 @@ html[data-game-theme="dark"] {
     --key-glow: 0 0 10px rgba(226, 146, 211, 0.5);
 }
 
+/* CYBER SHOCK THEME OVERRIDES */
+html[data-game-theme="cyber-shock"] {
+    --background: #09050d;
+    --surface: #130a1c;
+    --text-main: #ffffff;
+    --text-muted: #aa99bc;
+    --border: #442657;
+    --button-color: #ff0055;
+    --button-hover-color: #cc0044;
+    --primary: #ff3366;
+    --success: #00ffcc;
+    --success-hover: #33ffdd;
+    --ripple-color: rgba(255, 0, 85, 0.45);
+    --key-glow: 0 0 12px rgba(255, 0, 85, 0.6);
+}
+
+/* DEEP NEBULA THEME OVERRIDES */
+html[data-game-theme="deep-nebula"] {
+    --background: #0a0812;
+    --surface: #110d22;
+    --text-main: #ffffff;
+    --text-muted: #9c94c7;
+    --border: #3b2d72;
+    --button-color: #8c52ff;
+    --button-hover-color: #6a39cc;
+    --primary: #e5a4fc;
+    --success: #4deeea;
+    --success-hover: #80fffb;
+    --ripple-color: rgba(140, 82, 255, 0.4);
+    --key-glow: 0 0 12px rgba(140, 82, 255, 0.6);
+}
+
+/* MONOCHROME MINT THEME OVERRIDES */
+html[data-game-theme="monochrome-mint"] {
+    --background: #101010;
+    --surface: #1c1c1c;
+    --text-main: #ffffff;
+    --text-muted: #b8b8b8;
+    --border: #4a4a4a;
+    --button-color: #00ff87;
+    --button-hover-color: #00b35f;
+    --primary: #ff5e97;
+    --success: #00ff87;
+    --success-hover: #64ffda;
+    --ripple-color: rgba(0, 255, 135, 0.35);
+    --key-glow: 0 0 12px rgba(0, 255, 135, 0.6);
+}
+
+/* WARM AMBER THEME OVERRIDES */
+html[data-game-theme="warm-amber"] {
+    --background: #1a1410;
+    --surface: #281e18;
+    --text-main: #ffffff;
+    --text-muted: #cca991;
+    --border: #5e4839;
+    --button-color: #ff9f1c;
+    --button-hover-color: #cc7a00;
+    --primary: #ff595e;
+    --success: #2ec4b6;
+    --success-hover: #3fcbc0;
+    --ripple-color: rgba(255, 159, 28, 0.4);
+    --key-glow: 0 0 12px rgba(255, 159, 28, 0.6);
+}
+
+/* FROST OBSIDIAN THEME OVERRIDES */
+html[data-game-theme="frost-obsidian"] {
+    --background: #0e121a;
+    --surface: #151e2a;
+    --text-main: #ffffff;
+    --text-muted: #a6bdd8;
+    --border: #354c68;
+    --button-color: #3a86ff;
+    --button-hover-color: #1c63da;
+    --primary: #ff006e;
+    --success: #00f5d4;
+    --success-hover: #33f7dc;
+    --ripple-color: rgba(58, 134, 255, 0.45);
+    --key-glow: 0 0 12px rgba(58, 134, 255, 0.6);
+}
+
 /* ==========================================================================
    THEME SELECT CONTAINER DESIGNS
    ========================================================================== */
@@ -828,90 +908,6 @@ code {
     color: var(--success-hover) !important;
     font-weight: 600;
     font-size: 1rem !important;
-}
-
-/* ==========================================================================
-   9. CUSTOM GAME THEMES & CONTROLS INTERFACES
-   ========================================================================== */
-
-/* CYBER SHOCK THEME OVERRIDES */
-html[data-game-theme="cyber-shock"] {
-    --background: #09050d;
-    --surface: #130a1c;
-    --text-main: #ffffff;
-    --text-muted: #aa99bc;
-    --border: #442657;
-    --button-color: #ff0055;
-    --button-hover-color: #cc0044;
-    --primary: #ff3366;
-    --success: #00ffcc;
-    --success-hover: #33ffdd;
-    --ripple-color: rgba(255, 0, 85, 0.45);
-    --key-glow: 0 0 12px rgba(255, 0, 85, 0.6);
-}
-
-/* DEEP NEBULA THEME OVERRIDES */
-html[data-game-theme="deep-nebula"] {
-    --background: #0a0812;
-    --surface: #110d22;
-    --text-main: #ffffff;
-    --text-muted: #9c94c7;
-    --border: #3b2d72;
-    --button-color: #8c52ff;
-    --button-hover-color: #6a39cc;
-    --primary: #e5a4fc;
-    --success: #4deeea;
-    --success-hover: #80fffb;
-    --ripple-color: rgba(140, 82, 255, 0.4);
-    --key-glow: 0 0 12px rgba(140, 82, 255, 0.6);
-}
-
-/* MONOCHROME MINT THEME OVERRIDES */
-html[data-game-theme="monochrome-mint"] {
-    --background: #101010;
-    --surface: #1c1c1c;
-    --text-main: #ffffff;
-    --text-muted: #b8b8b8;
-    --border: #4a4a4a;
-    --button-color: #00ff87;
-    --button-hover-color: #00b35f;
-    --primary: #ff5e97;
-    --success: #00ff87;
-    --success-hover: #64ffda;
-    --ripple-color: rgba(0, 255, 135, 0.35);
-    --key-glow: 0 0 12px rgba(0, 255, 135, 0.6);
-}
-
-/* WARM AMBER THEME OVERRIDES */
-html[data-game-theme="warm-amber"] {
-    --background: #1a1410;
-    --surface: #281e18;
-    --text-main: #ffffff;
-    --text-muted: #cca991;
-    --border: #5e4839;
-    --button-color: #ff9f1c;
-    --button-hover-color: #cc7a00;
-    --primary: #ff595e;
-    --success: #2ec4b6;
-    --success-hover: #3fcbc0;
-    --ripple-color: rgba(255, 159, 28, 0.4);
-    --key-glow: 0 0 12px rgba(255, 159, 28, 0.6);
-}
-
-/* FROST OBSIDIAN THEME OVERRIDES */
-html[data-game-theme="frost-obsidian"] {
-    --background: #0e121a;
-    --surface: #151e2a;
-    --text-main: #ffffff;
-    --text-muted: #a6bdd8;
-    --border: #354c68;
-    --button-color: #3a86ff;
-    --button-hover-color: #1c63da;
-    --primary: #ff006e;
-    --success: #00f5d4;
-    --success-hover: #33f7dc;
-    --ripple-color: rgba(58, 134, 255, 0.45);
-    --key-glow: 0 0 12px rgba(58, 134, 255, 0.6);
 }
 
 /* PERSISTENT SUB-MENU ROW SPLIT LAYOUT */

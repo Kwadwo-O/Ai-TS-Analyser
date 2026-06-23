@@ -111,6 +111,11 @@
                     <option value="light">Light Archetype</option>
                     <option value="sepia">Muted Sepia (Mid)</option>
                     <option value="dark">Dark Archetype</option>
+                    <option value="cyber-shock">Cyber Shock</option>
+                    <option value="deep-nebula">Deep Nebula</option>
+                    <option value="monochrome-mint">Monochrome Mint</option>
+                    <option value="warm-amber">Warm Amber</option>
+                    <option value="frost-obsidian">Frost Obsidian</option>
                 </select>
             </div>
         </div>
@@ -364,6 +369,21 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (selectedTheme === "sepia") {
                 document.documentElement.setAttribute("data-game-theme", "sepia");
                 localStorage.setItem("app-ui-theme", "sepia");
+            } else if (selectedTheme === "cyber-shock") {
+                document.documentElement.setAttribute("data-game-theme", "cyber-shock");
+                localStorage.setItem("app-ui-theme", "cyber-shock");
+            } else if (selectedTheme === "deep-nebula") {
+                document.documentElement.setAttribute("data-game-theme", "deep-nebula");
+                localStorage.setItem("app-ui-theme", "deep-nebula");
+            } else if (selectedTheme === "monochrome-mint") {
+                document.documentElement.setAttribute("data-game-theme", "monochrome-mint");
+                localStorage.setItem("app-ui-theme", "monochrome-mint");
+            } else if (selectedTheme === "warm-amber") {
+                document.documentElement.setAttribute("data-game-theme", "warm-amber");
+                localStorage.setItem("app-ui-theme", "warm-amber");
+            } else if (selectedTheme === "frost-obsidian") {
+                document.documentElement.setAttribute("data-game-theme", "frost-obsidian");
+                localStorage.setItem("app-ui-theme", "frost-obsidian");
             } else {
                 document.documentElement.removeAttribute("data-game-theme");
                 localStorage.setItem("app-ui-theme", "light");

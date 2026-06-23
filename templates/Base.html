@@ -13,8 +13,19 @@
         document.documentElement.setAttribute("data-theme", "dark");
     } else if (savedGlobalUserTheme === "sepia") {
         document.documentElement.setAttribute("data-theme", "sepia");
+    } else if (savedGlobalUserTheme === "cyber-shock") {
+        document.documentElement.setAttribute("data-theme", "cyber-shock");
+    } else if (savedGlobalUserTheme === "deep-nebula") {
+        document.documentElement.setAttribute("data-theme", "deep-nebula");
+    } else if (savedGlobalUserTheme === "monochrome-mint") {
+        document.documentElement.setAttribute("data-theme", "monochrome-mint");
+    } else if (savedGlobalUserTheme === "warm-amber") {
+        document.documentElement.setAttribute("data-theme", "warm-amber");
+    } else if (savedGlobalUserTheme === "frost-obsidian") {
+        document.documentElement.setAttribute("data-theme", "frost-obsidian");
     } else {
-        document.documentElement.removeAttribute("data-theme");
+        // If the saved theme is invalid, default to light theme
+        document.documentElement.setAttribute("data-theme", "light");
     }
     // Also explicitly force game variables to sync globally across all pages
     document.documentElement.setAttribute("data-game-theme", savedGlobalUserTheme);
