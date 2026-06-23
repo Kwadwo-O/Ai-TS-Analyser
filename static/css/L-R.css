@@ -1,0 +1,74 @@
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.login-form {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 2.5rem;
+    min-height: calc(100vh - 70px);
+}
+
+#target-phrase {
+    animation: textPulse 4s infinite ease-in-out;
+    transition: background-color 0.3s ease;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--background);
+    color: var(--text-main);
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease, background-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 4px rgba(239, 130, 117, 0.12);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.form-footer {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+}
+
+.form-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.form-link:hover {
+    color: var(--primary-hover);
+    text-shadow: 0 0 1px rgba(224, 109, 96, 0.3);
+}
+
+#res-mistakes div {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

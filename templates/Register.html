@@ -1,4 +1,7 @@
 {% extends "Base.html" %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/L-R.css') }}">
+{% endblock %}
 {% block content %}
 <div class="login-container">
     <div class="main-card">

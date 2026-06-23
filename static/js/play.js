@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // ========== EXISTING TYPING GAME VARIABLES ==========
+    // ========== EXISTING TYPING GAME VARIABLES ==========\r
     const startBtn = document.getElementById("start-btn");
     const startIcon = document.getElementById("start-icon");
     const startSpinner = document.getElementById("start-spinner");
@@ -21,413 +21,347 @@ document.addEventListener("DOMContentLoaded", function() {
     const liveWpmLabel = document.getElementById("live-wpm");
     const difficultyControl = document.getElementById("difficulty-control");
     const difficultyBadge = document.getElementById("difficulty-badge");
-    const animToggle = document.getElementById("keyboard-animations-toggle");
-    const rippleToggle = document.getElementById("ripple-animations-toggle");
-    const themeButtons = document.querySelectorAll(".theme-tile-btn");
-
-    // ========== NEW MEMORY MODE VARIABLES ==========
+    const textSizeSlider = document.getElementById("text-size-slider");
+    const textSizeBadge = document.getElementById("text-size-badge");
     const modeTypingBtn = document.getElementById("mode-typing");
     const modeMemoryBtn = document.getElementById("mode-memory");
     const memoryPanel = document.getElementById("memory-panel");
-    const memorySentenceEl = document.getElementById("memorySentence");
-    const memoryProgressEl = document.getElementById("memoryProgress");
-    const memoryTimerEl = document.getElementById("memoryTimeLeft");
-    const memoryInputContainer = document.getElementById("memoryInputContainer");
-    const memoryInputEl = document.getElementById("memoryInput");
-    const memorySubmitBtn = document.getElementById("memorySubmit");
-    const memoryResetBtn = document.getElementById("memoryReset");
-    const memoryResultEl = document.getElementById("memoryResult");
+    const cadenceMonitor = document.getElementById("cadence-monitor");
 
-    const textSizeSlider = document.getElementById("text-size-slider");
-    const textSizeBadge = document.getElementById("text-size-badge");
-
-    let rawChallengeText = "";
-    let timeElapsed = 0;
+    let targetSentence = "";
+    let startTime = null;
     let timerInterval = null;
-    let timingStarted = false;
-    const difficultyMap = { "1": "easy", "2": "medium", "3": "hard" };
-    let currentMode = "typing"; // track which mode we're in
+    let currentMode = "typing"; // "typing" or "memory"\r
 
-    // Memory mode variables
-    let memoryDisplayTimeout = null;
-    let memoryHideTimeout = null;
-    let memoryProgressInterval = null;
-    const MEMORY_DISPLAY_MS = 30000; // 30 seconds
-
-    // TEXT PRESENTATION SIZING
-    const savedSize = localStorage.getItem("game-engine-text-size") || "1.25";
-    textSizeSlider.value = savedSize;
-    textSizeBadge.textContent = `${savedSize}rem`;
-    textDisplay.style.fontSize = `${savedSize}rem`;
-
-    textSizeSlider.addEventListener("input", function() {
-        const value = this.value;
-        textSizeBadge.textContent = `${value}rem`;
-        textDisplay.style.fontSize = `${value}rem`;
-        localStorage.setItem("game-engine-text-size", value);
-    });
-
-    // THEME CONFIGURATION
-    const savedTheme = localStorage.getItem("selected-game-theme") || "light";
-    applyThemeEngineConfiguration(savedTheme);
-
-    themeButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            applyThemeEngineConfiguration(this.getAttribute("data-theme"));
+    // ========== GAME MODE SELECTION HANDLING ==========\r
+    if (modeTypingBtn && modeMemoryBtn) {
+        modeTypingBtn.addEventListener("click", function() {
+            currentMode = "typing";
+            modeTypingBtn.classList.add("active");
+            modeMemoryBtn.classList.remove("active");
+            setupPanel.classList.remove("hidden-node");
+            gamePanel.classList.add("hidden-node");
+            memoryPanel.classList.add("hidden-node");
+            resultsPanel.classList.add("hidden-node");
+            errorFallback.classList.add("hidden-node");
+            clearInterval(timerInterval);
         });
-    });
 
-    function applyThemeEngineConfiguration(themeName) {
-        document.documentElement.setAttribute("data-game-theme", themeName);
-        localStorage.setItem("selected-game-theme", themeName);
-        themeButtons.forEach(b => b.classList.toggle("active", b.getAttribute("data-theme") === themeName));
+        modeMemoryBtn.addEventListener("click", function() {
+            currentMode = "memory";
+            modeMemoryBtn.classList.add("active");
+            modeTypingBtn.classList.remove("active");
+            setupPanel.classList.remove("hidden-node");
+            gamePanel.classList.add("hidden-node");
+            memoryPanel.classList.add("hidden-node");
+            resultsPanel.classList.add("hidden-node");
+            errorFallback.classList.add("hidden-node");
+            clearInterval(timerInterval);
+            if (window.initializeMemoryMode) {
+                window.initializeMemoryMode();
+            }
+        });
     }
 
-    // ========== MODE SWITCHING ==========
-    function switchMode(newMode) {
-        currentMode = newMode;
-        if(newMode === "typing") {
-            modeTypingBtn.style.opacity = "1";
-            modeMemoryBtn.style.opacity = "0.6";
-            memoryPanel.style.display = "none";
-            setupPanel.style.display = "block";
-            gamePanel.style.display = "none";
-            resultsPanel.style.display = "none";
-        } else if(newMode === "memory") {
-            modeTypingBtn.style.opacity = "0.6";
-            modeMemoryBtn.style.opacity = "1";
-            memoryPanel.style.display = "block";
-            setupPanel.style.display = "none";
-            gamePanel.style.display = "none";
-            resultsPanel.style.display = "none";
-            // Start memory round immediately
-            startMemoryRound();
-        }
+    // ========== PRESENTATION SLIDERS AND CONFIGS ==========\r
+    if (difficultyControl && difficultyBadge) {
+        difficultyControl.addEventListener("input", function() {
+            const val = parseInt(difficultyControl.value);
+            if (val === 1) difficultyBadge.textContent = "Easy";
+            else if (val === 3) difficultyBadge.textContent = "Hard";
+            else difficultyBadge.textContent = "Medium";
+        });
     }
 
-    if(modeTypingBtn) {
-        modeTypingBtn.addEventListener("click", () => switchMode("typing"));
-    }
-    if(modeMemoryBtn) {
-        modeMemoryBtn.addEventListener("click", () => switchMode("memory"));
+    if (textSizeSlider && textSizeBadge) {
+        textSizeSlider.addEventListener("input", function() {
+            const val = textSizeSlider.value + "rem";
+            textSizeBadge.textContent = val;
+            if (textDisplay) textDisplay.style.fontSize = val;
+        });
     }
 
-    // ========== MEMORY MODE FUNCTIONS ==========
-    async function startMemoryRound() {
-        // Use the already-generated rawChallengeText
-        if(!rawChallengeText) {
-            // If no sentence was generated yet, generate one
-            try {
-                const difficulty = difficultyMap[difficultyControl.value] || "medium";
-                const response = await fetch(`/api/generate?difficulty=${difficulty}`);
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || "Failed to generate sentence.");
-                rawChallengeText = result.sentence;
-            } catch(err) {
-                memoryResultEl.style.display = "block";
-                memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${err.message}</p>`;
+    // ========== SENTENCE GENERATION ENGINE ROUTINE ==========\r
+    if (startBtn) {
+        startBtn.addEventListener("click", async function() {
+            errorFallback.classList.add("hidden-node");
+            startBtn.disabled = true;
+            startIcon.classList.add("hidden-node");
+            startSpinner.classList.remove("hidden-node");
+            startBtnText.textContent = "Generating Challenge Context...";
+
+            const diffMap = { "1": "easy", "2": "medium", "3": "hard" };
+            const difficultyStr = diffMap[difficultyControl ? difficultyControl.value : "2"] || "medium";
+            const selectedModel = localStorage.getItem("selected_model") || "google/gemini-2.5-flash";
+
+            if (currentMode === "memory") {
+                try {
+                    const response = await fetch("/api/generate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ difficulty: difficultyStr, model: selectedModel })
+                    });
+                    if (!response.ok) throw new Error("HTTP error payload generation corrupted.");
+                    const data = await response.json();
+                    if (!data.success) throw new Error(data.error || "Generation routine breakdown.");
+
+                    setupPanel.classList.add("hidden-node");
+                    if (window.startMemoryChallenge) {
+                        window.startMemoryChallenge(data.sentence);
+                    }
+                } catch (err) {
+                    errorTitle.textContent = "Generation Error";
+                    errorText.textContent = err.message;
+                    errorFallback.classList.remove("hidden-node");
+                } finally {
+                    startBtn.disabled = false;
+                    startIcon.classList.remove("hidden-node");
+                    startSpinner.classList.add("hidden-node");
+                    startBtnText.textContent = "Generate Challenge Passage";
+                }
                 return;
             }
-        }
 
-        // Show the sentence
-        memorySentenceEl.textContent = rawChallengeText;
-        memoryInputContainer.style.display = "none";
-        memoryResultEl.style.display = "none";
-        memoryProgressEl.style.width = "100%";
-
-        // Animate the 30-second countdown
-        let timeRemaining = 30;
-        memoryTimerEl.textContent = "30";
-
-        const startTime = Date.now();
-        memoryProgressInterval = setInterval(() => {
-            const elapsed = Date.now() - startTime;
-            const pctRemaining = Math.max(0, 100 - (elapsed / MEMORY_DISPLAY_MS) * 100);
-            memoryProgressEl.style.width = pctRemaining + "%";
-
-            const secondsLeft = Math.ceil((MEMORY_DISPLAY_MS - elapsed) / 1000);
-            memoryTimerEl.textContent = Math.max(0, secondsLeft);
-
-            if(elapsed >= MEMORY_DISPLAY_MS) {
-                clearInterval(memoryProgressInterval);
-                // Hide sentence and show input
-                memorySentenceEl.textContent = "";
-                memoryInputContainer.style.display = "block";
-                memoryInputEl.value = "";
-                memoryInputEl.focus();
-            }
-        }, 100);
-    }
-
-    if(memorySubmitBtn) {
-        memorySubmitBtn.addEventListener("click", async function() {
-            const recalled = memoryInputEl.value || "";
-            const payload = {
-                original_sentence: rawChallengeText,
-                recalled_sentence: recalled,
-                difficulty: parseInt(difficultyControl.value, 10)
-            };
-
+            // Default Speed Typing Generation Routing\r
             try {
-                const response = await fetch("/api/submit_memory", {
+                const response = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ difficulty: difficultyStr, model: selectedModel })
                 });
+                if (!response.ok) throw new Error("Network response matrix non-operational.");
                 const data = await response.json();
+                if (!data.success) throw new Error(data.error || "Inference response payload malformed.");
 
-                if(data.error) {
-                    memoryResultEl.style.display = "block";
-                    memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${data.error}</p>`;
-                    return;
-                }
+                targetSentence = data.sentence;
+                buildTextDisplay(targetSentence);
 
-                // Display results
-                document.getElementById("res-mem-accuracy").textContent = `${data.accuracy}%`;
-                document.getElementById("res-mem-score").textContent = `${data.score}`;
+                setupPanel.classList.add("hidden-node");
+                gamePanel.classList.remove("hidden-node");
+                submitBtn.classList.add("hidden-node");
 
-                let mistakesHtml = "<strong>Mistakes:</strong> ";
-                if(data.mistakes && data.mistakes.length > 0) {
-                    mistakesHtml += `<div style="margin-top:0.5rem;">`;
-                    data.mistakes.forEach(m => {
-                        mistakesHtml += `<div><span style="text-decoration:line-through;color:var(--text-muted);">"${m.correct}"</span> <span style="color:var(--primary);font-weight:bold;">➔ "${m.entered}"</span></div>`;
-                    });
-                    mistakesHtml += `</div>`;
-                } else {
-                    mistakesHtml = "<strong>Perfect recall!</strong>";
-                }
-                document.getElementById("res-mem-mistakes").innerHTML = mistakesHtml;
-                memoryInputContainer.style.display = "none";
-                memoryResultEl.style.display = "block";
-            } catch(err) {
-                memoryResultEl.style.display = "block";
-                memoryResultEl.innerHTML = `<p style="color:var(--primary);">Error: ${err.message}</p>`;
+                timerLabel.textContent = "0s";
+                liveWpmLabel.textContent = "0 WPM";
+                if (cadenceMonitor) cadenceMonitor.classList.remove("active");
+
+                startTime = null;
+                clearInterval(timerInterval);
+                hiddenCatcher.value = "";
+                setTimeout(() => hiddenCatcher.focus(), 100);
+            } catch (err) {
+                errorTitle.textContent = "Generation Error";
+                errorText.textContent = err.message;
+                errorFallback.classList.remove("hidden-node");
+            } finally {
+                startBtn.disabled = false;
+                startIcon.classList.remove("hidden-node");
+                startSpinner.classList.add("hidden-node");
+                startBtnText.textContent = "Generate Challenge Passage";
             }
         });
     }
 
-    if(memoryResetBtn) {
-        memoryResetBtn.addEventListener("click", () => {
-            clearInterval(memoryProgressInterval);
-            rawChallengeText = ""; // Clear so next round generates new sentence
-            startMemoryRound();
-        });
-    }
-
-    // ========== EXISTING TYPING GAME LOGIC BELOW ==========
-    // (rest of the existing typing game code stays the same)
-
-    function renderChallengeTextToDOM(text) {
+    // ========== CORE LIVE TYPING TRACKING ACTIONS ==========\r
+    function buildTextDisplay(text) {
+        if (!textDisplay) return;
         textDisplay.innerHTML = "";
-        const lines = text.split("\n");
-
-        lines.forEach((line, lineIdx) => {
-            const lineContainer = document.createElement("div");
-            lineContainer.classList.add("code-line-block");
-
-            line.split("").forEach((char) => {
-                const span = document.createElement("span");
-                span.classList.add("char-span");
-                if (char === " ") {
-                    span.textContent = "·";
-                    span.classList.add("whitespace-node");
-                } else {
-                    span.textContent = char;
-                }
-                lineContainer.appendChild(span);
-            });
-
-            if (lineIdx < lines.length - 1) {
-                const breakSpan = document.createElement("span");
-                breakSpan.classList.add("char-span", "whitespace-node");
-                breakSpan.textContent = "↵\n";
-                lineContainer.appendChild(breakSpan);
-            }
-            textDisplay.appendChild(lineContainer);
-        });
-
-        const firstChar = textDisplay.querySelector(".char-span");
-        if (firstChar) firstChar.classList.add("active-cursor");
-    }
-
-    window.addEventListener("keydown", function(e) {
-        let code = e.code;
-        if (e.key === " ") code = "Space";
-
-        const keyElement = document.getElementById(code);
-        if (keyElement) {
-            if (animToggle.checked) keyElement.classList.add("hardware-pressed");
-            if (rippleToggle.checked) {
-                const rect = keyElement.getBoundingClientRect();
-                document.querySelectorAll(".key").forEach(k => {
-                    if (k === keyElement) return;
-                    const r = k.getBoundingClientRect();
-                    const dist = Math.hypot((r.left+r.width/2)-(rect.left+rect.width/2), (r.top+r.height/2)-(rect.top+rect.height/2));
-                    setTimeout(() => {
-                        k.style.borderColor = "var(--button-color)";
-                        setTimeout(() => k.style.borderColor = "", 100);
-                    }, dist * 0.35);
-                });
-            }
-        }
-
-        if (gamePanel.style.display === "block" && !hiddenCatcher.disabled) {
-            if (document.activeElement !== hiddenCatcher) hiddenCatcher.focus();
-
-            if (code === "Space" && e.target !== hiddenCatcher) e.preventDefault();
-            if (code === "Tab" || code === "Backspace") e.preventDefault();
-
-            if (code === "Backspace") {
-                hiddenCatcher.value = hiddenCatcher.value.slice(0, -1);
-                hiddenCatcher.dispatchEvent(new Event('input'));
-            } else if (code === "Tab") {
-                hiddenCatcher.value += "    ";
-                hiddenCatcher.dispatchEvent(new Event('input'));
-            } else if (code === "Enter") {
-                if (rawChallengeText.includes("\n") || rawChallengeText.includes("    ")) {
-                    hiddenCatcher.value += "\n";
-                    hiddenCatcher.dispatchEvent(new Event('input'));
-                } else if (hiddenCatcher.value.length >= rawChallengeText.length) {
-                    submitBtn.click();
-                }
-            } else if (e.key.length === 1) {
-                if (document.activeElement !== hiddenCatcher) {
-                    hiddenCatcher.value += e.key;
-                    hiddenCatcher.dispatchEvent(new Event('input'));
-                }
-            }
-        }
-    });
-
-    window.addEventListener("keyup", function(e) {
-        let code = e.code; if (e.key === " ") code = "Space";
-        const keyElement = document.getElementById(code);
-        if (keyElement) keyElement.classList.remove("hardware-pressed");
-    });
-
-    if (difficultyControl) {
-        difficultyControl.addEventListener("input", function() {
-            difficultyBadge.textContent = difficultyMap[this.value];
+        text.split("").forEach((char, idx) => {
+            const span = document.createElement("span");
+            span.textContent = char;
+            span.classList.add("char-node");
+            if (idx === 0) span.classList.add("current-cursor");
+            textDisplay.appendChild(span);
         });
     }
 
-    hiddenCatcher.addEventListener("input", function() {
-        const val = this.value;
-
-        if (!timingStarted && val.length > 0) {
-            timingStarted = true;
-            timerInterval = setInterval(() => {
-                timeElapsed++;
-                timerLabel.textContent = `${timeElapsed}s`;
-                liveWpmLabel.textContent = `${Math.round((hiddenCatcher.value.length / 5) / (timeElapsed / 60))} WPM`;
-            }, 1000);
-        }
-
-        const spans = textDisplay.querySelectorAll(".char-span");
-        let idx = 0;
-
-        spans.forEach((span) => {
-            span.classList.remove("correct", "incorrect", "active-cursor");
-            let targetChar = span.textContent;
-            if (span.classList.contains("whitespace-node")) {
-                targetChar = span.textContent.includes("↵") ? "\n" : " ";
+    if (hiddenCatcher) {
+        document.addEventListener("click", function(e) {
+            if (gamePanel && !gamePanel.classList.contains("hidden-node")) {
+                if (e.target !== startBtn && e.target !== submitBtn && e.target !== resetBtn) {
+                    hiddenCatcher.focus();
+                }
             }
+        });
 
-            if (idx < val.length) {
-                if (val[idx] === targetChar) {
+        hiddenCatcher.addEventListener("input", function() {
+            if (!startTime) {
+                startTime = new Date();
+                if (cadenceMonitor) cadenceMonitor.classList.add("active");
+                timerInterval = setInterval(updateLiveTelemetry, 250);
+            }
+            evaluateCurrentInputState();
+        });
+    }
+
+    function updateLiveTelemetry() {
+        if (!startTime) return;
+        const elapsed = (new Date() - startTime) / 1000;
+        timerLabel.textContent = Math.floor(elapsed) + "s";
+
+        const typedVal = hiddenCatcher.value;
+        if (typedVal.length > 0 && elapsed > 0.5) {
+            const words = typedVal.length / 5;
+            const wpm = Math.round(words / (elapsed / 60));
+            liveWpmLabel.textContent = wpm + " WPM";
+        }
+    }
+
+    function evaluateCurrentInputState() {
+        const typedVal = hiddenCatcher.value;
+        const spans = textDisplay.querySelectorAll(".char-node");
+        let isPerfectSoFar = true;
+
+        spans.forEach((span, idx) => {
+            span.classList.remove("correct", "incorrect", "current-cursor");
+            if (idx < typedVal.length) {
+                if (typedVal[idx] === span.textContent) {
                     span.classList.add("correct");
                 } else {
                     span.classList.add("incorrect");
+                    isPerfectSoFar = false;
                 }
-            } else if (idx === val.length) {
-                span.classList.add("active-cursor");
-            }
-            idx++;
-        });
-
-        liveWpmLabel.textContent = `${Math.round((val.length / 5) / ((timeElapsed || 1) / 60))} WPM`;
-        submitBtn.style.display = (val.length >= spans.length) ? "inline-flex" : "none";
-    });
-
-    if (startBtn) {
-        startBtn.addEventListener("click", async function() {
-            startBtn.disabled = true; startIcon.style.display = "none"; startSpinner.style.display = "inline-block"; startBtnText.textContent = "Fetching...";
-            errorFallback.style.display = "none";
-
-            try {
-                const difficulty = difficultyMap[difficultyControl.value] || "medium";
-                const response = await fetch(`/api/generate?difficulty=${difficulty}`);
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || "Failed layout configurations.");
-
-                rawChallengeText = result.sentence;
-                renderChallengeTextToDOM(rawChallengeText);
-
-                timeElapsed = 0; timingStarted = false;
-                timerLabel.textContent = "0s"; liveWpmLabel.textContent = "0 WPM";
-                hiddenCatcher.value = ""; hiddenCatcher.disabled = false;
-                setupPanel.style.display = "none"; gamePanel.style.display = "block";
-
-                document.body.addEventListener("click", () => { if(gamePanel.style.display === "block") hiddenCatcher.focus(); });
-                hiddenCatcher.focus();
-            } catch (err) {
-                errorText.textContent = err.message; errorFallback.style.display = "block";
-            } finally {
-                startBtn.disabled = false; startIcon.style.display = "inline-block"; startSpinner.style.display = "none"; startBtnText.textContent = "Generate Challenge Passage";
+            } else if (idx === typedVal.length) {
+                span.classList.add("current-cursor");
             }
         });
+
+        if (typedVal.length >= targetSentence.length) {
+            clearInterval(timerInterval);
+            if (cadenceMonitor) cadenceMonitor.classList.remove("active");
+            submitBtn.classList.remove("hidden-node");
+            submitBtn.focus();
+        } else {
+            submitBtn.classList.add("hidden-node");
+        }
     }
 
+    // ========== SUBMISSION & AI ASSESSMENT ENGINE ROUTINE ==========\r
     if (submitBtn) {
         submitBtn.addEventListener("click", async function() {
+            if (!startTime || !targetSentence) return;
             clearInterval(timerInterval);
-            submitBtn.disabled = true; submitIcon.style.display = "none"; submitSpinner.style.display = "inline-block";
+
+            submitBtn.disabled = true;
+            submitIcon.classList.add("hidden-node");
+            submitSpinner.classList.remove("hidden-node");
+            submitBtnText.textContent = "Analyzing Performance Grid...";
+
+            const elapsedSeconds = (new Date() - startTime) / 1000;
+            const typedText = hiddenCatcher.value;
+            const selectedModel = localStorage.getItem("selected_model") || "google/gemini-2.5-flash";
 
             try {
                 const response = await fetch("/api/submit", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        original_sentence: rawChallengeText,
-                        user_sentence: hiddenCatcher.value,
-                        time: `${timeElapsed}s`,
-                        typing_speed: liveWpmLabel.textContent
+                        expected: targetSentence,
+                        typed: typedText,
+                        time_seconds: elapsedSeconds,
+                        model: selectedModel
                     })
                 });
-                const metrics = await response.json();
+                if (!response.ok) throw new Error("Evaluation routine processing timed out.");
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || "Analysis matrix payload processing failed.");
 
-                document.getElementById("res-speed").textContent = liveWpmLabel.textContent;
-                document.getElementById("res-accuracy").textContent = metrics.accuracy || "100%";
-                document.getElementById("res-score").textContent = metrics.score || "100/100";
-                document.getElementById("res-analysis").textContent = metrics.text_analysis || "Completed.";
+                const metrics = data.metrics;
+                document.getElementById("res-speed").textContent = metrics.speed_wpm + " WPM";
+                document.getElementById("res-accuracy").textContent = metrics.accuracy + "%";
+                document.getElementById("res-score").textContent = metrics.score;
+                document.getElementById("res-analysis").textContent = data.analysis;
 
-                const wrapper = document.getElementById("res-mistakes"); wrapper.innerHTML = "";
+                const wrapper = document.getElementById("res-mistakes");
+                wrapper.innerHTML = "";
                 if (metrics.mistakes && metrics.mistakes.length > 0) {
                     metrics.mistakes.forEach(m => {
                         const row = document.createElement("div");
-                        row.innerHTML = `<span style="color:var(--text-muted); text-decoration:line-through;">${m.expected}</span> <span style="color:var(--primary); font-weight:bold;">➔ ${m.typed}</span>`;
+                        row.className = "mistake-row-entry";
+                        row.innerHTML = `<span style="text-decoration: line-through; opacity: 0.6;">${m.expected}</span> <span style="font-weight: bold; color: var(--primary);">➔ ${m.typed}</span>`;
                         wrapper.appendChild(row);
                     });
-                    document.getElementById("mistakes-wrapper").style.display = "block";
+                    document.getElementById("mistakes-wrapper").classList.remove("hidden-node");
                 } else {
-                    document.getElementById("mistakes-wrapper").style.display = "none";
+                    const cleanRow = document.createElement("div");
+                    cleanRow.className = "perfect-run-row";
+                    cleanRow.textContent = "✓ Performance complete. Perfect accuracy profile achieved.";
+                    wrapper.appendChild(cleanRow);
+                    document.getElementById("mistakes-wrapper").classList.remove("hidden-node");
                 }
 
-                gamePanel.style.display = "none"; resultsPanel.style.display = "block";
+                gamePanel.classList.add("hidden-node");
+                resultsPanel.classList.remove("hidden-node");
                 if (window.confetti) confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
             } catch (err) {
-                errorText.textContent = err.message; errorFallback.style.display = "block";
-                gamePanel.style.display = "none"; setupPanel.style.display = "block";
+                errorTitle.textContent = "Submission Evaluation Error";
+                errorText.textContent = err.message;
+                errorFallback.classList.remove("hidden-node");
+                gamePanel.classList.add("hidden-node");
+                setupPanel.classList.remove("hidden-node");
             } finally {
-                submitBtn.disabled = false; submitIcon.style.display = "inline-block"; submitSpinner.style.display = "none";
+                submitBtn.disabled = false;
+                submitIcon.classList.remove("hidden-node");
+                submitSpinner.classList.add("hidden-node");
+                submitBtnText.textContent = "Submit for Evaluation";
             }
         });
     }
 
     if (resetBtn) {
         resetBtn.addEventListener("click", function() {
-            resultsPanel.style.display = "none"; setupPanel.style.display = "block";
+            resultsPanel.classList.add("hidden-node");
+            setupPanel.classList.remove("hidden-node");
+            errorFallback.classList.add("hidden-node");
+            targetSentence = "";
+            startTime = null;
+            hiddenCatcher.value = "";
+            if (textDisplay) textDisplay.innerHTML = "";
         });
+    }
+
+    // ========== LIVE PHYSICAL PERIPHERAL INPUT MATRIX MIRROR ==========\r
+    const animationToggle = document.getElementById("keyboard-animations-toggle");
+    const rippleToggle = document.getElementById("ripple-animations-toggle");
+
+    window.addEventListener("keydown", function(e) {
+        if (animationToggle && !animationToggle.checked) return;
+
+        let code = e.code;
+        if (e.key === " " || code === "Space") code = "Space";
+
+        const keyElement = document.getElementById(code);
+        if (keyElement) {
+            keyElement.classList.add("hardware-pressed");
+            if (rippleToggle && rippleToggle.checked) {
+                createHardwareMatrixRipple(keyElement);
+            }
+        }
+    });
+
+    window.addEventListener("keyup", function(e) {
+        let code = e.code;
+        if (e.key === " " || code === "Space") code = "Space";
+
+        const keyElement = document.getElementById(code);
+        if (keyElement) {
+            keyElement.classList.remove("hardware-pressed");
+        }
+    });
+
+    function createHardwareMatrixRipple(element) {
+        const circle = document.createElement("span");
+        const diameter = Math.max(element.clientWidth, element.clientHeight);
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${element.clientWidth / 2 - diameter / 2}px`;
+        circle.style.top = `${element.clientHeight / 2 - diameter / 2}px`;
+        circle.classList.add("ripple-wave-element");
+
+        const existingRipple = element.querySelector(".ripple-wave-element");
+        if (existingRipple) {
+            existingRipple.remove();
+        }
+
+        element.appendChild(circle);
     }
 });

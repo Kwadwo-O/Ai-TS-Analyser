@@ -1,0 +1,51 @@
+.description {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.btn-dashboard {
+    background-color: var(--surface);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-dashboard:hover {
+    background-color: var(--primary);
+    color: var(--surface);
+    box-shadow: 0 6px 20px rgba(239, 130, 117, 0.15);
+}
+
+.dashboard-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 2rem;
+    padding-top: 1rem;
+}
+
+.dashboard-banner {
+    max-width: 100%;
+    text-align: left;
+    padding: 2.5rem 2rem;
+}
+
+.dashboard-card {
+    max-width: 100%;
+    text-align: left;
+    padding: 2.5rem 2rem;
+}
+
+.dashboard-grid {
+    display: flex;
+    gap: 2rem;
+    flex-direction: column-reverse;
+    width: 100%;
+}
+
+.dashboard-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}

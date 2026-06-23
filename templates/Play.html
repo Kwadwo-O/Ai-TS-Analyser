@@ -188,49 +188,6 @@
     </div>
 </div>
 
-    <!-- Memory Mode Panel -->
-<!-- Memory Mode Panel -->
-<div id="memory-panel" class="main-card dashboard-card" style="display:none;">
-  <h2>Memory Challenge</h2>
-  <p style="color:var(--text-muted); margin-bottom:1rem;">A sentence will appear for 30 seconds. Memorize it, then type what you remember.</p>
-
-  <div id="memoryDisplay" style="margin-top:1rem;">
-    <div id="memorySentence" class="sentence-display" style="font-size:1.25rem; min-height:2em; padding:1rem; background:var(--background); border-radius:8px; border:2px solid var(--border); text-align:center;"></div>
-    <div id="memoryCountdown" style="height:8px; background:#eee; margin-top:.5rem; border-radius:4px; overflow:hidden;">
-      <div id="memoryProgress" style="height:100%; width:100%; background:var(--primary); transition:width 0.1s linear;"></div>
-    </div>
-    <div id="memoryTimer" style="text-align:center; margin-top:0.5rem; font-weight:700; color:var(--text-muted);">Memorizing: <span id="memoryTimeLeft">30</span>s</div>
-  </div>
-
-  <div id="memoryInputContainer" style="display:none; margin-top:1rem;">
-    <label class="form-label">Type what you remember:</label>
-    <textarea id="memoryInput" rows="4" style="width:100%; font-size:1rem;" placeholder="Type the sentence here..."></textarea>
-    <div style="margin-top:.5rem; display:flex; gap:0.5rem;">
-      <button id="memorySubmit" class="btn btn-play" style="flex:1;">Submit Recall</button>
-      <button id="memoryReset" class="btn" style="flex:1;">Try Another</button>
-    </div>
-  </div>
-
-  <div id="memoryResult" class="main-card alert-card success" style="display:none; margin-top:1rem; padding:1.5rem;">
-    <h3 style="color:var(--button-color); margin-bottom:1rem;">Memory Recall Results</h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom:1rem;">
-      <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Accuracy</div>
-        <div id="res-mem-accuracy" style="font-size: 1.4rem; font-weight: 700; color: var(--success); margin-top: 0.25rem;">--</div>
-      </div>
-      <div style="background: var(--background); padding: 1rem; border-radius: 8px; border: 2px solid var(--border); text-align: center;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Score</div>
-        <div id="res-mem-score" style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">--</div>
-      </div>
-    </div>
-    <div id="res-mem-mistakes" style="background: var(--background); padding:1rem; border-radius:8px; border:2px solid var(--border); font-size:0.9rem;"></div>
-  </div>
-</div>
-    {% block scripts %}
-    <script src="{{ url_for('static', filename='js/memory.js') }}" defer></script>
-    {% endblock %}
-
-
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script src="{{ url_for('static', filename='js/play.js') }}"></script>
 {% endblock %}

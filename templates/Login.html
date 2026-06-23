@@ -1,9 +1,27 @@
 {% extends "Base.html" %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/L-R.css') }}">
+{% endblock %}
 {% block content %}
 <div class="login-container">
     <div class="main-card">
         <h1 class="title">Welcome <span class="title-highlight">Back</span></h1>
         <p class="description">Please enter your details to sign in and track your typing speed.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="main-card alert-card" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--button-color); flex-shrink: 0;">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <p class="alert-message" style="margin: 0; font-size: 0.95rem; color: var(--text-main);">{{ msg }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <form action="{{ url_for('login') }}" method="POST" class="login-form">
             <div class="form-group">
