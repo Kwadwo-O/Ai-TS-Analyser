@@ -1,0 +1,34 @@
+.description {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.btn-dashboard {
+    background-color: var(--surface);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+.btn-dashboard:focus,
+.btn-dashboard:active,
+.btn-dashboard:hover {
+    background-color: var(--primary);
+    color: var(--surface);
+    border: 2px solid var(--primary);
+}
+
+.api-btn {
+    background-color: var(--button-color);
+    color: var(--surface);
+    border: 2px solid var(--button-color);
+}
+.api-btn:focus,
+.api-btn:active,
+.api-btn:hover {
+    background-color: var(--button-color);
+    color: var(--surface);
+    border: 2px solid var(--button-color);
+}
+
+

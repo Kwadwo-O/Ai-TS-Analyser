@@ -1,80 +1,438 @@
-.keyboard-toolbar-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 0.75rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
-.toolbar-brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
-.cadence-visualizer-container { display: inline-flex; align-items: flex-end; gap: 3px; height: 24px; }
-.cadence-bar { width: 4px; height: 6px; background: var(--text-muted); border-radius: 2px; transition: all 0.1s ease; }
-.cadence-monitor.active .cadence-bar { background: var(--primary); }
-.keyboard-matrix-container { padding: 1.25rem; background: var(--surface); border: 2px solid var(--border); border-radius: 12px; margin-top: 1.5rem; }
-.keyboard-drawer-container-wrapper { display: flex; width: 100%; overflow: hidden; }
-.keyboard-grid-baseboard { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
-.keyboard-row { display: flex; width: 100%; gap: 0.4rem; }
-.key { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; padding: 0.65rem 0; text-align: center; font-family: monospace; font-size: 0.95rem; font-weight: 600; position: relative; overflow: hidden; }
-.key-label { position: relative; z-index: 5; pointer-events: none; }
-.backspace-key { flex: 2; } .tab-key { flex: 1.5; } .backslash-key { flex: 1.5; } .capslock-key { flex: 1.75; } .enter-key { flex: 2.25; } .shift-key { flex: 2.6; } .space-key { flex: 8; }
-.ctrl-key, .alt-key, .meta-key { flex: 1.25; font-size: 0.8rem; opacity: 0.8; }
-
-/*main page*/
-/* PERSISTENT SUB-MENU ROW SPLIT LAYOUT */
-.layout-split-container {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-    width: 100%;
+/* ==========================================================================
+   1. CORE SPLIT INTERFACE STRUCTURE (SCALED & EXPANDED MATRIX)
+   ========================================================================== */
+.play-page-container {
+    max-width: 1800px; /* Enhanced view boundaries expanded from 1340px */
+    margin: 0 auto;
+    padding: 2.5rem;   /* Expanded frame space padding */
+    position: relative;
+    transition: all 0.25s ease-in-out;
+    font-size: 1.15rem; /* Up-scaled fallback core font base metrics */
 }
 
+.layout-split-container {
+    display: flex;
+    gap: 2.5rem; /* Amplified split alignment separation gutter spacing */
+    width: 100%;
+    align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+    .layout-split-container {
+        flex-direction: column;
+    }
+    .persistent-right-control-panel {
+        width: 100% !important;
+    }
+}
+
+#hidden-keyboard-catcher {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ==========================================================================
+   2. PANEL 1: PRIMARY WORKSPACE CANVAS
+   ========================================================================== */
 .primary-workspace-stack {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Scaled vertical gap spacing elements */
     min-width: 0;
 }
 
-.persistent-right-control-panel {
-    width: 320px;
-    flex-shrink: 0;
+.dashboard-banner {
+    padding: 3rem; /* Expanded internal dashboard breathing zone padding */
     background: var(--surface);
     border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    position: sticky;
-    top: 20px;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.05);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* LABELS AND TOGGLES SUB-PANEL MATRICES */
-.switch-wrapper-row {
+.play-page-container:not(.reduced-motion-active) .dashboard-banner {
+    animation: floatingMotion 6s ease-in-out infinite alternate;
+}
+
+@keyframes floatingMotion {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-6px); }
+}
+
+.dashboard-banner .title {
+    font-size: 3.25rem; /* Amplified typographic layout font sizing rule hierarchy */
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.75rem 0;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-banner .title-highlight {
+    color: var(--button-color);
+}
+
+.dashboard-banner .description {
+    color: var(--text-muted);
+    font-size: 1.35rem; /* Up-scaled visibility paragraph layout metric configurations */
+    line-height: 1.6;
+    margin: 0;
+}
+
+.dashboard-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem; /* Amplified overall module grid canvas container padding */
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.play-page-container:not(.reduced-motion-active) .dashboard-card:focus-within {
+    box-shadow: 0 0 16px rgba(138, 79, 125, 0.15);
+    border-color: var(--button-color);
+}
+
+.panel-header-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 0;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
 }
 
-.switch-wrapper-row:last-of-type {
-    border-bottom: none;
+.metric-cluster {
+    display: flex;
+    gap: 2rem;
+}
+
+.metric-capsule {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.capsule-label {
+    font-size: 0.9rem; /* Increased metric label descriptor sizing values */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.capsule-value {
+    font-size: 1.85rem; /* Scaled visual feedback performance monitoring indicators */
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.text-highlight {
+    color: var(--button-color);
+}
+
+.typing-text-canvas-board {
+    width: 100%;
+    min-height: 220px; /* Expanded interaction block spatial metrics box */
+    padding: 2.5rem;   /* Scaled interior space configuration constraints */
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2rem;   /* Significantly boosted target text tracking size variables */
+    font-weight: normal;
+    line-height: 1.6;
+    color: var(--text-main);
+    word-break: break-word;
+    outline: none;
+    transition: border-color 0.2s ease, font-size 0.1s steps(1), font-weight 0.15s ease;
+    text-align: center; /* Centered layout content constraints alignment parameter matrix */
+}
+
+.typing-text-canvas-board:focus {
+    border-color: var(--button-color);
+}
+
+.play-page-container.bold-text-active .typing-text-canvas-board {
+    font-weight: 900 !important;
+}
+
+/* ==========================================================================
+   2B. ACCURATE 60% STYLED FORM-FACTOR PROPORTIONS (UPSCALED BASEBOARD)
+   ========================================================================== */
+.keyboard-matrix-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem; /* Amplified padding framework footprint */
+    margin-top: 2rem;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+    max-height: 600px; /* Shifted constraints matrix for larger height layout keys */
+    opacity: 1;
+    overflow: hidden;
+}
+
+.keyboard-matrix-container.keyboard-hidden {
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    opacity: 0 !important;
+    border: none !important;
+}
+
+.keyboard-row {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.key {
+    flex: 1;
+    height: 58px; /* Increased peripheral vertical matrix boundary block dimensions from 44px */
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem; /* Boosted visibility tracking font layout scale metrics from 0.85rem */
+    font-weight: 700;
+    color: var(--text-main);
+    user-select: none;
+    position: relative; /* CRITICAL: Maintained layout binding constraint boundary encapsulation framework */
+    overflow: hidden;   /* CRITICAL: Enforces clean clipping masks on dynamic internal absolute nodes */
+    transition: background-color 0.1s ease, border-color 0.1s ease, transform 0.05s ease, box-shadow 0.1s ease;
+}
+
+/* 60% Standard ANSI Sizing Flex Layout Rule Modifiers */
+.backspace-key { flex: 2 !important; }
+.tab-key       { flex: 1.5 !important; }
+.slash-key     { flex: 1.5 !important; }
+.caps-key      { flex: 1.75 !important; }
+.enter-key     { flex: 2.25 !important; }
+.left-shift-key{ flex: 2.25 !important; }
+.right-shift-key{ flex: 2.75 !important; }
+.space-bar-key { flex: 6.25 !important; }
+.ctrl-key      { flex: 1.25 !important; }
+.win-key, .alt-key, .spec-key { flex: 1.25 !important; }
+
+/* Key Active Actions */
+.key.hardware-pressed-active {
+    background: var(--button-color) !important;
+    color: #ffffff !important;
+    border-color: var(--button-color) !important;
+    transform: scale(0.94) translateY(1px); /* Sourced translation metrics step */
+}
+
+.play-page-container:not(.reduced-motion-active).keyboard-glow-active .key.hardware-pressed-active {
+    box-shadow: var(--key-glow, 0 0 16px var(--button-color));
+}
+
+/* --------------------------------------------------------------------------
+   HARDWARE WAVE RIPPLE STRUCTURAL ANIMATION
+   -------------------------------------------------------------------------- */
+.ripple-wave-element {
+    position: absolute;
+    background: var(--ripple-color, rgba(138, 79, 125, 0.45)); /* Stabilized canvas density values */
+    border-radius: 50%;
+    transform: scale(0);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Execution logic for animation initialization when motion criteria is met */
+.play-page-container:not(.reduced-motion-active) .ripple-wave-element {
+    animation: keyRippleEffect 0.5s cubic-bezier(0.1, 0.8, 0.3, 1); /* Tuned velocity properties tracking */
+}
+
+@keyframes keyRippleEffect {
+    to {
+        transform: scale(5.5); /* Extended spatial scaling trajectory coverage to overflow larger keys safely */
+        opacity: 0;
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.15rem 2.5rem; /* Expanded interface button footprint limits */
+    font-size: 1.2rem;       /* Scaled typographical display parameters */
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.15s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--button-color);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: var(--button-hover-color);
+}
+
+.play-page-container:not(.reduced-motion-active) .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   3. PANEL 2: CONFIGURATION & ACCESSIBILITY SIDEBAR HUB
+   ========================================================================== */
+.persistent-right-control-panel {
+    width: 420px; /* Widened right operational command station sidebar block */
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+}
+
+.sidebar-panel-heading {
+    font-size: 1.35rem; /* Increased heading visibility text settings */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-main);
+    margin: 0 0 2rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.form-control-block .form-label {
+    display: block;
+    font-size: 1.05rem; /* Scaled interface typography elements labels */
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+
+.mode-button-group.ternary-layout,
+.difficulty-button-group.ternary-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.diff-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 0.4rem; /* Scaled input interactive bounds buttons layout */
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.diff-btn .diff-title {
+    font-size: 1rem; /* Up-scaled inline configuration button typography text dimensions */
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.diff-btn:hover {
+    border-color: var(--button-color);
+}
+
+.diff-btn.active {
+    background: var(--surface);
+    border-color: var(--button-color);
+}
+
+.diff-btn.active .diff-title {
+    color: var(--button-color);
+}
+
+.play-page-container:not(.reduced-motion-active) .diff-btn.active {
+    box-shadow: 0 0 0 4px rgba(138, 79, 125, 0.15);
+}
+
+.form-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px; /* Slightly thicker canvas track */
+    border-radius: 4px;
+    background: var(--border);
+    outline: none;
+}
+
+.form-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; /* Amplified handling knob element for custom slider configurations */
+    height: 22px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.play-page-container:not(.reduced-motion-active) .form-range-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.status-badge.active-badge {
+    background: rgba(138, 79, 125, 0.1);
+    color: var(--button-color);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 6px;
+}
+
+/* ==========================================================================
+   4. ACCESSIBILITY TOGGLE SWITCH BLOCKS & HIGH CONTRAST MATRIX HOOKS
+   ========================================================================== */
+.toggle-switches-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Expanded gaps matrix structures spacing bounds */
+}
+
+.switch-wrapper-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
 }
 
 .switch-label-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
-    text-align: left;
+    gap: 0.35rem;
+    padding-right: 1.25rem;
 }
 
 .switch-title {
-    font-size: 0.9rem;
+    font-size: 1.1rem; /* Up-scaled parameters configuration text properties toggle */
     font-weight: 700;
     color: var(--text-main);
 }
 
 .switch-desc {
-    font-size: 0.75rem;
+    font-size: 0.85rem; /* Increased description context clarity visibility scales */
     color: var(--text-muted);
+    line-height: 1.4;
 }
 
 .engine-ui-switch {
     position: relative;
     display: inline-block;
-    width: 46px;
-    height: 24px;
+    width: 52px; /* Proportionally expanded structural switch bounds */
+    height: 28px;
     flex-shrink: 0;
 }
 
@@ -87,21 +445,24 @@
 .switch-slider {
     position: absolute;
     cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: var(--border);
-    transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-    border-radius: 24px;
+    transition: background-color 0.25s ease;
+    border-radius: 34px;
 }
 
 .switch-slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: var(--surface);
-    transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 20px; /* Scaled toggle interior knob node dimensions */
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #ffffff;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 50%;
 }
 
@@ -110,146 +471,49 @@ input:checked + .switch-slider {
 }
 
 input:checked + .switch-slider:before {
-    transform: translateX(22px);
+    transform: translateX(24px); /* Extended trajectory alignment values */
 }
 
-/* THEME SELECTION INTERACTIVE TILES */
-.theme-selector-grid-stack {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+/* HIGH CONTRAST OVERRIDES */
+.play-page-container.high-contrast-active {
+    --background: #000000 !important;
+    --surface: #000000 !important;
+    --text-main: #ffffff !important;
+    --text-muted: #ffff00 !important;
+    --border: #ffffff !important;
+    --button-color: #00ff00 !important;
+    --button-hover-color: #00ff00 !important;
+    --ripple-color: rgba(0, 255, 0, 0.4) !important;
 }
 
-.theme-tile-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.7rem 0.9rem;
-    background: var(--background);
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s ease;
-    width: 100%;
-}
-
-.theme-tile-btn:hover {
-    border-color: var(--button-color);
-}
-
-.theme-tile-btn.active {
-    border-color: var(--button-color);
-    background: var(--button-color);
-}
-
-.theme-tile-btn.active .theme-title-text {
-    color: #ffffff;
-}
-
-.theme-title-text {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-main);
-    transition: color 0.15s ease;
-}
-
-.theme-palette-preview {
-    display: flex;
-    gap: 4px;
-}
-
-.color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.25);
-}
-
-/* HARDWARE KEYBOARD LIGHTING ANIMATIONS */
-.key {
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
-}
-
-.key.hardware-pressed {
-    background-color: var(--button-color) !important;
+.play-page-container.high-contrast-active .typing-text-canvas-board {
+    background: #000000 !important;
     color: #ffffff !important;
-    border-color: var(--button-color) !important;
-    box-shadow: var(--key-glow) !important;
-    transform: scale(0.94) translateY(1px);
+    border: 3px dashed #ffffff !important;
 }
 
-.key .ripple-wave-element {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--ripple-color);
-    transform: scale(0);
-    animation: keyRippleEffect 0.45s cubic-bezier(0.1, 0.8, 0.3, 1);
-    pointer-events: none;
-    z-index: 2;
+.play-page-container.high-contrast-active .keyboard-matrix-container {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
 }
 
-@keyframes keyRippleEffect {
-    to {
-        transform: scale(3.5);
-        opacity: 0;
-    }
+.play-page-container.high-contrast-active .key {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
 }
 
-.loading-spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-left-color: var(--surface);
-    animation: spinLoader 0.75s linear infinite;
-    vertical-align: middle;
+.play-page-container.high-contrast-active .key.hardware-pressed-active {
+    background: #00ff00 !important;
+    color: #000000 !important;
+    border-color: #00ff00 !important;
 }
 
-@keyframes spinLoader {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.play-page-container.high-contrast-active .diff-btn.active {
+    border: 3px solid #00ff00 !important;
+    background: #ffffff !important;
 }
 
-.passive-float {
-    animation: floatingMotion 6s ease-in-out infinite alternate !important;
-}
-
-@keyframes floatingMotion {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-6px); }
-}
-
-.interactive-hover {
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-                background-color 0.15s ease,
-                box-shadow 0.2s ease !important;
-}
-
-.interactive-hover:hover {
-    transform: translateY(-3px) scale(1.01) !important;
-}
-
-.interactive-hover:active {
-    transform: translateY(-1px) scale(0.99) !important;
-}
-
-.theme-error-icon {
-    color: var(--primary);
-    flex-shrink: 0;
-    margin-right: 0.25rem;
-}
-
-.theme-success-icon {
-    color: var(--success-hover);
-    flex-shrink: 0;
-    margin-right: 0.25rem;
-}
-
-.perfect-run-row {
-    color: var(--success-hover) !important;
-    font-weight: 600;
-    font-size: 1rem !important;
+.play-page-container.high-contrast-active .diff-btn.active .diff-title {
+    color: #000000 !important;
 }
