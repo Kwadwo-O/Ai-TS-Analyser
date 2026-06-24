@@ -19,9 +19,15 @@
             </header>
 
             <section id="setup-panel" class="main-card dashboard-card">
+                <div id="error-fallback" class="main-card alert-card failure" style="display: none; margin-bottom: 1.5rem; border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.05); padding: 1rem 1.25rem; border-radius: 8px; text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="color: #e74c3c; font-weight: bold;" id="error-title">Generation Error</div>
+                        <p id="error-text" style="margin: 0; font-size: 0.95rem; color: var(--text-main);"></p>
+                    </div>
+                </div>
+
                 <div style="text-align: center; padding: 2rem 0; position: relative;">
                     <p class="description" style="margin-bottom: 2rem;">Ready to generate your localized typing stream metrics context pipeline?</p>
-
                     <div style="display: inline-flex; align-items: center; justify-content: center; gap: 1rem; min-height: 60px;">
                         <button type="button" id="start-btn" class="btn btn-primary btn-interactive">Initialize Challenge Engine</button>
                     </div>
@@ -29,22 +35,34 @@
             </section>
 
             <section id="game-panel" class="main-card dashboard-card" style="display: none;">
-                <div class="panel-header-row">
+                <div class="panel-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <div class="metric-cluster">
                         <div class="metric-capsule">
                             <span class="capsule-label">Elapsed Duration</span>
-                            <span id="timer-label" class="capsule-value text-highlight">0s</span>
+                            <span id="timer-label" class="capsule-value text-highlight" style="font-variant-numeric: tabular-nums; min-width: 140px; display: inline-block;">0s</span>
                         </div>
                         <div class="metric-capsule">
                             <span class="capsule-label">Calculated Output</span>
                             <span id="live-wpm" class="capsule-value">0 WPM</span>
                         </div>
                     </div>
+
+                    <button type="button" id="leave-btn" class="btn btn-leave btn-interactive">
+                        Leave Game
+                    </button>
                 </div>
 
-                <div id="text-display" class="typing-text-canvas-board font-mono" tabindex="0">
-                    <div class="reference-line-container" id="reference-text-line">
-                        </div>
+                <div class="canvas-narrative-block" style="margin-bottom: 1.25rem;">
+                    <p id="canvas-descriptor-message" class="switch-desc" style="font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">
+                        Challenge Target Text (Type anywhere on screen to begin)
+                    </p>
+                </div>
+
+                <div id="text-display" class="typing-text-canvas-board font-mono" tabindex="0"></div>
+
+                <div id="completion-controls" class="main-card alignment-submission-tray" style="display: none; margin-top: 2rem; padding: 1.5rem; border: 2px dashed #2ecc71; background: rgba(46, 204, 113, 0.03); border-radius: 12px; text-align: center;">
+                    <p class="switch-title" style="color: #2ecc71; margin-bottom: 1rem; font-size: 1.15rem;">✓ Typing Metrics Cycle Processing Fully Structured!</p>
+                    <button type="button" id="submit-challenge-btn" class="btn btn-primary btn-interactive" style="background: #2ecc71; border-color: #27ae60;">Submit Results Vector</button>
                 </div>
             </section>
 
@@ -89,8 +107,8 @@
 
                 <div class="form-control-block" id="code-language-container" style="display: none; margin-bottom: 1.5rem;">
                     <label for="code-language-select" class="form-label">Syntax Language</label>
-                    <div class="select-dropdown-wrapper">
-                        <select id="code-language-select" class="form-select-dropdown">
+                    <div class="select-dropdown-wrapper" style="position: relative; width: 100%;">
+                        <select id="code-language-select" class="form-select-dropdown" style="width: 100%; padding: 0.75rem; background: var(--surface); color: var(--text-main); border: 2px solid var(--border); border-radius: 8px;">
                             <option value="python" selected>Python</option>
                             <option value="javascript">JavaScript</option>
                         </select>
@@ -115,19 +133,20 @@
                 <div class="slider-control-capsule">
                     <div class="slider-labels-row" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <label for="text-size-slider" class="form-label" style="margin: 0;">Presentation Font Size</label>
-                        <span id="text-size-badge" class="status-badge active-badge">26px</span>
+                        <span id="text-size-badge" class="status-badge active-badge">24px</span>
                     </div>
-                    <input type="range" id="text-size-slider" min="16" max="72" step="2" value="26" class="form-range-input" style="width: 100%;">
+                    <input type="range" id="text-size-slider" min="16" max="72" step="2" value="24" class="form-range-input" style="width: 100%;">
                 </div>
             </div>
 
             <div class="settings-group-block" style="margin-bottom: 2rem;">
                 <h2 class="sidebar-panel-heading">Visual Keyboard Settings</h2>
-                <div class="toggle-switches-stack">
-                    <div class="switch-wrapper-row">
+                <div class="toggle-switches-stack" style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="switch-label-stack">
-                            <span class="switch-title">Display Key Matrix</span>
-                            <span class="switch-desc">Render layout map interface under canvas</span>
+                            <span class="switch-title" style="display: block; font-weight: 600;">Display Key Matrix</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Render layout map interface under canvas</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="keyboard-visibility-toggle" checked>
@@ -135,10 +154,10 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row">
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="switch-label-stack">
-                            <span class="switch-title">Reactive Key Glow</span>
-                            <span class="switch-desc">Emit radial lighting filters on pressed assets</span>
+                            <span class="switch-title" style="display: block; font-weight: 600;">Reactive Key Glow</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Emit radial lighting filters on pressed assets</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="keyboard-glow-toggle" checked>
@@ -146,38 +165,28 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row">
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="switch-label-stack">
-                            <span class="switch-title">Cascading Border Waves</span>
-                            <span class="switch-desc">Radiating peripheral board ripple</span>
+                            <span class="switch-title" style="display: block; font-weight: 600;">Cascading Border Waves</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Radiating peripheral board ripple</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="ripple-animations-toggle" checked>
                             <span class="switch-slider"></span>
                         </label>
                     </div>
+
                 </div>
             </div>
 
             <div class="settings-group-block">
                 <h2 class="sidebar-panel-heading">Accessibility Framework</h2>
-                <div class="toggle-switches-stack">
+                <div class="toggle-switches-stack" style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-                    <div class="form-control-block" style="margin-bottom: 0.5rem;">
-                        <label for="font-style-select" class="form-label">Accessible Font Face</label>
-                        <div class="select-dropdown-wrapper">
-                            <select id="font-style-select" class="form-select-dropdown">
-                                <option value="mono" selected>Standard Monospace (Default)</option>
-                                <option value="sans">Clean Sans-Serif</option>
-                                <option value="dyslexic">OpenDyslexic (High Readability)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="switch-wrapper-row">
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="switch-label-stack">
-                            <span class="switch-title">High-Contrast Layer</span>
-                            <span class="switch-desc">Maximize text canvas contrast metrics</span>
+                            <span class="switch-title" style="display: block; font-weight: 600;">High-Contrast Layer</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Maximize text canvas contrast metrics</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="high-contrast-toggle">
@@ -185,16 +194,28 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row">
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="switch-label-stack">
-                            <span class="switch-title">Bold Text Weights</span>
-                            <span class="switch-desc">Force maximum text payload emphasis</span>
+                            <span class="switch-title" style="display: block; font-weight: 600;">Bold Text Weights</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Force maximum text payload emphasis</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="bold-text-toggle">
                             <span class="switch-slider"></span>
                         </label>
                     </div>
+
+                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="switch-label-stack">
+                            <span class="switch-title" style="display: block; font-weight: 600;">Light Theme Mode</span>
+                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Invert workspace configuration variables globally</span>
+                        </div>
+                        <label class="engine-ui-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+
                 </div>
             </div>
 

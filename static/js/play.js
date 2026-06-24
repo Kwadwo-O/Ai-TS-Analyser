@@ -7,18 +7,21 @@ document.addEventListener("DOMContentLoaded", function() {
     const textSizeBadge = document.getElementById("text-size-badge");
     const textDisplay = document.getElementById("text-display");
 
-    // Minimalist text display tracks
-    const referenceTextLine = document.getElementById("reference-text-line");
+    // Engine Interfaces
+    const startBtn = document.getElementById("start-btn");
+    const leaveBtn = document.getElementById("leave-btn");
+    const setupPanel = document.getElementById("setup-panel");
+    const gamePanel = document.getElementById("game-panel");
+    const errorFallback = document.getElementById("error-fallback");
+    const hiddenCatcher = document.getElementById("hidden-keyboard-catcher");
 
-    // Dynamic Language Selector Elements
+    // Language Dropdown Interface Selectors
     const codeLanguageContainer = document.getElementById("code-language-container");
     const codeLanguageSelect = document.getElementById("code-language-select");
 
-    // Engine Interfaces
-    const startBtn = document.getElementById("start-btn");
-    const setupPanel = document.getElementById("setup-panel");
-    const gamePanel = document.getElementById("game-panel");
-    const hiddenCatcher = document.getElementById("hidden-keyboard-catcher");
+    // Dynamic Submission Interface Hooks
+    const completionControls = document.getElementById("completion-controls");
+    const submitChallengeBtn = document.getElementById("submit-challenge-btn");
 
     // Telemetry Interfaces
     const timerLabel = document.getElementById("timer-label");
@@ -33,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Accessibility Framework Switches
     const highContrastToggle = document.getElementById("high-contrast-toggle");
     const boldTextToggle = document.getElementById("bold-text-toggle");
-    const fontStyleSelect = document.getElementById("font-style-select");
+    const themeToggle = document.getElementById("theme-toggle");
 
     // Local runtime variables
     let activeMode = "normal";
@@ -42,10 +45,11 @@ document.addEventListener("DOMContentLoaded", function() {
     let targetSentence = "";
     let startTime = null;
     let timerInterval = null;
+    let isSessionFinished = false;
 
-    // Setup Baseline Execution States
-    if (rootContainer) {
-        rootContainer.classList.add("keyboard-glow-active");
+    // Initialize Workspace Font Scalers
+    if (textSizeSlider && textDisplay) {
+        textDisplay.style.fontSize = `${textSizeSlider.value}px`;
     }
 
     // 2. WORKSPACE MODE SELECTOR MECHANICS
@@ -93,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Font size adjustment engine
     if (textSizeSlider) {
         textSizeSlider.addEventListener("input", function() {
             textSizeBadge.textContent = `${this.value}px`;
@@ -101,27 +104,18 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Accessibility Font Style Engine Switcher
-    if (fontStyleSelect) {
-        fontStyleSelect.addEventListener("change", function() {
-            // Clear current font face flags
-            textDisplay.classList.remove("font-mono", "font-sans", "font-dyslexic");
-
-            if (this.value === "mono") textDisplay.classList.add("font-mono");
-            else if (this.value === "sans") textDisplay.classList.add("font-sans");
-            else if (this.value === "dyslexic") textDisplay.classList.add("font-dyslexic");
-        });
-    }
-
     // 4. API FETCH LOGIC: GENERATE PASSAGE
     if (startBtn) {
         startBtn.addEventListener("click", async function() {
+            if (errorFallback) errorFallback.style.display = "none";
             startBtn.disabled = true;
+            isSessionFinished = false;
+            if (completionControls) completionControls.style.display = "none";
 
             try {
                 let url = `/api/generate?difficulty=${encodeURIComponent(activeDifficulty)}&mode=${encodeURIComponent(activeMode)}`;
                 if (activeMode === "code") {
-                    url += `&lang=${encodeURIComponent(activeLanguage)}`;
+                    url += `&language=${encodeURIComponent(activeLanguage)}`;
                 }
 
                 const response = await fetch(url, {
@@ -132,22 +126,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (!response.ok) throw new Error("Server generation failed.");
                 const data = await response.json();
 
-                targetSentence = data.sentence;
-                if (!targetSentence) throw new Error("Missing string data");
+                if (data.error) throw new Error(data.error);
+                targetSentence = data.sentence || "def verify_metrics():\n    return True";
 
             } catch (err) {
-                // Hardcoded offline developer fallbacks tailored cleanly for Python / JS layout matrix
                 if (activeMode === "code") {
-                    if (activeLanguage === "python") {
-                        targetSentence = "def process_stream(data):\n    if not data:\n        return None\n    return data.items()";
-                    } else {
-                        targetSentence = "function initWorkspace(data) {\n    if (!data) return null;\n    return Object.keys(data);\n}";
-                    }
+                    targetSentence = "function initWorkspace() {\n    console.log('Ready');\n}";
                 } else {
-                    targetSentence = "The quick brown fox jumps over the lazy dog near the programming workspace.";
+                    targetSentence = "The quick brown fox jumps over the lazy dog near the workspace.";
                 }
             } finally {
-                buildTextDisplayMinimalist(targetSentence);
+                buildUnifiedTextDisplay(targetSentence);
                 setupPanel.style.display = "none";
                 gamePanel.style.display = "block";
 
@@ -163,80 +152,84 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 5. MINIMALIST TYPING DISPLAY COMPILER (IMAGE STYLE)
-    function buildTextDisplayMinimalist(text) {
-        if (!referenceTextLine) return;
-        referenceTextLine.innerHTML = "";
+    // 5. LEAVE GAME ACTIONS
+    if (leaveBtn) {
+        leaveBtn.addEventListener("click", function() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            startTime = null;
+            targetSentence = "";
+            hiddenCatcher.value = "";
+            isSessionFinished = false;
 
-        // Transform original string into normalized character tokens
-        let characterArray = [];
+            if (textDisplay) textDisplay.innerHTML = "";
+
+            timerLabel.textContent = "0s";
+            liveWpmLabel.textContent = "0 WPM";
+
+            if (completionControls) completionControls.style.display = "none";
+            gamePanel.style.display = "none";
+            setupPanel.style.display = "block";
+        });
+    }
+
+    // UNIFIED CHARACTER BOX RENDERING ENGINE
+    function buildUnifiedTextDisplay(text) {
+        if (!textDisplay) return;
+        textDisplay.innerHTML = "";
 
         for (let i = 0; i < text.length; i++) {
-            if (text[i] === "\n") {
-                characterArray.push({ type: "enter", raw: "\n" });
+            const char = text[i];
+            const charBox = document.createElement("span");
+            charBox.className = "char-box";
+            charBox.setAttribute("data-index", i);
+
+            if (char === "\n") {
+                charBox.classList.add("is-newline");
+                charBox.innerHTML = '<span class="enter-badge">&#x23CE;</span>';
+            } else if (char === " ") {
+                charBox.classList.add("is-space");
+                charBox.innerHTML = "&nbsp;";
             } else {
-                characterArray.push({ type: "char", raw: text[i] });
+                charBox.textContent = char;
             }
+            textDisplay.appendChild(charBox);
         }
-
-        characterArray.forEach((token, index) => {
-            const span = document.createElement("span");
-            span.setAttribute("data-index", index);
-
-            if (token.type === "enter") {
-                span.className = "char-node type-enter-node";
-                span.innerHTML = `<span class="enter-badge">&#x23CE; Enter</span><br>`;
-            } else {
-                span.className = "char-node type-char-node";
-                span.textContent = token.raw;
-                if (token.raw === " ") {
-                    span.classList.add("is-space");
-                }
-            }
-            referenceTextLine.appendChild(span);
-        });
-
-        // Set the active cursor node on index zero initialization frame
-        updateMinimalistCursor(0);
+        updateUnifiedCaretPosition(0);
     }
 
-    function updateMinimalistCursor(activeIndex) {
-        const nodes = referenceTextLine.querySelectorAll(".char-node");
-        nodes.forEach((node) => {
-            node.classList.remove("is-cursor", "is-cursor-enter");
-        });
+    function updateUnifiedCaretPosition(index) {
+        const boxes = textDisplay.querySelectorAll(".char-box");
+        boxes.forEach(box => box.classList.remove("is-current-caret"));
 
-        if (activeIndex < nodes.length) {
-            const activeNode = nodes[activeIndex];
-            if (activeNode.classList.contains("type-enter-node")) {
-                activeNode.classList.add("is-cursor-enter");
-            } else {
-                activeNode.classList.add("is-cursor");
-            }
+        if (index < boxes.length) {
+            boxes[index].classList.add("is-current-caret");
         }
     }
 
-    // 6. LIVE TYPING METRICS AND INPUT HANDLING
+    // 6. LIVE INPUT LOGIC & INPUT SHAKE LISTENERS
     if (hiddenCatcher) {
         document.addEventListener("click", function(e) {
-            if (gamePanel && gamePanel.style.display === "block") {
-                if (e.target !== startBtn && !setupPanel.contains(e.target)) {
+            if (gamePanel && gamePanel.style.display === "block" && !isSessionFinished) {
+                if (e.target !== startBtn && e.target !== leaveBtn && !completionControls.contains(e.target)) {
                     hiddenCatcher.focus();
                 }
             }
         });
 
         hiddenCatcher.addEventListener("input", function() {
+            if (isSessionFinished) return;
+
             if (!startTime) {
                 startTime = new Date();
                 timerInterval = setInterval(updateLiveTelemetry, 250);
             }
-            evaluateMinimalistInputState();
+            evaluateUnifiedInputState();
         });
     }
 
     function updateLiveTelemetry() {
-        if (!startTime) return;
+        if (!startTime || isSessionFinished) return;
         const elapsed = (new Date() - startTime) / 1000;
         timerLabel.textContent = Math.floor(elapsed) + "s";
 
@@ -248,79 +241,156 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function evaluateMinimalistInputState() {
+    function evaluateUnifiedInputState() {
+        if (isSessionFinished) return;
+
         const typedVal = hiddenCatcher.value;
-        const nodes = referenceTextLine.querySelectorAll(".char-node");
+        const boxes = textDisplay.querySelectorAll(".char-box");
 
-        for (let i = 0; i < nodes.length; i++) {
-            const node = nodes[i];
+        for (let i = 0; i < boxes.length; i++) {
+            const box = boxes[i];
+            const targetChar = targetSentence[i];
 
-            // Check matching properties base mapping variables
-            let expectedChar = targetSentence[i];
-
+            // Only update states for newly modified characters to protect execution cycles
             if (i < typedVal.length) {
                 const userChar = typedVal[i];
-                node.classList.remove("correct", "incorrect", "incorrect-space", "incorrect-enter");
 
-                if (userChar === expectedChar) {
-                    node.classList.add("correct");
+                if (userChar === targetChar) {
+                    if (!box.classList.contains("correct")) {
+                        box.classList.remove("incorrect", "incorrect-space", "incorrect-newline");
+                        box.classList.add("correct");
+                    }
                 } else {
-                    if (node.classList.contains("type-enter-node")) {
-                        node.classList.add("incorrect-enter");
-                    } else if (expectedChar === " ") {
-                        node.classList.add("incorrect-space");
-                    } else {
-                        node.classList.add("incorrect");
+                    if (!box.classList.contains("incorrect") && !box.classList.contains("incorrect-newline") && !box.classList.contains("incorrect-space")) {
+                        box.classList.remove("correct");
+
+                        if (box.classList.contains("is-newline")) {
+                            box.classList.add("incorrect-newline");
+                        } else if (targetChar === " ") {
+                            box.classList.add("incorrect-space", "incorrect");
+                        } else {
+                            box.classList.add("incorrect");
+                        }
+
+                        // Re-trigger the shaking CSS animation on key mistakes
+                        box.style.animation = 'none';
+                        box.offsetHeight; // Triggers DOM reflow
+                        box.style.animation = null;
                     }
                 }
             } else {
-                // Unvisited nodes tracking parameters
-                node.classList.remove("correct", "incorrect", "incorrect-space", "incorrect-enter");
+                // Clear character styles if user hits backspace
+                box.classList.remove("correct", "incorrect", "incorrect-space", "incorrect-newline");
             }
         }
 
-        updateMinimalistCursor(typedVal.length);
+        updateUnifiedCaretPosition(typedVal.length);
 
         if (typedVal.length >= targetSentence.length) {
+            isSessionFinished = true;
             clearInterval(timerInterval);
-            console.log("Typing workspace completion targeted.");
+            hiddenCatcher.blur();
+            if (completionControls) {
+                completionControls.style.display = "block";
+                setTimeout(() => submitChallengeBtn.focus(), 150);
+            }
         }
     }
 
-    // 7. IMMEDIATE BORDER RIPPLE ENGINE
+    // 7. PIPELINE SUBMISSION INTERFACE
+    if (submitChallengeBtn) {
+        submitChallengeBtn.addEventListener("click", async function() {
+            submitChallengeBtn.disabled = true;
+            submitChallengeBtn.textContent = "Transmitting Payload...";
+
+            const payload = {
+                original_sentence: targetSentence,
+                user_sentence: hiddenCatcher.value,
+                time: timerLabel.textContent,
+                typing_speed: liveWpmLabel.textContent
+            };
+
+            try {
+                const response = await fetch("/api/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("Metrics delivery tracking failed.");
+                const data = await response.json();
+
+                alert(`Analysis Track Recorded Successfully!\nAccuracy: ${data.accuracy || "100%"}\nScore: ${data.score || "100/100"}\nTier: ${data.user_rating || "Pro"}`);
+
+                gamePanel.style.display = "none";
+                completionControls.style.display = "none";
+                setupPanel.style.display = "block";
+
+            } catch (err) {
+                alert(`Operational API Submission Failure: ${err.message}`);
+            } finally {
+                submitChallengeBtn.disabled = false;
+                submitChallengeBtn.textContent = "Submit Results Vector";
+            }
+        });
+    }
+
+    // 8. VIRTUAL KEYBOARD GLOW ENGINE
     function triggerRadiatingBorderRipple(pressedKeyElement) {
         const allKeys = document.querySelectorAll('.key');
+        const rect1 = pressedKeyElement.getBoundingClientRect();
+        const x1 = rect1.left + rect1.width / 2;
+        const y1 = rect1.top + rect1.height / 2;
 
         allKeys.forEach(key => {
             if (key === pressedKeyElement) return;
 
-            key.classList.remove('border-ripple-fx');
-            void key.offsetWidth; // Force instant global layout reflow
+            const rect2 = key.getBoundingClientRect();
+            const x2 = rect2.left + rect2.width / 2;
+            const y2 = rect2.top + rect2.height / 2;
 
-            key.style.animationDelay = `0ms`;
+            const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const delayMs = distance * 0.9;
+
+            key.classList.remove('border-ripple-fx');
+            void key.offsetWidth;
+
+            key.style.animationDelay = `${delayMs}ms`;
             key.classList.add('border-ripple-fx');
 
             key.addEventListener('animationend', function cleanup() {
                 key.classList.remove('border-ripple-fx');
+                key.style.animationDelay = '0ms';
                 key.removeEventListener('animationend', cleanup);
             });
         });
     }
 
-    // 8. KEYBOARD EVENT BINDINGS
     window.addEventListener("keydown", function(event) {
         let targetId = event.code;
         if (event.key === " " || targetId === "Space") targetId = "Space";
+
+        if (targetId === "Tab") {
+            if (gamePanel && gamePanel.style.display === "block" && !isSessionFinished) {
+                event.preventDefault();
+
+                if (!startTime) {
+                    startTime = new Date();
+                    timerInterval = setInterval(updateLiveTelemetry, 250);
+                }
+
+                hiddenCatcher.value += "    ";
+                evaluateUnifiedInputState();
+            }
+        }
 
         const visualKey = document.getElementById(targetId);
         if (visualKey) {
             if (targetId === "CapsLock") {
                 visualKey.classList.toggle("caps-lock-active");
             }
-
             if (!visualKey.classList.contains("hardware-pressed-active")) {
                 visualKey.classList.add("hardware-pressed-active");
-
                 if (rippleAnimationsToggle && rippleAnimationsToggle.checked) {
                     triggerRadiatingBorderRipple(visualKey);
                 }
@@ -338,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // 9. ACCESSIBILITY TOGGLE LISTENERS
+    // 9. SYSTEM ACCESSIBILITY SWITCHES
     if (keyboardVisibilityToggle) {
         keyboardVisibilityToggle.addEventListener("change", function() {
             if (this.checked) virtualKeyboard.classList.remove("keyboard-hidden");
@@ -364,6 +434,13 @@ document.addEventListener("DOMContentLoaded", function() {
         boldTextToggle.addEventListener("change", function() {
             if (this.checked) rootContainer.classList.add("bold-text-active");
             else rootContainer.classList.remove("bold-text-active");
+        });
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener("change", function() {
+            if (this.checked) rootContainer.classList.add("light-theme");
+            else rootContainer.classList.remove("light-theme");
         });
     }
 });

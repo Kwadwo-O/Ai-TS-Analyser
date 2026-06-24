@@ -143,3 +143,13 @@ html[data-game-theme="frost-obsidian"] {
     --ripple-color: rgba(58, 134, 255, 0.45);
     --key-glow: 0 0 12px rgba(58, 134, 255, 0.6);
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+/* Fallback readable styling rule map variables */
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: local('OpenDyslexic'), url('https://antijingoist.github.io/opendyslexic/compiled/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}

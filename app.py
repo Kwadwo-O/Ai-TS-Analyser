@@ -121,6 +121,7 @@ def generate_passage():
     print(f"API request received for difficulty: {difficulty}, mode: {mode}, language: {selected_language}")
     try:
         sentence = backend_generate(user_api_key, difficulty, mode, selected_language)
+        print(f"API response generated: {sentence}")
         return jsonify({"sentence": sentence})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

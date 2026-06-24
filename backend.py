@@ -72,10 +72,10 @@ def verify_openrouter(api_key: str = API_KEY):
 
 
 
-def backend_generate(api_key: str = API_KEY, difficulty=None, mode=None):
+def backend_generate(api_key: str = API_KEY, difficulty=None, mode=None, language=None):
     print("api key: ", api_key)
     global max_sentence
-    if mode == "Normal":
+    if mode == "normal":
         if difficulty == "easy":
             max_sentence = 20
             difficulty = "easy"
@@ -106,7 +106,8 @@ The sentence should have accurate punctuation like commas and spaces to separate
 Avoid inappropriate or sensitive sentences.
 Avoid hard words to type."""
     elif text == 2:
-        prompt = f"""Generate a random code snippet for a typing speed test. """
+        prompt = f"""Generate a random code snippet for a typing speed test. in the programming language {language} and the difficulty is {difficulty}"""
+
     data = send_data(prompt, api_key)
     print(data)
     return data
@@ -143,6 +144,7 @@ user rating:{data["user_rating"]}
 score: {data["score"]}/100%
 accuracy: {data["accuracy"]}/100
 mistakes = {data.get("mistakes", [])}""")
+    print(data)
     return data
 
 
