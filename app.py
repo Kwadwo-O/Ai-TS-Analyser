@@ -115,9 +115,12 @@ def play():
 @login_required
 def generate_passage():
     user_api_key = current_user.api_key
-    difficulty = request.args.get('difficulty', 'medium')
+    difficulty = request.args.get('difficulty', 'easy')
+    mode = request.args.get('mode', 'text')
+    selected_language = request.args.get('language', 'python')
+    print(f"API request received for difficulty: {difficulty}, mode: {mode}, language: {selected_language}")
     try:
-        sentence = backend_generate(user_api_key, difficulty)
+        sentence = backend_generate(user_api_key, difficulty, mode, selected_language)
         return jsonify({"sentence": sentence})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

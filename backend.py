@@ -72,19 +72,27 @@ def verify_openrouter(api_key: str = API_KEY):
 
 
 
-def backend_generate(api_key: str = API_KEY, difficulty=None):
+def backend_generate(api_key: str = API_KEY, difficulty=None, mode=None):
     print("api key: ", api_key)
     global max_sentence
-    if difficulty == 1:
-        max_sentence = 20
-        difficulty = "easy"
-    elif difficulty == 2:
-        max_sentence = 30
-        difficulty = "medium"
-    elif difficulty == 3:
-        max_sentence = 40
-        difficulty = "hard"
-    prompt = f"""Generate a random sentence for a typing speed test. 
+    if mode == "Normal":
+        if difficulty == "easy":
+            max_sentence = 20
+            difficulty = "easy"
+        elif difficulty == "medium":
+            max_sentence = 30
+            difficulty = "medium"
+        elif difficulty == "hard":
+            max_sentence = 40
+            difficulty = "hard"
+        text = 1
+    elif mode == "Code":
+        max_sentence = 50
+        text = 2
+
+
+    if text == 1:
+        prompt = f"""Generate a random sentence for a typing speed test. 
 The sentence should be between 10 and {max_sentence} words long. 
 The sentence should be {difficulty} difficulty.
 if the difficulty is easy, the sentence should be easy to type no special characters.
@@ -97,6 +105,8 @@ The sentence should be unique and not a common phrase or idiom.
 The sentence should have accurate punctuation like commas and spaces to separate words.
 Avoid inappropriate or sensitive sentences.
 Avoid hard words to type."""
+    elif text == 2:
+        prompt = f"""Generate a random code snippet for a typing speed test. """
     data = send_data(prompt, api_key)
     print(data)
     return data

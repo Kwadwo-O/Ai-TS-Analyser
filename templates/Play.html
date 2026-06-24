@@ -18,7 +18,17 @@
                 </p>
             </header>
 
-            <section id="game-panel" class="main-card dashboard-card">
+            <section id="setup-panel" class="main-card dashboard-card">
+                <div style="text-align: center; padding: 2rem 0; position: relative;">
+                    <p class="description" style="margin-bottom: 2rem;">Ready to generate your localized typing stream metrics context pipeline?</p>
+
+                    <div style="display: inline-flex; align-items: center; justify-content: center; gap: 1rem; min-height: 60px;">
+                        <button type="button" id="start-btn" class="btn btn-primary btn-interactive">Initialize Challenge Engine</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="game-panel" class="main-card dashboard-card" style="display: none;">
                 <div class="panel-header-row">
                     <div class="metric-cluster">
                         <div class="metric-capsule">
@@ -32,88 +42,27 @@
                     </div>
                 </div>
 
-                <div id="text-display" class="typing-text-canvas-board" tabindex="0" style="display: flex; align-items: center; justify-content: center;">
-                    Awaiting deployment stream initialization...
+                <div id="text-display" class="typing-text-canvas-board font-mono" tabindex="0">
+                    <div class="reference-line-container" id="reference-text-line">
+                        </div>
                 </div>
+            </section>
 
-                <div class="keyboard-matrix-container" id="virtual-keyboard-board">
-                    <div class="keyboard-row">
-                        <div class="key spec-key" id="Backquote">`</div>
-                        <div class="key" id="Digit1">1</div>
-                        <div class="key" id="Digit2">2</div>
-                        <div class="key" id="Digit3">3</div>
-                        <div class="key" id="Digit4">4</div>
-                        <div class="key" id="Digit5">5</div>
-                        <div class="key" id="Digit6">6</div>
-                        <div class="key" id="Digit7">7</div>
-                        <div class="key" id="Digit8">8</div>
-                        <div class="key" id="Digit9">9</div>
-                        <div class="key" id="Digit0">0</div>
-                        <div class="key" id="Minus">-</div>
-                        <div class="key" id="Equal">=</div>
-                        <div class="key backspace-key" id="Backspace">Backspace</div>
-                    </div>
-                    <div class="keyboard-row">
-                        <div class="key tab-key" id="Tab">Tab</div>
-                        <div class="key" id="KeyQ">Q</div>
-                        <div class="key" id="KeyW">W</div>
-                        <div class="key" id="KeyE">E</div>
-                        <div class="key" id="KeyR">R</div>
-                        <div class="key" id="KeyT">T</div>
-                        <div class="key" id="KeyY">Y</div>
-                        <div class="key" id="KeyU">U</div>
-                        <div class="key" id="KeyI">I</div>
-                        <div class="key" id="KeyO">O</div>
-                        <div class="key" id="KeyP">P</div>
-                        <div class="key" id="BracketLeft">[</div>
-                        <div class="key" id="BracketRight">]</div>
-                        <div class="key slash-key" id="Backslash">\</div>
-                    </div>
-                    <div class="keyboard-row">
-                        <div class="key caps-key" id="CapsLock">Caps</div>
-                        <div class="key" id="KeyA">A</div>
-                        <div class="key" id="KeyS">S</div>
-                        <div class="key" id="KeyD">D</div>
-                        <div class="key" id="KeyF">F</div>
-                        <div class="key" id="KeyG">G</div>
-                        <div class="key" id="KeyH">H</div>
-                        <div class="key" id="KeyJ">J</div>
-                        <div class="key" id="KeyK">K</div>
-                        <div class="key" id="KeyL">L</div>
-                        <div class="key" id="Semicolon">;</div>
-                        <div class="key" id="Quote">'</div>
-                        <div class="key enter-key" id="Enter">Enter</div>
-                    </div>
-                    <div class="keyboard-row">
-                        <div class="key left-shift-key" id="ShiftLeft">Shift</div>
-                        <div class="key" id="KeyZ">Z</div>
-                        <div class="key" id="KeyX">X</div>
-                        <div class="key" id="KeyC">C</div>
-                        <div class="key" id="KeyV">V</div>
-                        <div class="key" id="KeyB">B</div>
-                        <div class="key" id="KeyN">N</div>
-                        <div class="key" id="KeyM">M</div>
-                        <div class="key" id="Comma">,</div>
-                        <div class="key" id="Period">.</div>
-                        <div class="key" id="Slash">/</div>
-                        <div class="key right-shift-key" id="ShiftRight">Shift</div>
-                    </div>
-                    <div class="keyboard-row">
-                        <div class="key ctrl-key" id="ControlLeft">Ctrl</div>
-                        <div class="key win-key" id="MetaLeft">Win</div>
-                        <div class="key alt-key" id="AltLeft">Alt</div>
-                        <div class="key space-bar-key" id="Space">Space</div>
-                        <div class="key alt-key" id="AltRight">Alt</div>
-                        <div class="key win-key" id="MetaRight">Win</div>
-                        <div class="key spec-key" id="ContextMenu">Fn</div>
-                        <div class="key ctrl-key" id="ControlRight">Ctrl</div>
-                    </div>
+            <section class="keyboard-matrix-container" id="virtual-keyboard-board">
+                <div class="keyboard-row">
+                    <div class="key spec-key" id="Backquote">`</div><div class="key" id="Digit1">1</div><div class="key" id="Digit2">2</div><div class="key" id="Digit3">3</div><div class="key" id="Digit4">4</div><div class="key" id="Digit5">5</div><div class="key" id="Digit6">6</div><div class="key" id="Digit7">7</div><div class="key" id="Digit8">8</div><div class="key" id="Digit9">9</div><div class="key" id="Digit0">0</div><div class="key" id="Minus">-</div><div class="key" id="Equal">=</div><div class="key backspace-key" id="Backspace">Backspace</div>
                 </div>
-
-                <div class="results-action-footer" style="margin-top: 1.5rem;">
-                    <button type="button" id="start-btn" class="btn btn-primary btn-interactive">
-                        Deploy Core Stream
-                    </button>
+                <div class="keyboard-row">
+                    <div class="key tab-key" id="Tab">Tab</div><div class="key" id="KeyQ">Q</div><div class="key" id="KeyW">W</div><div class="key" id="KeyE">E</div><div class="key" id="KeyR">R</div><div class="key" id="KeyT">T</div><div class="key" id="KeyY">Y</div><div class="key" id="KeyU">U</div><div class="key" id="KeyI">I</div><div class="key" id="KeyO">O</div><div class="key" id="KeyP">P</div><div class="key" id="BracketLeft">[</div><div class="key" id="BracketRight">]</div><div class="key slash-key" id="Backslash">\</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key caps-key" id="CapsLock">Caps</div><div class="key" id="KeyA">A</div><div class="key" id="KeyS">S</div><div class="key" id="KeyD">D</div><div class="key" id="KeyF">F</div><div class="key" id="KeyG">G</div><div class="key" id="KeyH">H</div><div class="key" id="KeyJ">J</div><div class="key" id="KeyK">K</div><div class="key" id="KeyL">L</div><div class="key" id="Semicolon">;</div><div class="key" id="Quote">'</div><div class="key enter-key" id="Enter">Enter</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key left-shift-key" id="ShiftLeft">Shift</div><div class="key" id="KeyZ">Z</div><div class="key" id="KeyX">X</div><div class="key" id="KeyC">C</div><div class="key" id="KeyV">V</div><div class="key" id="KeyB">B</div><div class="key" id="KeyN">N</div><div class="key" id="KeyM">M</div><div class="key" id="Comma">,</div><div class="key" id="Period">.</div><div class="key" id="Slash">/</div><div class="key right-shift-key" id="ShiftRight">Shift</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="key ctrl-key" id="ControlLeft">Ctrl</div><div class="key win-key" id="MetaLeft">Win</div><div class="key alt-key" id="AltLeft">Alt</div><div class="key space-bar-key" id="Space">Space</div><div class="key alt-key" id="AltRight">Alt</div><div class="key win-key" id="MetaRight">Win</div><div class="key spec-key" id="ContextMenu">Fn</div><div class="key ctrl-key" id="ControlRight">Ctrl</div>
                 </div>
             </section>
         </main>
@@ -138,6 +87,16 @@
                     </div>
                 </div>
 
+                <div class="form-control-block" id="code-language-container" style="display: none; margin-bottom: 1.5rem;">
+                    <label for="code-language-select" class="form-label">Syntax Language</label>
+                    <div class="select-dropdown-wrapper">
+                        <select id="code-language-select" class="form-select-dropdown">
+                            <option value="python" selected>Python</option>
+                            <option value="javascript">JavaScript</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-control-block" style="margin-bottom: 1.5rem;">
                     <label class="form-label">Inference Stream Difficulty</label>
                     <div class="difficulty-button-group ternary-layout" id="difficulty-selection-matrix">
@@ -156,20 +115,19 @@
                 <div class="slider-control-capsule">
                     <div class="slider-labels-row" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <label for="text-size-slider" class="form-label" style="margin: 0;">Presentation Font Size</label>
-                        <span id="text-size-badge" class="status-badge active-badge">24px</span>
+                        <span id="text-size-badge" class="status-badge active-badge">26px</span>
                     </div>
-                    <input type="range" id="text-size-slider" min="16" max="72" step="2" value="24" class="form-range-input" style="width: 100%;">
+                    <input type="range" id="text-size-slider" min="16" max="72" step="2" value="26" class="form-range-input" style="width: 100%;">
                 </div>
             </div>
 
             <div class="settings-group-block" style="margin-bottom: 2rem;">
                 <h2 class="sidebar-panel-heading">Visual Keyboard Settings</h2>
-                <div class="toggle-switches-stack" style="display: flex; flex-direction: column; gap: 1.25rem;">
-
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="toggle-switches-stack">
+                    <div class="switch-wrapper-row">
                         <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">Display Key Matrix</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Render layout map interface under canvas</span>
+                            <span class="switch-title">Display Key Matrix</span>
+                            <span class="switch-desc">Render layout map interface under canvas</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="keyboard-visibility-toggle" checked>
@@ -177,10 +135,10 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="switch-wrapper-row">
                         <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">Reactive Key Glow</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Emit radial lighting filters on pressed assets</span>
+                            <span class="switch-title">Reactive Key Glow</span>
+                            <span class="switch-desc">Emit radial lighting filters on pressed assets</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="keyboard-glow-toggle" checked>
@@ -188,29 +146,38 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="switch-wrapper-row">
                         <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">Hardware Ripple Wave</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Staggered canvas ripples on key pressure</span>
+                            <span class="switch-title">Cascading Border Waves</span>
+                            <span class="switch-desc">Radiating peripheral board ripple</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="ripple-animations-toggle" checked>
                             <span class="switch-slider"></span>
                         </label>
                     </div>
-
                 </div>
             </div>
 
             <div class="settings-group-block">
                 <h2 class="sidebar-panel-heading">Accessibility Framework</h2>
+                <div class="toggle-switches-stack">
 
-                <div class="toggle-switches-stack" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div class="form-control-block" style="margin-bottom: 0.5rem;">
+                        <label for="font-style-select" class="form-label">Accessible Font Face</label>
+                        <div class="select-dropdown-wrapper">
+                            <select id="font-style-select" class="form-select-dropdown">
+                                <option value="mono" selected>Standard Monospace (Default)</option>
+                                <option value="sans">Clean Sans-Serif</option>
+                                <option value="dyslexic">OpenDyslexic (High Readability)</option>
+                            </select>
+                        </div>
+                    </div>
 
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="switch-wrapper-row">
                         <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">High-Contrast Layer</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Maximize text canvas contrast metrics</span>
+                            <span class="switch-title">High-Contrast Layer</span>
+                            <span class="switch-desc">Maximize text canvas contrast metrics</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="high-contrast-toggle">
@@ -218,28 +185,16 @@
                         </label>
                     </div>
 
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="switch-wrapper-row">
                         <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">Bold Text Weights</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Force maximum text payload emphasis</span>
+                            <span class="switch-title">Bold Text Weights</span>
+                            <span class="switch-desc">Force maximum text payload emphasis</span>
                         </div>
                         <label class="engine-ui-switch">
                             <input type="checkbox" id="bold-text-toggle">
                             <span class="switch-slider"></span>
                         </label>
                     </div>
-
-                    <div class="switch-wrapper-row" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="switch-label-stack">
-                            <span class="switch-title" style="display: block; font-weight: 600;">Reduced FX Motion</span>
-                            <span class="switch-desc" style="display: block; font-size: 0.75rem; color: var(--text-muted);">Disable background glowing UI and structural transitions</span>
-                        </div>
-                        <label class="engine-ui-switch">
-                            <input type="checkbox" id="reduced-motion-toggle">
-                            <span class="switch-slider"></span>
-                        </label>
-                    </div>
-
                 </div>
             </div>
 
