@@ -519,3 +519,141 @@ input:checked + .switch-slider:before {
     color: #ffffff !important;
     border-color: var(--button-color) !important;
 }
+
+/* ==========================================================================
+   9. EXTRA-THICK ULTRA BOLD TEXT MODIFIER (WHOLE PAGE OVERHAUL IMPLEMENTATION)
+   ========================================================================== */
+.bold-text-active,
+.bold-text-active * {
+    font-weight: 900 !important; /* Forces all elements down the DOM hierarchy to max numeric thickness */
+
+    /* Synthetic vector dilation technique to multiply pixel rendering footprint */
+    -webkit-text-stroke: 1px currentColor;
+
+    /* Double layered subpixel drop layer overlay to densely fuse characters and prevent gaps */
+    text-shadow: 0.5px 0px 0px currentColor, -0.5px 0px 0px currentColor !important;
+}
+
+/* Prevent text stroke from bleeding over interactive form slider controls or check toggles */
+.bold-text-active input[type="range"],
+.bold-text-active input[type="checkbox"],
+.bold-text-active .switch-slider {
+    -webkit-text-stroke: 0px transparent !important;
+    text-shadow: none !important;
+}
+
+/* ==========================================================================
+   10. HIGH CONTRAST SPECIFICITY OVERRIDES (SYSTEM INVERSION)
+   ========================================================================== */
+.high-contrast-active,
+.high-contrast-active .play-page-container,
+#play-root.high-contrast-active {
+    --background: #000000 !important;
+    --surface: #111111 !important;
+    --surface-vibrant: #1a1a1a !important;
+    --border: #ffffff !important;
+    --text-main: #ffffff !important;
+    --text-muted: #ffff00 !important; /* Pure accessible amber/yellow tokens */
+    --button-color: #00ff00 !important; /* High-visibility processing target */
+    --button-hover-color: #00cc00 !important;
+    --shadow-sm: none !important;
+}
+
+/* Force elements to conform to high-contrast variables */
+.high-contrast-active .main-card,
+.high-contrast-active .settings-group-block,
+.high-contrast-active .metric-capsule,
+.high-contrast-active .slider-control-capsule {
+    background: #111111 !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+.high-contrast-active .title,
+.high-contrast-active .title-highlight,
+.high-contrast-active .capsule-value,
+.high-contrast-active .form-label,
+.high-contrast-active .switch-title {
+    color: #ffffff !important;
+}
+
+.high-contrast-active .description,
+.high-contrast-active .sidebar-panel-heading,
+.high-contrast-active .capsule-label,
+.high-contrast-active .switch-desc {
+    color: #ffff00 !important;
+}
+
+/* Typing Playground Hard Structural Lock */
+.high-contrast-active .typing-text-canvas-board {
+    background: #000000 !important;
+    border: 3px solid #ffffff !important;
+}
+
+/* Character Tokens baseline under high contrast */
+.high-contrast-active .char-box {
+    color: #bcbcbc !important;
+}
+
+.high-contrast-active .char-box.correct {
+    color: #00ff00 !important; /* Explicitly distinct green targets */
+    text-shadow: 0 0 1px #00ff00;
+}
+
+/* Enforce ultra-bold synthesis variables inside High Contrast layer if toggled simultaneously */
+.high-contrast-active.bold-text-active .char-box.correct {
+    text-shadow: 0.5px 0px 0px #00ff00, -0.5px 0px 0px #00ff00 !important;
+}
+
+.high-contrast-active .char-box.incorrect {
+    color: #ffffff !important;
+    background: #ff0000 !important; /* High contrast absolute block typo alert */
+}
+
+/* Virtual Keyboard Matrix Override */
+.high-contrast-active .key {
+    background: #111111 !important;
+    border: 1px solid #ffffff !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 0 0 #ffffff !important;
+}
+
+.high-contrast-active .key.hardware-pressed-active {
+    background: #00ff00 !important;
+    color: #000000 !important;
+    border-color: #00ff00 !important;
+    box-shadow: none !important;
+}
+
+/* Initialization Button Override */
+.high-contrast-active .btn-primary {
+    background: #00ff00 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: 900 !important;
+}
+
+/* Difficulty Buttons Matrix Overlay Override */
+.high-contrast-active .ternary-layout {
+    background: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.high-contrast-active .diff-btn {
+    color: #ffff00 !important;
+}
+
+.high-contrast-active .diff-btn.active {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+
+.high-contrast-active .diff-btn.active .diff-title {
+    color: #000000 !important;
+}
+
+.high-contrast-active #difficulty-selection-matrix .diff-btn.active {
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+}

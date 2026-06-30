@@ -67,7 +67,7 @@ def verify_openrouter(api_key: str = API_KEY):
             print(f"Response: {response.text}")
             return False
     except requests.RequestException as e:
-        print(f"📡 Connection error occurred: {e}")
+        print(f"Connection error occurred: {e}")
         return False
 
 
@@ -89,8 +89,6 @@ def backend_generate(api_key: str = API_KEY, difficulty=None, mode=None, languag
     elif mode == "Code":
         max_sentence = 50
         text = 2
-
-
     if text == 1:
         prompt = f"""Generate a random sentence for a typing speed test. 
 The sentence should be between 10 and {max_sentence} words long. 

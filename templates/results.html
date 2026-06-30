@@ -1,0 +1,153 @@
+{% extends "Base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/play.css') }}">
+
+    <style>
+        /* Component specific grid layout mapping */
+        .results-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+            width: 100%;
+        }
+
+        .passage-review-block {
+            background-color: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .sentence-display-canvas {
+            background-color: var(--background) !important;
+            border: 2px solid var(--border) !important;
+            padding: 1.5rem !important;
+            border-radius: 12px !important;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace !important;
+            font-size: 1.25rem !important;
+            line-height: 1.8 !important;
+            color: var(--text-main) !important;
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+            border-left: 4px solid var(--button-color) !important;
+        }
+
+        /* Actual button stack cluster styling */
+        .action-routes-cluster {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 2.5rem;
+            width: 100%;
+        }
+
+        .action-routes-cluster .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            text-shadow: none;
+        }
+
+        @media (max-width: 640px) {
+            .action-routes-cluster {
+                flex-direction: column;
+            }
+            .action-routes-cluster .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="play-page-container" style="max-width: 1100px; margin: 0 auto;">
+
+    <header class="main-card dashboard-banner" style="margin-bottom: 2rem;">
+        <h1 class="title">Session <span class="title-highlight">Results</span></h1>
+        <p class="description">
+            results of your typing test session.
+        </p>
+    </header>
+
+    <div class="results-matrix-grid">
+
+        <div class="metric-capsule">
+            <span class="capsule-label">Typing Speed</span>
+            <span class="capsule-value" style="color: var(--button-color);">
+                {{ wpm if wpm is defined else '70'}} <span style="font-size: 1.15rem; color: var(--text-muted); font-weight: 700;">WPM</span>
+            </span>
+            <div class="timeline-bar">
+                <div class="timeline-progress" style="width: {{ wpm if wpm is defined else '20' }}%; background-color: var(--button-color);"></div>
+            </div>
+        </div>
+
+        <div class="metric-capsule">
+            <span class="capsule-label">Accuracy Rating</span>
+            <span class="capsule-value" style="color: var(--text-main);">
+                {{ accuracy if accuracy is defined else '100.0' }}<span style="font-size: 1.5rem; color: var(--text-muted); font-weight: 700;">%</span>
+            </span>
+            <div class="timeline-bar">
+                <div class="timeline-progress" style="width: {{ accuracy if accuracy is defined else '100' }}%; background-color: var(--success);"></div>
+            </div>
+        </div>
+
+        <div class="metric-capsule">
+            <span class="capsule-label">Time Taken</span>
+            <span class="capsule-value" style="color: var(--text-main);">
+                {{ duration if duration is defined else '20' }} <span style="font-size: 1.15rem; color: var(--text-muted); font-weight: 700;">sec</span>
+            </span>
+            <div class="timeline-bar">
+                <div class="timeline-progress" style="width: 100%; background-color: var(--border);"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="passage-review-block">
+
+        <div style="margin-bottom: 2rem;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.35rem; font-weight: 800; color: var(--text-main);">Performance Evaluation</h3>
+            <p class="description" style="font-size: 1.05rem;">
+                {% if description is defined %}
+                    {{ description }}
+                {% else %}
+                    The user typed the sentence correctly at a rate of 70 WPM. which is a 100.0% accuracy rating. taking only 20 seconds to complete the test. well done!
+                    This is better than the average user in the world.
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <h4 style="margin: 0 0 0.75rem 0; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em;">User Sentence</h4>
+            <div class="sentence-display-canvas">{% if actual_sentence is defined %}{{ actual_sentence }}{% else %}The quick brown fox jumps over the lazy dog.{% endif %}</div>
+        </div>
+
+    </div>
+
+    <div class="action-routes-cluster">
+        <a href="{{ url_for('play') }}" class="btn btn-play" style="flex: 1;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            Initialize Next Sentence
+        </a>
+
+        <a href="{{ url_for('dashboard', tab='profile') }}" class="btn btn-dashboard" style="padding-left: 2.5rem; padding-right: 2.5rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Return to Console Hub
+        </a>
+    </div>
+
+</div>
+{% endblock %}

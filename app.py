@@ -75,6 +75,10 @@ with app.app_context():
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+@app.route('/results', methods=['GET', 'POST'])
+@login_required
+def results():
+    return render_template('results.html')
 
 @login_manager.user_loader
 def load_user(user_id):
